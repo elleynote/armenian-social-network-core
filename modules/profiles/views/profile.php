@@ -45,7 +45,7 @@ $summary_fields = array(
     <?php endif; ?>
 
     <div class="asn-profile__cards">
-        <?php foreach ( ASNCoreProfilesProfile_Fields::prompt_keys() as $key ) : ?>
+        <?php foreach ( \ASN\Core\Profiles\Profile_Fields::prompt_keys() as $key ) : ?>
             <?php
             $value = trim( (string) ( $profile[ $key ] ?? '' ) );
             $image = (string) ( $profile['prompt_images'][ $key ] ?? '' );
@@ -62,10 +62,10 @@ $summary_fields = array(
                 </header>
 
                 <div class="asn-profile-card__body">
-                    <h2 class="asn-profile-card__title"><?php echo esc_html( ASNCoreProfilesProfile_Fields::prompt_label( $key ) ); ?></h2>
+                    <h2 class="asn-profile-card__title"><?php echo esc_html( \ASN\Core\Profiles\Profile_Fields::prompt_label( $key ) ); ?></h2>
 
                     <?php if ( ! empty( $profile['is_owner'] ) ) : ?>
-                        <textarea class="asn-profile-card__textarea" maxlength="1000" name="asn_profile[<?php echo esc_attr( $key ); ?>]" aria-label="<?php echo esc_attr( ASNCoreProfilesProfile_Fields::prompt_label( $key ) ); ?>" placeholder="Not updated yet"><?php echo esc_html( $value ); ?></textarea>
+                        <textarea class="asn-profile-card__textarea" maxlength="1000" name="asn_profile[<?php echo esc_attr( $key ); ?>]" aria-label="<?php echo esc_attr( \ASN\Core\Profiles\Profile_Fields::prompt_label( $key ) ); ?>" placeholder="Not updated yet"><?php echo esc_html( $value ); ?></textarea>
                     <?php elseif ( '' === $value ) : ?>
                         <p class="asn-profile-card__answer asn-profile-card__answer--empty">Not updated yet</p>
                     <?php else : ?>
@@ -73,7 +73,7 @@ $summary_fields = array(
                     <?php endif; ?>
 
                     <?php if ( '' !== $image ) : ?>
-                        <img class="asn-profile-card__image" src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( ASNCoreProfilesProfile_Fields::prompt_label( $key ) ); ?>" loading="lazy">
+                        <img class="asn-profile-card__image" src="<?php echo esc_url( $image ); ?>" alt="<?php echo esc_attr( \ASN\Core\Profiles\Profile_Fields::prompt_label( $key ) ); ?>" loading="lazy">
                     <?php endif; ?>
                 </div>
             </article>
