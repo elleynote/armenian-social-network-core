@@ -92,6 +92,25 @@ if ( ! function_exists( 'dbDelta' ) ) {
     }
 }
 
+if ( ! function_exists( 'current_user_can' ) ) {
+    function current_user_can( $capability ) { return true; }
+}
+if ( ! function_exists( 'add_menu_page' ) ) {
+    function add_menu_page() { $GLOBALS['asn_test_menu'] = func_get_args(); }
+}
+if ( ! function_exists( 'count_users' ) ) {
+    function count_users() { return array( 'total_users' => 567 ); }
+}
+if ( ! function_exists( 'esc_html' ) ) {
+    function esc_html( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
+}
+if ( ! function_exists( 'esc_html__' ) ) {
+    function esc_html__( $value, $domain = null ) { return $value; }
+}
+if ( ! function_exists( 'wp_die' ) ) {
+    function wp_die( $message ) { throw new RuntimeException( $message ); }
+}
+
 require_once dirname( __DIR__ ) . '/asn-core.php';
 
 $GLOBALS['asn_test_users'] = array(

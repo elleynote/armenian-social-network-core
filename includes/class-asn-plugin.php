@@ -1,6 +1,8 @@
 <?php
 namespace ASN\Core;
 
+use ASN\Core\Admin\Admin;
+
 defined( 'ABSPATH' ) || exit;
 
 final class Plugin {
@@ -24,6 +26,9 @@ final class Plugin {
 
         $this->booted = true;
         add_action( 'init', array( $this, 'init' ) );
+
+        $admin = new Admin();
+        $admin->register_hooks();
     }
 
     public function init(): void {
