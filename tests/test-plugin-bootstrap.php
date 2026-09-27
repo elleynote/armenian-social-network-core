@@ -30,11 +30,13 @@ final class PluginBootstrapTest extends TestCase {
         $tables = $GLOBALS['asn_test_tables'];
         $sql = $GLOBALS['asn_test_dbdelta_sql'];
         $prefix = $GLOBALS['wpdb']->prefix;
+        $fail_table = $GLOBALS['asn_test_fail_table'];
 
         try {
             $GLOBALS['asn_test_options'][ Database::VERSION_OPTION ] = '1.0.0';
             $GLOBALS['asn_test_tables'] = array();
             $GLOBALS['asn_test_dbdelta_sql'] = array();
+            $GLOBALS['asn_test_fail_table'] = '';
             $GLOBALS['wpdb']->prefix = 'custom_';
 
             Plugin::instance()->init();
@@ -45,6 +47,7 @@ final class PluginBootstrapTest extends TestCase {
             $GLOBALS['asn_test_options'] = $options;
             $GLOBALS['asn_test_tables'] = $tables;
             $GLOBALS['asn_test_dbdelta_sql'] = $sql;
+            $GLOBALS['asn_test_fail_table'] = $fail_table;
             $GLOBALS['wpdb']->prefix = $prefix;
         }
     }
