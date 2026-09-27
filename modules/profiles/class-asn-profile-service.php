@@ -19,6 +19,13 @@ final class Profile_Service {
             'is_owner'     => $viewer_id > 0 && $viewer_id === $user_id,
         );
 
+        if ( $viewer_id > 0 ) {
+            $user = get_userdata( $user_id );
+            if ( $user && isset( $user->user_email ) ) {
+                $profile['email'] = sanitize_email( (string) $user->user_email );
+            }
+        }
+
         foreach ( Profile_Fields::public_keys() as $key ) {
             $profile[ $key ] = Members::profile_meta( $user_id, $key, '' );
         }
