@@ -285,7 +285,7 @@ if ( ! function_exists( 'is_user_logged_in' ) ) {
     function is_user_logged_in() { return (bool) $GLOBALS['asn_test_logged_in']; }
 }
 if ( ! function_exists( 'wp_verify_nonce' ) ) {
-    function wp_verify_nonce( $nonce, $action ) { return 'asn_update_profile' === $action && $nonce === $GLOBALS['asn_test_valid_nonce']; }
+    function wp_verify_nonce( $nonce, $action ) { return in_array( $action, array( 'asn_update_profile', 'asn_sync_profiles' ), true ) && $nonce === $GLOBALS['asn_test_valid_nonce']; }
 }
 if ( ! function_exists( 'wp_unslash' ) ) {
     function wp_unslash( $value ) {

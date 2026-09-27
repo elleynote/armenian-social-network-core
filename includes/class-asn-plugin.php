@@ -2,6 +2,7 @@
 namespace ASN\Core;
 
 use ASN\Core\Admin\Admin;
+use ASN\Core\Admin\Profile_Index_Admin;
 use ASN\Core\Profiles\Profile_Shortcode;
 use ASN\Core\Profiles\Profile_Form;
 
@@ -31,6 +32,9 @@ final class Plugin {
 
         $admin = new Admin();
         $admin->register_hooks();
+
+        $profile_index_admin = new Profile_Index_Admin();
+        $profile_index_admin->register_hooks();
 
         $profile_shortcode = new Profile_Shortcode();
         $profile_shortcode->register();

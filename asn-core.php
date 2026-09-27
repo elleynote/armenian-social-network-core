@@ -28,6 +28,7 @@ require_once ASN_CORE_PATH . 'integrations/pmpro/class-asn-pmpro.php';
 require_once ASN_CORE_PATH . 'integrations/woocommerce/class-asn-woocommerce.php';
 require_once ASN_CORE_PATH . 'includes/class-asn-memberships.php';
 require_once ASN_CORE_PATH . 'admin/class-asn-admin.php';
+require_once ASN_CORE_PATH . 'admin/class-asn-profile-index-admin.php';
 require_once ASN_CORE_PATH . 'includes/class-asn-plugin.php';
 require_once ASN_CORE_PATH . 'includes/class-asn-activator.php';
 require_once ASN_CORE_PATH . 'includes/class-asn-deactivator.php';

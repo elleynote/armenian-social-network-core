@@ -43,6 +43,8 @@ final class Admin {
             'subscriptions_available'      => WooCommerce_Integration::subscriptions_available(),
             'atomchat_active'              => $this->plugin_is_active( 'atomchat' ),
             'miniorange_active'            => $this->plugin_is_active( 'miniorange' ),
+            'profile_sync_offset'           => (int) get_option( Profile_Index_Admin::OFFSET_OPTION, 0 ),
+            'profile_sync_complete'         => (bool) get_option( Profile_Index_Admin::COMPLETE_OPTION, false ),
         );
 
         require __DIR__ . '/views/status.php';
