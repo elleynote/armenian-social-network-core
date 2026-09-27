@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.3 - Profile editing patch
+
+- Added the member email as the second profile-summary row for logged-in members.
+- Reordered the profile summary to name, email, age, gender, job title, spoken proficiency, then country.
+- Made all 23 profile cards editable inline for the profile owner using the existing secure profile update flow.
+- Kept profile cards read-only for other members while preserving saved card text and legacy card images.
+
+
 ## 0.2.2 - Profile parity patch
 
 - Restored all 23 legacy profile-card prompts on the new ASN profile page.
