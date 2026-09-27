@@ -4,7 +4,7 @@ defined( 'ABSPATH' ) || exit;
 <section class="asn-directory" aria-labelledby="asn-directory-title">
     <h1 id="asn-directory-title" class="asn-directory__title">Explore members</h1>
 
-    <form class="asn-directory__filters" method="get">
+    <form class="asn-directory__filters" method="get" action="<?php echo esc_url( $form_action ); ?>">
         <label class="asn-field">
             <span class="asn-field__label">Search</span>
             <input class="asn-field__input" type="search" name="q" value="<?php echo esc_attr( $filters['q'] ); ?>">
