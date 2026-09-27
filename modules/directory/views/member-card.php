@@ -1,7 +1,7 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
-$profile_url = add_query_arg( 'member', (int) $member['id'], site_url( '/profile/' ) );
+$profile_url = add_query_arg( 'member', (int) $member['id'], $profile_base_url );
 $profile_url = add_query_arg( 'tac_user', (int) $member['id'], $profile_url );
 $message = $member['message_action'];
 ?>
