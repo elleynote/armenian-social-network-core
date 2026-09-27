@@ -5,6 +5,7 @@ use ASN\Core\Admin\Admin;
 use ASN\Core\Admin\Profile_Index_Admin;
 use ASN\Core\Profiles\Profile_Shortcode;
 use ASN\Core\Profiles\Profile_Form;
+use ASN\Core\Directory\Directory_Shortcode;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -41,6 +42,9 @@ final class Plugin {
 
         $profile_form = new Profile_Form();
         $profile_form->register();
+
+        $directory_shortcode = new Directory_Shortcode();
+        $directory_shortcode->register();
     }
 
     public function init(): void {
