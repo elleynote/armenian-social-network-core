@@ -34,6 +34,19 @@ final class ProfileServiceTest extends TestCase {
         $this->assertArrayNotHasKey( 'wp_capabilities', $profile );
     }
 
+    public function test_email_like_wordpress_display_name_is_never_exposed_publicly(): void {
+        $original_display_name = $GLOBALS['asn_test_users'][7]->display_name;
+        $GLOBALS['asn_test_users'][7]->display_name = 'private@example.test';
+
+        try {
+            $profile = Profile_Service::find( 7, 0 );
+            $this->assertSame( 'Test Member', $profile['display_name'] );
+            $this->assertStringNotContainsString( '@', $profile['display_name'] );
+        } finally {
+            $GLOBALS['asn_test_users'][7]->display_name = $original_display_name;
+        }
+    }
+
     public function test_nonexistent_member_returns_null_and_other_viewer_is_not_owner(): void {
         $this->assertNull( Profile_Service::find( 999, 7 ) );
         $this->assertFalse( Profile_Service::find( 7, 8 )['is_owner'] );
