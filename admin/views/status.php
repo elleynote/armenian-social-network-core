@@ -12,7 +12,7 @@ $status = static function ( $available ): string {
     <table class="widefat striped" style="max-width: 900px;">
         <tbody>
             <tr><th><?php echo esc_html( 'ASN Core version' ); ?></th><td><?php echo esc_html( $data['version'] ); ?></td></tr>
-            <tr><th><?php echo esc_html( 'ASN database schema' ); ?></th><td><?php echo esc_html( $data['database_version'] ?: 'Not installed' ); ?></td></tr>
+            <tr><th><?php echo esc_html( 'ASN database schema' ); ?></th><td><?php echo esc_html( '' !== $data['database_version'] ? $data['database_version'] : 'Not installed' ); ?></td></tr>
             <tr><th><?php echo esc_html( 'WordPress users' ); ?></th><td><?php echo esc_html( (string) $data['wordpress_users'] ); ?></td></tr>
             <tr><th><?php echo esc_html( 'PMPro' ); ?></th><td><?php echo esc_html( $status( $data['pmpro_available'] ) ); ?></td></tr>
             <tr><th><?php echo esc_html( 'Premium access integration' ); ?></th><td><?php echo esc_html( $status( $data['premium_access_available'] ) ); ?></td></tr>
