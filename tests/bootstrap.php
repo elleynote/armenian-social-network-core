@@ -261,6 +261,9 @@ if ( ! function_exists( 'sanitize_text_field' ) ) {
 if ( ! function_exists( 'sanitize_textarea_field' ) ) {
     function sanitize_textarea_field( $value ) { return trim( strip_tags( (string) $value ) ); }
 }
+if ( ! function_exists( 'sanitize_email' ) ) {
+    function sanitize_email( $value ) { return filter_var( (string) $value, FILTER_SANITIZE_EMAIL ); }
+}
 if ( ! function_exists( 'wp_json_encode' ) ) {
     function wp_json_encode( $value ) { return json_encode( $value ); }
 }
