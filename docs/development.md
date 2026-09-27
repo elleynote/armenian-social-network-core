@@ -5,22 +5,47 @@
 - `develop` — active implementation and integration testing
 - `main` — deployable, approved releases only
 
-Use feature branches later when a change is large enough to need isolated review.
-
 ## Normal workflow
 
-1. Build and test on `develop`.
+1. Build on `develop`.
 2. Run `composer lint` and `composer test`.
-3. Confirm GitHub Actions is green.
-4. Test the candidate in WordPress without replacing current live features.
-5. Merge the approved candidate to `main`.
-6. Tag a semantic version such as `v0.1.0`.
+3. GitHub Actions must be green.
+4. Build the versioned ZIP:
+   `pwsh -File scripts/build-release.ps1 -Version 0.2.0`
+5. Verify the archive contains one `asn-core/` root and no development files.
+6. Upload the ZIP manually through WordPress Admin and replace the existing ASN Core version.
+7. Test the parallel Profile/Explore pages and regress the existing live site.
+8. Only after approval, promote the candidate to `main` and create the semantic release tag.
 
-## Production discipline
+Production is **not** connected to arbitrary `develop` commits.
 
-Once GitHub deployment is connected, do not routinely edit ASN Core directly in WP File Manager. GitHub is the source of truth so every change remains reviewable and reversible.
+## Parallel v0.2 test pages
 
-Do not connect production to `develop`. Production should track approved `main` releases.
+Create unlinked WordPress pages containing:
+
+```
+[asn_profile]
+```
+
+and:
+
+```
+[asn_explore]
+```
+
+Recommended slugs:
+
+- `/asn-profile-test/`
+- `/asn-explore-test/`
+
+Do not replace the live legacy shortcodes until the v0.2 test gate passes.
+
+## Source-of-truth discipline
+
+- WordPress users/user meta remain authoritative.
+- `asn_profiles` is rebuildable index data.
+- Profile edits write approved WordPress fields first, then refresh the index.
+- Never edit generated release files as the source of truth.
 
 ## Secrets
 
