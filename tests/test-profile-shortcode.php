@@ -62,12 +62,12 @@ final class ProfileShortcodeTest extends TestCase {
         $html = ( new Profile_Shortcode() )->render();
 
         $positions = array(
-            strpos( $html, 'Test Member' ),
-            strpos( $html, 'private@example.test' ),
-            strpos( $html, '>Age<' ),
-            strpos( $html, '>Gender<' ),
-            strpos( $html, '>Job title<' ),
-            strpos( $html, '>Spoken proficiency<' ),
+            strpos( $html, 'class="asn-profile__name">Test Member</h1>' ),
+            strpos( $html, 'class="asn-profile__email">private@example.test</p>' ),
+            strpos( $html, '<strong>Age:</strong>' ),
+            strpos( $html, '<strong>Gender:</strong>' ),
+            strpos( $html, '<strong>Job title:</strong>' ),
+            strpos( $html, '<strong>Spoken proficiency:</strong>' ),
         );
 
         foreach ( $positions as $position ) {
