@@ -1,5 +1,6 @@
 <?php
 use ASN\Core\Plugin;
+use ASN\Core\Database;
 use PHPUnit\Framework\TestCase;
 
 final class PluginBootstrapTest extends TestCase {
@@ -23,4 +24,29 @@ final class PluginBootstrapTest extends TestCase {
 
         $this->assertSame( $before, $after );
     }
+
+    public function test_init_upgrades_pending_database_schema(): void {
+        $options = $GLOBALS['asn_test_options'];
+        $tables = $GLOBALS['asn_test_tables'];
+        $sql = $GLOBALS['asn_test_dbdelta_sql'];
+        $prefix = $GLOBALS['wpdb']->prefix;
+
+        try {
+            $GLOBALS['asn_test_options'][ Database::VERSION_OPTION ] = '1.0.0';
+            $GLOBALS['asn_test_tables'] = array();
+            $GLOBALS['asn_test_dbdelta_sql'] = array();
+            $GLOBALS['wpdb']->prefix = 'custom_';
+
+            Plugin::instance()->init();
+
+            $this->assertSame( Database::VERSION, get_option( Database::VERSION_OPTION ) );
+            $this->assertNotEmpty( $GLOBALS['asn_test_dbdelta_sql'] );
+        } finally {
+            $GLOBALS['asn_test_options'] = $options;
+            $GLOBALS['asn_test_tables'] = $tables;
+            $GLOBALS['asn_test_dbdelta_sql'] = $sql;
+            $GLOBALS['wpdb']->prefix = $prefix;
+        }
+    }
+
 }
