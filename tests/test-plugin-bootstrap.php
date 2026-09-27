@@ -11,6 +11,13 @@ final class PluginBootstrapTest extends TestCase {
         $this->assertTrue( defined( 'ASN_CORE_URL' ) );
     }
 
+    public function test_git_updater_headers_are_present(): void {
+        $source = file_get_contents( dirname( __DIR__ ) . '/asn-core.php' );
+
+        $this->assertStringContainsString( 'GitHub Plugin URI: https://github.com/elleynote/armenian-social-network-core', $source );
+        $this->assertStringContainsString( 'Primary Branch: main', $source );
+    }
+
     public function test_plugin_instance_is_singleton(): void {
         $this->assertSame( Plugin::instance(), Plugin::instance() );
     }
