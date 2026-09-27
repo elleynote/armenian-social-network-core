@@ -49,6 +49,18 @@ final class ProfileFormTest extends TestCase {
         }
     }
 
+
+    public function test_array_field_value_is_rejected_without_source_write(): void {
+        $before = $GLOBALS['asn_test_user_meta'][7]['country'];
+        $result = Profile_Service::update_own_profile( 7, 7, array(
+            'country' => array( 'Armenia' ),
+        ) );
+
+        $this->assertFalse( $result['success'] );
+        $this->assertSame( $before, $GLOBALS['asn_test_user_meta'][7]['country'] );
+        $this->assertContains( 'invalid_value:country', $result['errors'] );
+    }
+
     public function test_valid_own_profile_update_writes_only_approved_source_fields_and_refreshes_index(): void {
         $result = Profile_Service::update_own_profile( 7, 7, array(
             'country'   => ' Armenia ',
