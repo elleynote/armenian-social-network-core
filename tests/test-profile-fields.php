@@ -8,10 +8,27 @@ use PHPUnit\Framework\TestCase;
 
 final class ProfileFieldsTest extends TestCase {
     public function test_only_approved_fields_are_public_and_editable(): void {
-        $this->assertCount( 24, Profile_Fields::public_keys() );
+        $this->assertCount( 30, Profile_Fields::public_keys() );
         $this->assertSame( Profile_Fields::public_keys(), Profile_Fields::editable_keys() );
         $this->assertNotContains( 'user_email', Profile_Fields::editable_keys(), true );
         $this->assertNotContains( 'wp_capabilities', Profile_Fields::editable_keys(), true );
+    }
+
+    public function test_all_legacy_profile_card_prompts_and_photo_prompts_are_defined(): void {
+        $this->assertCount( 23, Profile_Fields::prompt_keys() );
+        $this->assertSame(
+            array(
+                'a_photo_of_me_on_holiday',
+                'a_photo_of_me_doing_what_i_love_most',
+                'a_photo_that_brings_back_good_memories',
+                'a_photo_of_me_being_me',
+                'a_photo_of_something_i_ve_done_recently',
+                'a_photo_of_the_good_old_days',
+            ),
+            Profile_Fields::photo_prompt_keys()
+        );
+        $this->assertSame( "I'm currently trying to learn", Profile_Fields::prompt_label( 'i_m_currently_trying_to_learn' ) );
+        $this->assertSame( 'A photo of me on holiday', Profile_Fields::prompt_label( 'a_photo_of_me_on_holiday' ) );
     }
 
     public function test_age_is_bounded_to_defensive_legacy_compatible_range(): void {
