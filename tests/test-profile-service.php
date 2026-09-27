@@ -34,6 +34,16 @@ final class ProfileServiceTest extends TestCase {
         $this->assertArrayNotHasKey( 'wp_capabilities', $profile );
     }
 
+    public function test_logged_in_members_can_see_profile_email_but_anonymous_visitors_cannot(): void {
+        $owner_view = Profile_Service::find( 7, 7 );
+        $member_view = Profile_Service::find( 7, 8 );
+        $anonymous_view = Profile_Service::find( 7, 0 );
+
+        $this->assertSame( 'private@example.test', $owner_view['email'] );
+        $this->assertSame( 'private@example.test', $member_view['email'] );
+        $this->assertArrayNotHasKey( 'email', $anonymous_view );
+    }
+
     public function test_email_like_wordpress_display_name_is_never_exposed_publicly(): void {
         $original_display_name = $GLOBALS['asn_test_users'][7]->display_name;
         $GLOBALS['asn_test_users'][7]->display_name = 'private@example.test';
