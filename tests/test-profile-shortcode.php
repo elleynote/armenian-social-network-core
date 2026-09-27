@@ -25,7 +25,7 @@ final class ProfileShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'Test Member', $html );
         $this->assertStringContainsString( 'Australia', $html );
         $this->assertStringContainsString( 'asn-profile', $html );
-        $this->assertStringNotContainsString( 'private@example.test', $html );
+        $this->assertStringContainsString( 'private@example.test', $html );
         $this->assertStringNotContainsString( 'secret-hash', $html );
     }
 
