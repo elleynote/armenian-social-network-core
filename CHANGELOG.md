@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 - Privacy patch
+
+- Prevented email-like WordPress display names from being exposed on ASN public profiles.
+- Prefer approved first/last profile names for public member display names, with a neutral member fallback when needed.
+- Prevented email-like display names from being stored in the ASN profile search index.
+
+
 ## 0.2.0 - Profiles and Explore candidate
 
 - Added approved profile-field contracts based on the active legacy implementation.
