@@ -42,7 +42,7 @@ final class ReleaseManifestTest extends TestCase {
             $this->assertStringContainsString( $excluded, $script );
         }
 
-        $this->assertStringContainsString( ".Replace('\\\\', '/')", $script );
+        $this->assertStringContainsString( ".Replace('\\', '/')", $script );
         $this->assertStringContainsString( "'asn-core/'", $script );
         $this->assertStringNotContainsString( 'Compress-Archive', $script );
     }
