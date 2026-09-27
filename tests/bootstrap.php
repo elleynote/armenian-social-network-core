@@ -11,6 +11,7 @@ $GLOBALS['asn_test_current_user_can'] = true;
 $GLOBALS['asn_test_profile_rows'] = array();
 $GLOBALS['asn_test_sync_fail_user'] = 0;
 $GLOBALS['asn_test_dbdelta_sql'] = array();
+$GLOBALS['asn_test_avatar_urls'] = array( 7 => 'https://example.test/avatar-7.jpg', 8 => 'https://example.test/avatar-8.jpg' );
 
 class ASN_Test_WPDB {
     public $prefix = 'wp_';
@@ -164,6 +165,8 @@ $GLOBALS['asn_test_user_meta'] = array(
         'gender'             => 'Female',
         'job_title'          => 'Teacher',
         'spoken_proficiency' => 'Western Armenian - Fluent',
+        'profile_pic'         => 'https://example.test/profile-7.jpg',
+        'my_favorite_music_is' => 'Jazz',
     ),
     8 => array(
         'first_name'         => 'Free',
@@ -230,4 +233,13 @@ if ( ! function_exists( 'sanitize_textarea_field' ) ) {
 }
 if ( ! function_exists( 'wp_json_encode' ) ) {
     function wp_json_encode( $value ) { return json_encode( $value ); }
+}
+
+if ( ! function_exists( 'get_avatar_url' ) ) {
+    function get_avatar_url( $user_id, $args = array() ) {
+        return $GLOBALS['asn_test_avatar_urls'][ $user_id ] ?? '';
+    }
+}
+if ( ! function_exists( 'esc_url_raw' ) ) {
+    function esc_url_raw( $value ) { return filter_var( (string) $value, FILTER_SANITIZE_URL ); }
 }
