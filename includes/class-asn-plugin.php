@@ -2,6 +2,7 @@
 namespace ASN\Core;
 
 use ASN\Core\Admin\Admin;
+use ASN\Core\Profiles\Profile_Shortcode;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,6 +30,9 @@ final class Plugin {
 
         $admin = new Admin();
         $admin->register_hooks();
+
+        $profile_shortcode = new Profile_Shortcode();
+        $profile_shortcode->register();
     }
 
     public function init(): void {

@@ -12,6 +12,9 @@ $GLOBALS['asn_test_profile_rows'] = array();
 $GLOBALS['asn_test_sync_fail_user'] = 0;
 $GLOBALS['asn_test_dbdelta_sql'] = array();
 $GLOBALS['asn_test_avatar_urls'] = array( 7 => 'https://example.test/avatar-7.jpg', 8 => 'https://example.test/avatar-8.jpg' );
+$GLOBALS['asn_test_shortcodes'] = array();
+$GLOBALS['asn_test_current_user_id'] = 7;
+$GLOBALS['asn_test_styles'] = array();
 
 class ASN_Test_WPDB {
     public $prefix = 'wp_';
@@ -242,4 +245,23 @@ if ( ! function_exists( 'get_avatar_url' ) ) {
 }
 if ( ! function_exists( 'esc_url_raw' ) ) {
     function esc_url_raw( $value ) { return filter_var( (string) $value, FILTER_SANITIZE_URL ); }
+}
+
+if ( ! function_exists( 'add_shortcode' ) ) {
+    function add_shortcode( $tag, $callback ) { $GLOBALS['asn_test_shortcodes'][ $tag ] = $callback; }
+}
+if ( ! function_exists( 'get_current_user_id' ) ) {
+    function get_current_user_id() { return (int) $GLOBALS['asn_test_current_user_id']; }
+}
+if ( ! function_exists( 'absint' ) ) {
+    function absint( $value ) { return abs( (int) $value ); }
+}
+if ( ! function_exists( 'wp_enqueue_style' ) ) {
+    function wp_enqueue_style() { $GLOBALS['asn_test_styles'][] = func_get_args(); }
+}
+if ( ! function_exists( 'esc_attr' ) ) {
+    function esc_attr( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
+}
+if ( ! function_exists( 'esc_url' ) ) {
+    function esc_url( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
 }
