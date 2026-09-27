@@ -22,6 +22,13 @@ final class Directory_Shortcode {
         wp_enqueue_script( 'asn-messaging', ASN_CORE_URL . 'public/js/asn-messaging.js', array(), ASN_CORE_VERSION, true );
 
         $filters = Directory_Query::from_request( $_GET );
+        $profile_base_url = isset( $atts['profile_url'] ) && is_scalar( $atts['profile_url'] )
+            ? esc_url_raw( (string) $atts['profile_url'] )
+            : site_url( '/profile/' );
+        if ( '' === $profile_base_url ) {
+            $profile_base_url = site_url( '/profile/' );
+        }
+
         $result = Directory_Service::search( $filters );
         $viewer_id = (int) get_current_user_id();
         $members = array();
