@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.4 - Explore filter form fix
+
+- Fixed the Explore filter form so Search submits GET parameters explicitly to the current Explore page.
+- Preserved the working server-side search, country, dialect, proficiency, and pagination filtering logic.
+
+
 ## 0.2.3 - Profile editing patch
 
 - Added the member email as the second profile-summary row for logged-in members.
