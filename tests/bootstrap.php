@@ -141,6 +141,25 @@ if ( ! function_exists( 'wp_die' ) ) {
     function wp_die( $message ) { throw new RuntimeException( $message ); }
 }
 
+if ( ! function_exists( 'add_shortcode' ) ) {
+    function add_shortcode( $tag, $callback ) { $GLOBALS['asn_test_shortcodes'][ $tag ] = $callback; }
+}
+if ( ! function_exists( 'get_current_user_id' ) ) {
+    function get_current_user_id() { return (int) $GLOBALS['asn_test_current_user_id']; }
+}
+if ( ! function_exists( 'absint' ) ) {
+    function absint( $value ) { return abs( (int) $value ); }
+}
+if ( ! function_exists( 'wp_enqueue_style' ) ) {
+    function wp_enqueue_style() { $GLOBALS['asn_test_styles'][] = func_get_args(); }
+}
+if ( ! function_exists( 'esc_attr' ) ) {
+    function esc_attr( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
+}
+if ( ! function_exists( 'esc_url' ) ) {
+    function esc_url( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
+}
+
 require_once dirname( __DIR__ ) . '/asn-core.php';
 
 $GLOBALS['asn_test_users'] = array(
@@ -247,21 +266,3 @@ if ( ! function_exists( 'esc_url_raw' ) ) {
     function esc_url_raw( $value ) { return filter_var( (string) $value, FILTER_SANITIZE_URL ); }
 }
 
-if ( ! function_exists( 'add_shortcode' ) ) {
-    function add_shortcode( $tag, $callback ) { $GLOBALS['asn_test_shortcodes'][ $tag ] = $callback; }
-}
-if ( ! function_exists( 'get_current_user_id' ) ) {
-    function get_current_user_id() { return (int) $GLOBALS['asn_test_current_user_id']; }
-}
-if ( ! function_exists( 'absint' ) ) {
-    function absint( $value ) { return abs( (int) $value ); }
-}
-if ( ! function_exists( 'wp_enqueue_style' ) ) {
-    function wp_enqueue_style() { $GLOBALS['asn_test_styles'][] = func_get_args(); }
-}
-if ( ! function_exists( 'esc_attr' ) ) {
-    function esc_attr( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
-}
-if ( ! function_exists( 'esc_url' ) ) {
-    function esc_url( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
-}
