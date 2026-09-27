@@ -28,7 +28,7 @@ final class Profile_Index {
 
         $data = array(
             'user_id'       => $user_id,
-            'display_name'  => sanitize_text_field( (string) $user->display_name ),
+            'display_name'  => sanitize_text_field( (string) $member['display_name'] ),
             'country'       => (string) ( Profile_Fields::sanitize( 'country', $member['country'] ?? '' ) ?? '' ),
             'age'           => null === $age ? null : (int) $age,
             'gender'        => null === $gender ? '' : (string) $gender,
