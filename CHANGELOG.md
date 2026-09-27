@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.0 - Profiles and Explore candidate
+
+- Added approved profile-field contracts based on the active legacy implementation.
+- Added profile index schema 1.1.0 with age, job title, registration date, dialect, and proficiency indexing.
+- Added idempotent single-member and batch profile-index synchronization.
+- Added public profile service with legacy profile-photo compatibility and safe fallbacks.
+- Added parallel `[asn_profile]` view and secure edit-own-profile flow.
+- Added administrator profile-index backfill controls in batches of 50.
+- Added indexed `[asn_explore]` search, dialect/proficiency/country filters, and 20-member pagination.
+- Added transport-neutral messaging action backed by the existing AtomChat runtime launcher.
+- Added scoped responsive Profile/Explore styles.
+- Added a portable PowerShell release builder that creates Linux-safe WordPress ZIP paths.
+- Preserved live legacy Profile/Explore shortcodes, Feed, registration, login, billing, AtomChat configuration, and Tun SSO behavior.
+
 ## 0.1.0 - Foundation candidate
 
 - Added ASN Core WordPress plugin bootstrap.
