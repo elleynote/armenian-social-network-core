@@ -3,6 +3,7 @@ namespace ASN\Core;
 
 use ASN\Core\Admin\Admin;
 use ASN\Core\Profiles\Profile_Shortcode;
+use ASN\Core\Profiles\Profile_Form;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -33,6 +34,9 @@ final class Plugin {
 
         $profile_shortcode = new Profile_Shortcode();
         $profile_shortcode->register();
+
+        $profile_form = new Profile_Form();
+        $profile_form->register();
     }
 
     public function init(): void {

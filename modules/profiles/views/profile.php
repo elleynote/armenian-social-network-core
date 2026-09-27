@@ -1,6 +1,11 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 
+if ( ! empty( $profile['is_owner'] ) && isset( $_GET['asn_edit_profile'] ) ) {
+    require __DIR__ . '/profile-edit.php';
+    return;
+}
+
 $basic_fields = array(
     'country'            => 'Country',
     'age'                => 'Age',

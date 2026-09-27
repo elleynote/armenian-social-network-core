@@ -25,4 +25,59 @@ final class Profile_Service {
 
         return $profile;
     }
+
+    public static function update_own_profile( int $actor_user_id, int $target_user_id, array $input ): array {
+        $result = array(
+            'success'      => false,
+            'updated'      => array(),
+            'index_synced' => false,
+            'errors'       => array(),
+        );
+
+        if ( $actor_user_id <= 0 || $actor_user_id !== $target_user_id || ! get_userdata( $target_user_id ) ) {
+            $result['errors'][] = 'not_allowed';
+            return $result;
+        }
+
+        $allowed = Profile_Fields::editable_keys();
+        $clean = array();
+
+        foreach ( $input as $key => $value ) {
+            $key = (string) $key;
+            if ( ! in_array( $key, $allowed, true ) ) {
+                $result['errors'][] = 'invalid_field:' . $key;
+                continue;
+            }
+
+            if ( '' === trim( (string) $value ) ) {
+                $clean[ $key ] = '';
+                continue;
+            }
+
+            $sanitized = Profile_Fields::sanitize( $key, $value );
+            if ( null === $sanitized ) {
+                $result['errors'][] = 'invalid_value:' . $key;
+                continue;
+            }
+            $clean[ $key ] = $sanitized;
+        }
+
+        if ( ! empty( $result['errors'] ) ) {
+            return $result;
+        }
+
+        foreach ( $clean as $key => $value ) {
+            update_user_meta( $target_user_id, $key, $value );
+            $result['updated'][] = $key;
+        }
+
+        $result['success'] = true;
+        $result['index_synced'] = Profile_Index::sync_user( $target_user_id );
+        if ( ! $result['index_synced'] ) {
+            $result['errors'][] = 'index_sync_failed';
+        }
+
+        return $result;
+    }
+
 }

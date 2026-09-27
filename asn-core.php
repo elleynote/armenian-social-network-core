@@ -23,6 +23,7 @@ require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-index.php';
 require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-photo.php';
 require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-service.php';
 require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-shortcode.php';
+require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-form.php';
 require_once ASN_CORE_PATH . 'integrations/pmpro/class-asn-pmpro.php';
 require_once ASN_CORE_PATH . 'integrations/woocommerce/class-asn-woocommerce.php';
 require_once ASN_CORE_PATH . 'includes/class-asn-memberships.php';
