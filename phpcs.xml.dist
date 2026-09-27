@@ -9,7 +9,6 @@
     <rule ref="WordPress-Core">
         <exclude name="WordPress.Files.FileName" />
         <exclude name="Generic.WhiteSpace.DisallowSpaceIndent" />
-        <exclude name="WordPress.WhiteSpace.PrecisionAlignment" />
     </rule>
     <config name="minimum_supported_wp_version" value="6.0" />
 </ruleset>
