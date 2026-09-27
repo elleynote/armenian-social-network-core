@@ -1,39 +1,36 @@
 # ASN Core
 
-ASN Core is the custom WordPress social-network foundation for [ArmenianSocialNetwork.com](https://armeniansocialnetwork.com/).
+ASN Core is the custom WordPress social-network application layer for ArmenianSocialNetwork.com.
 
-## v0.1 scope
+## v0.2.0 candidate
 
-Version 0.1 is intentionally non-destructive. It installs beside the current TunApp Customizations and AtomChat setup and does **not** replace any live member-facing feature.
+Version 0.2 adds the first parallel member-facing replacements while keeping the current live social experience intact.
 
 It provides:
 
-- plugin bootstrap and versioning
-- versioned ASN database tables
-- read-only access to existing WordPress users/profile metadata
-- PMPro free/premium access helpers
-- WooCommerce/WooCommerce Subscriptions availability helpers
-- a read-only **ASN Core** WordPress admin diagnostics screen
-- automated foundation/safety tests
+- the `[asn_profile]` profile view for existing WordPress members
+- secure edit-own-profile handling for approved existing fields
+- a rebuildable/indexed `asn_profiles` search layer
+- administrator batch backfill controls for the profile index
+- the `[asn_explore]` member directory
+- search plus dialect, proficiency, and country filters
+- fixed 20-member pagination
+- a transport-neutral message action backed by the existing AtomChat launcher
+- responsive, `asn-` scoped front-end styles
+- a repeatable WordPress-safe release ZIP builder
 
-It does not change Explore, Profile, Feed, registration, login, billing, AtomChat, or Tun SSO/miniOrange.
+The new Profile and Explore shortcodes are intended for separate test pages first. v0.2 does **not** automatically replace `[tac_user_profile]` or `[tac_contacts]`.
 
-## Runtime integrations
+It also does not change Feed, registration, login, billing, WooCommerce subscriptions/prices, AtomChat configuration, or Tun SSO / miniOrange.
 
-- WordPress is the user identity source.
-- PMPro is the membership/entitlement layer.
-- WooCommerce Subscriptions + WooPayments remain the billing layer.
-- AtomChat remains live during the rebuild.
-- Tun SSO / miniOrange remains unchanged during the rebuild.
-- Better Messages will be integrated in a later phase after the foundation is validated.
+## Data ownership
 
-All optional integrations are detected defensively so ASN Core can load without them.
-
-## Installation
-
-For development, deploy the repository as a WordPress plugin folder named `asn-core` and activate **ASN Core** from WordPress Admin → Plugins.
-
-Activation creates the initial ASN tables using the site's actual WordPress table prefix. It does not import, delete, or bulk-update existing members.
+- WordPress remains the only user identity source.
+- Existing profile fields remain in WordPress user data/user meta.
+- `asn_profiles` is a rebuildable directory index, not a second user database.
+- PMPro remains the access/entitlement layer.
+- WooCommerce Subscriptions + WooPayments remain the billing source of truth.
+- AtomChat remains live during v0.2.
 
 ## Development
 
@@ -43,10 +40,24 @@ composer lint
 composer test
 ```
 
-Development work goes to `develop`. Only tested/approved releases are merged to `main` and tagged.
+Build the manual WordPress package with PowerShell:
+
+```powershell
+pwsh -File scripts/build-release.ps1 -Version 0.2.0
+```
+
+The verified output is:
+
+```
+build/asn-core-v0.2.0.zip
+```
+
+The archive contains one top-level `asn-core/` folder and runtime files only.
+
+Development work goes to `develop`. Only a tested and manually approved release is promoted to `main` and tagged.
 
 See `docs/development.md` and `docs/release-checklist.md`.
 
 ## Security
 
-Never commit API keys, database credentials, WordPress salts, access tokens, app passwords, or other service secrets to this repository.
+Never commit API keys, database credentials, WordPress salts, access tokens, app passwords, or other service secrets.
