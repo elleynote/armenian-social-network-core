@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.2 - Profile parity patch
+
+- Restored all 23 legacy profile-card prompts on the new ASN profile page.
+- Empty profile-card answers now remain visible as `Not updated yet`, matching the legacy experience.
+- Existing six legacy profile-card images are read from their verified `<field>_image` user-meta keys and displayed when present.
+- Updated the new profile layout to a compact centered member summary with stacked legacy-style cards.
+- Preserved the 0.2.1 privacy protection that prevents email-like display names from appearing publicly.
+
+
 ## 0.2.1 - Privacy patch
 
 - Prevented email-like WordPress display names from being exposed on ASN public profiles.
