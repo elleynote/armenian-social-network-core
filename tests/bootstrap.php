@@ -318,3 +318,7 @@ if ( ! function_exists( 'wp_nonce_field' ) ) {
         echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $GLOBALS['asn_test_valid_nonce'] ) . '">';
     }
 }
+
+if ( ! function_exists( 'wp_enqueue_script' ) ) {
+    function wp_enqueue_script() { $GLOBALS['asn_test_scripts'][] = func_get_args(); }
+}
