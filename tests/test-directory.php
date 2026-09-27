@@ -51,7 +51,7 @@ final class ASN_Directory_Test_WPDB extends ASN_Test_WPDB {
             }
         }
 
-        if ( preg_match( "/display_name LIKE '([^']*)'/i", $sql, $match ) ) {
+        if ( preg_match( "/display_name LIKE '((?:''|[^'])*)'/i", $sql, $match ) ) {
             $needle = str_replace( array( '\\%', '\\_', "''" ), array( '%', '_', "'" ), $match[1] );
             $needle = trim( $needle, '%' );
             $rows = array_values( array_filter( $rows, static function ( $row ) use ( $needle ) {
