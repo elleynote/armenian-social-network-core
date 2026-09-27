@@ -48,6 +48,8 @@ final class Plugin {
     }
 
     public function init(): void {
-        // Foundation hook for future ASN modules.
+        if ( Database::VERSION !== Database::current_version() ) {
+            Database::install();
+        }
     }
 }
