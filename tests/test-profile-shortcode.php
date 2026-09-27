@@ -36,6 +36,28 @@ final class ProfileShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'Edit profile', $html );
     }
 
+    public function test_profile_renders_all_legacy_cards_including_empty_prompts_and_saved_images(): void {
+        $previous_image = $GLOBALS['asn_test_user_meta'][7]['a_photo_of_me_on_holiday_image'] ?? null;
+        $GLOBALS['asn_test_user_meta'][7]['a_photo_of_me_on_holiday_image'] = 'https://example.test/holiday.jpg';
+
+        try {
+            $html = ( new Profile_Shortcode() )->render();
+
+            $this->assertSame( 23, substr_count( $html, 'class="asn-profile-card"' ) );
+            $this->assertStringContainsString( 'My dream holiday destination is', $html );
+            $this->assertStringContainsString( 'Not updated yet', $html );
+            $this->assertStringContainsString( 'Jazz', $html );
+            $this->assertStringContainsString( 'A photo of me on holiday', $html );
+            $this->assertStringContainsString( 'https://example.test/holiday.jpg', $html );
+        } finally {
+            if ( null === $previous_image ) {
+                unset( $GLOBALS['asn_test_user_meta'][7]['a_photo_of_me_on_holiday_image'] );
+            } else {
+                $GLOBALS['asn_test_user_meta'][7]['a_photo_of_me_on_holiday_image'] = $previous_image;
+            }
+        }
+    }
+
     public function test_other_member_does_not_show_edit_control(): void {
         $_GET['member'] = '8';
         $html = ( new Profile_Shortcode() )->render();
