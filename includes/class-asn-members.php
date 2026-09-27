@@ -22,7 +22,7 @@ final class Members {
 
         $data = array(
             'id'           => (int) $user->ID,
-            'display_name' => (string) $user->display_name,
+            'display_name' => self::public_display_name( $user_id, $user ),
         );
 
         foreach ( self::PROFILE_KEYS as $key ) {
@@ -30,6 +30,28 @@ final class Members {
         }
 
         return $data;
+    }
+
+    public static function public_display_name( int $user_id, $user = null ): string {
+        $user = $user ?: get_userdata( $user_id );
+        if ( ! $user ) {
+            return '';
+        }
+
+        $first_name = trim( sanitize_text_field( (string) self::profile_meta( $user_id, 'first_name', '' ) ) );
+        $last_name  = trim( sanitize_text_field( (string) self::profile_meta( $user_id, 'last_name', '' ) ) );
+        $full_name  = trim( $first_name . ' ' . $last_name );
+
+        if ( '' !== $full_name ) {
+            return $full_name;
+        }
+
+        $display_name = trim( sanitize_text_field( (string) $user->display_name ) );
+        if ( '' !== $display_name && false === strpos( $display_name, '@' ) ) {
+            return $display_name;
+        }
+
+        return 'Member #' . (int) $user->ID;
     }
 
     public static function profile_meta( int $user_id, string $key, $default = null ) {
