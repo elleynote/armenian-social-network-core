@@ -24,7 +24,7 @@ final class SafetyContractTest extends TestCase {
 
         foreach ( array( 'tac_contacts', 'tac_user_profile', 'tac_feeds', 'tac_reg_form' ) as $shortcode ) {
             $this->assertDoesNotMatchRegularExpression(
-                '/add_shortcode\\s*\\(\\s*[\\'\\"]' . preg_quote( $shortcode, '/' ) . '[\\'\\"]/',
+                '/add_shortcode\s*\(\s*[\'\"]' . preg_quote( $shortcode, '/' ) . '[\'\"]/',
                 $source
             );
         }
@@ -32,7 +32,7 @@ final class SafetyContractTest extends TestCase {
 
     public function test_v01_does_not_remove_atomchat_hooks(): void {
         $this->assertDoesNotMatchRegularExpression(
-            '/remove_(action|filter)\\s*\\([^;]*atomchat/i',
+            '/remove_(action|filter)\s*\([^;]*atomchat/i',
             $this->production_php()
         );
     }
