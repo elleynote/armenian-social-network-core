@@ -3,6 +3,16 @@ use ASN\Core\Admin\Admin;
 use PHPUnit\Framework\TestCase;
 
 final class AdminTest extends TestCase {
+    protected function tearDown(): void {
+        $GLOBALS['asn_test_current_user_can'] = true;
+    }
+
+    public function test_status_screen_rejects_non_administrators(): void {
+        $GLOBALS['asn_test_current_user_can'] = false;
+        $this->expectException( RuntimeException::class );
+        ( new Admin() )->render_status_page();
+    }
+
     public function test_menu_requires_manage_options(): void {
         $admin = new Admin();
         $admin->register_menu();

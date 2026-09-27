@@ -7,6 +7,7 @@ $GLOBALS['asn_test_hooks'] = array();
 $GLOBALS['asn_test_options'] = array();
 $GLOBALS['asn_test_tables'] = array();
 $GLOBALS['asn_test_fail_table'] = '';
+$GLOBALS['asn_test_current_user_can'] = true;
 
 class ASN_Test_WPDB {
     public $prefix = 'wp_';
@@ -93,7 +94,7 @@ if ( ! function_exists( 'dbDelta' ) ) {
 }
 
 if ( ! function_exists( 'current_user_can' ) ) {
-    function current_user_can( $capability ) { return true; }
+    function current_user_can( $capability ) { return (bool) $GLOBALS['asn_test_current_user_can']; }
 }
 if ( ! function_exists( 'add_menu_page' ) ) {
     function add_menu_page() { $GLOBALS['asn_test_menu'] = func_get_args(); }
