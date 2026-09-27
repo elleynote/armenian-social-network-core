@@ -1,0 +1,147 @@
+<?php
+use ASN\Core\Directory\Directory_Query;
+use ASN\Core\Directory\Directory_Service;
+use PHPUnit\Framework\TestCase;
+
+final class ASN_Directory_Test_WPDB extends ASN_Test_WPDB {
+    public $prepared_sql = array();
+
+    public function prepare( $sql, ...$values ) {
+        $prepared = parent::prepare( $sql, ...$values );
+        $this->prepared_sql[] = $prepared;
+        return $prepared;
+    }
+
+    public function esc_like( $text ) {
+        return addcslashes( (string) $text, '_%\\' );
+    }
+
+    public function get_var( $sql ) {
+        if ( false !== stripos( $sql, 'SELECT COUNT(*) FROM' ) && false !== stripos( $sql, 'asn_profiles' ) ) {
+            return count( $this->filtered_rows( $sql ) );
+        }
+        return parent::get_var( $sql );
+    }
+
+    public function get_results( $sql, $output = null ) {
+        $rows = $this->filtered_rows( $sql );
+        usort( $rows, static function ( $a, $b ) {
+            $date = strcmp( (string) $b['registered_at'], (string) $a['registered_at'] );
+            return 0 !== $date ? $date : (int) $b['user_id'] <=> (int) $a['user_id'];
+        } );
+
+        preg_match( '/LIMIT\s+(\d+)\s+OFFSET\s+(\d+)/i', $sql, $limit );
+        $rows = array_slice( $rows, isset( $limit[2] ) ? (int) $limit[2] : 0, isset( $limit[1] ) ? (int) $limit[1] : 20 );
+        $allowed = array_flip( array( 'user_id', 'display_name', 'country', 'age', 'gender', 'job_title', 'dialect', 'proficiency', 'registered_at' ) );
+
+        return array_map( static function ( $row ) use ( $allowed ) {
+            return array_intersect_key( $row, $allowed );
+        }, $rows );
+    }
+
+    private function filtered_rows( string $sql ): array {
+        $rows = array_values( $GLOBALS['asn_test_profile_rows'] );
+
+        foreach ( array( 'dialect', 'proficiency', 'country' ) as $key ) {
+            if ( preg_match( "/" . $key . " = '([^']*)'/i", $sql, $match ) ) {
+                $expected = str_replace( "''", "'", $match[1] );
+                $rows = array_values( array_filter( $rows, static function ( $row ) use ( $key, $expected ) {
+                    return (string) ( $row[ $key ] ?? '' ) === $expected;
+                } ) );
+            }
+        }
+
+        if ( preg_match( "/display_name LIKE '([^']*)'/i", $sql, $match ) ) {
+            $needle = str_replace( array( '\\%', '\\_', "''" ), array( '%', '_', "'" ), $match[1] );
+            $needle = trim( $needle, '%' );
+            $rows = array_values( array_filter( $rows, static function ( $row ) use ( $needle ) {
+                foreach ( array( 'display_name', 'country', 'job_title' ) as $key ) {
+                    if ( false !== stripos( (string) ( $row[ $key ] ?? '' ), $needle ) ) {
+                        return true;
+                    }
+                }
+                return false;
+            } ) );
+        }
+
+        return $rows;
+    }
+}
+
+final class DirectoryTest extends TestCase {
+    private $wpdb;
+    private $rows;
+
+    protected function setUp(): void {
+        global $wpdb;
+        $this->wpdb = $wpdb;
+        $this->rows = $GLOBALS['asn_test_profile_rows'];
+        $wpdb = new ASN_Directory_Test_WPDB();
+        $wpdb->prefix = 'custom_';
+        $GLOBALS['asn_test_profile_rows'] = array();
+
+        for ( $id = 1; $id <= 25; ++$id ) {
+            $GLOBALS['asn_test_profile_rows'][ $id ] = array(
+                'user_id' => $id,
+                'display_name' => 25 === $id ? 'Anna Latest' : 'Member ' . $id,
+                'country' => $id >= 24 ? 'Armenia' : 'Australia',
+                'age' => 30,
+                'gender' => 'Female',
+                'job_title' => 23 === $id ? 'Teacher Anna' : 'Developer',
+                'dialect' => 0 === $id % 2 ? 'eastern' : 'western',
+                'proficiency' => 0 === $id % 3 ? 'advanced' : 'beginner',
+                'registered_at' => sprintf( '2025-01-%02d 00:00:00', $id ),
+                'user_email' => 'private@example.test',
+            );
+        }
+    }
+
+    protected function tearDown(): void {
+        global $wpdb;
+        $wpdb = $this->wpdb;
+        $GLOBALS['asn_test_profile_rows'] = $this->rows;
+    }
+
+    public function test_request_normalization_is_bounded_and_allowlisted(): void {
+        $filters = Directory_Query::from_request( array(
+            'q' => ' Anna ', 'dialect' => 'WESTERN', 'proficiency' => 'advanced',
+            'country' => '<b>Armenia</b>', 'page' => '-4',
+        ) );
+
+        $this->assertSame( 'Anna', $filters['q'] );
+        $this->assertSame( '', $filters['dialect'] );
+        $this->assertSame( 'advanced', $filters['proficiency'] );
+        $this->assertSame( 'Armenia', $filters['country'] );
+        $this->assertSame( 1, $filters['page'] );
+        $this->assertSame( 20, $filters['per_page'] );
+        $this->assertSame( 10000, Directory_Query::from_request( array( 'page' => '99999999' ) )['page'] );
+    }
+
+    public function test_search_filters_and_pagination_work(): void {
+        $this->assertSame( 2, Directory_Service::search( array( 'q' => 'Anna' ) )['total'] );
+        $this->assertSame( 13, Directory_Service::search( array( 'dialect' => 'western' ) )['total'] );
+        $this->assertSame( 8, Directory_Service::search( array( 'proficiency' => 'advanced' ) )['total'] );
+        $this->assertSame( 2, Directory_Service::search( array( 'country' => 'Armenia' ) )['total'] );
+
+        $combined = Directory_Service::search( array( 'country' => 'Armenia', 'dialect' => 'western', 'proficiency' => 'beginner' ) );
+        $this->assertSame( 1, $combined['total'] );
+        $this->assertSame( 25, $combined['items'][0]['user_id'] );
+
+        $page1 = Directory_Service::search( array( 'page' => 1 ) );
+        $page2 = Directory_Service::search( array( 'page' => 2 ) );
+        $this->assertCount( 20, $page1['items'] );
+        $this->assertSame( 25, $page1['items'][0]['user_id'] );
+        $this->assertCount( 5, $page2['items'] );
+        $this->assertSame( 2, Directory_Service::search( array( 'page' => 9999 ) )['page'] );
+    }
+
+    public function test_private_fields_are_not_returned_and_hostile_search_stays_data(): void {
+        global $wpdb;
+        $result = Directory_Service::search( array() );
+        $this->assertArrayNotHasKey( 'user_email', $result['items'][0] );
+
+        $hostile = Directory_Service::search( array( 'q' => "%' OR 1=1 --" ) );
+        $this->assertSame( 0, $hostile['total'] );
+        $this->assertStringContainsString( "''", implode( "\n", $wpdb->prepared_sql ) );
+    }
+}
