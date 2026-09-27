@@ -49,6 +49,11 @@ final class Profile_Service {
                 continue;
             }
 
+            if ( ! is_scalar( $value ) && null !== $value ) {
+                $result['errors'][] = 'invalid_value:' . $key;
+                continue;
+            }
+
             if ( '' === trim( (string) $value ) ) {
                 $clean[ $key ] = '';
                 continue;
