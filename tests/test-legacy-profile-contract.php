@@ -33,7 +33,7 @@ final class LegacyProfileContractTest extends TestCase {
     public function test_contract_contains_no_secret_material(): void {
         $payload = wp_json_encode( array(
             Legacy_Profile_Contract::profile_photo_source(),
-            Legacy_Profile_Contract::yender_options(),
+            Legacy_Profile_Contract::gender_options(),
             Legacy_Profile_Contract::spoken_proficiency_options(),
             Legacy_Profile_Contract::atomchat_launcher_name(),
         ) );
