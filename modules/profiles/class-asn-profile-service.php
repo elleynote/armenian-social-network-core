@@ -23,6 +23,12 @@ final class Profile_Service {
             $profile[ $key ] = Members::profile_meta( $user_id, $key, '' );
         }
 
+        $profile['prompt_images'] = array();
+        foreach ( Profile_Fields::photo_prompt_keys() as $key ) {
+            $image = Members::profile_meta( $user_id, $key . '_image', '' );
+            $profile['prompt_images'][ $key ] = is_string( $image ) ? esc_url_raw( $image ) : '';
+        }
+
         return $profile;
     }
 
