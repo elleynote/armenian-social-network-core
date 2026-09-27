@@ -3,14 +3,14 @@
  * Plugin Name: ASN Core
  * Plugin URI: https://armeniansocialnetwork.com/
  * Description: Core social-network foundation for Armenian Social Network.
- * Version: 0.2.2
+ * Version: 0.2.3
  * Author: Imran Gul
  * Text Domain: asn-core
  */
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ASN_CORE_VERSION', '0.2.2' );
+define( 'ASN_CORE_VERSION', '0.2.3' );
 define( 'ASN_CORE_FILE', __FILE__ );
 define( 'ASN_CORE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ASN_CORE_URL', plugin_dir_url( __FILE__ ) );
