@@ -16,6 +16,10 @@ define( 'ASN_CORE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ASN_CORE_URL', plugin_dir_url( __FILE__ ) );
 
 require_once ASN_CORE_PATH . 'includes/class-asn-database.php';
+require_once ASN_CORE_PATH . 'includes/class-asn-members.php';
+require_once ASN_CORE_PATH . 'integrations/pmpro/class-asn-pmpro.php';
+require_once ASN_CORE_PATH . 'integrations/woocommerce/class-asn-woocommerce.php';
+require_once ASN_CORE_PATH . 'includes/class-asn-memberships.php';
 require_once ASN_CORE_PATH . 'includes/class-asn-plugin.php';
 require_once ASN_CORE_PATH . 'includes/class-asn-activator.php';
 require_once ASN_CORE_PATH . 'includes/class-asn-deactivator.php';

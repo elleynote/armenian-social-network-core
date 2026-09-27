@@ -93,3 +93,68 @@ if ( ! function_exists( 'dbDelta' ) ) {
 }
 
 require_once dirname( __DIR__ ) . '/asn-core.php';
+
+$GLOBALS['asn_test_users'] = array(
+    7 => (object) array(
+        'ID'           => 7,
+        'display_name' => 'Test Member',
+        'user_email'   => 'private@example.test',
+        'user_pass'    => 'secret-hash',
+    ),
+    8 => (object) array(
+        'ID'           => 8,
+        'display_name' => 'Free Member',
+        'user_email'   => 'private2@example.test',
+        'user_pass'    => 'secret-hash-2',
+    ),
+);
+$GLOBALS['asn_test_user_meta'] = array(
+    7 => array(
+        'first_name'         => 'Test',
+        'last_name'          => 'Member',
+        'country'            => 'Australia',
+        'age'                => '35',
+        'gender'             => 'Female',
+        'job_title'          => 'Teacher',
+        'spoken_proficiency' => 'Western Armenian - Fluent',
+    ),
+    8 => array(
+        'first_name'         => 'Free',
+        'last_name'          => 'Member',
+        'country'            => 'United States',
+        'spoken_proficiency' => 'Eastern Armenian - Beginner',
+    ),
+);
+$GLOBALS['asn_test_pmpro_levels'] = array( 7 => 2, 8 => 1 );
+
+if ( ! function_exists( 'get_userdata' ) ) {
+    function get_userdata( $user_id ) {
+        return $GLOBALS['asn_test_users'][ $user_id ] ?? false;
+    }
+}
+
+if ( ! function_exists( 'metadata_exists' ) ) {
+    function metadata_exists( $type, $user_id, $key ) {
+        return array_key_exists( $key, $GLOBALS['asn_test_user_meta'][ $user_id ] ?? array() );
+    }
+}
+
+if ( ! function_exists( 'get_user_meta' ) ) {
+    function get_user_meta( $user_id, $key, $single = true ) {
+        return $GLOBALS['asn_test_user_meta'][ $user_id ][ $key ] ?? '';
+    }
+}
+
+if ( ! function_exists( 'pmpro_getMembershipLevelForUser' ) ) {
+    function pmpro_getMembershipLevelForUser( $user_id ) {
+        return isset( $GLOBALS['asn_test_pmpro_levels'][ $user_id ] )
+            ? (object) array( 'id' => $GLOBALS['asn_test_pmpro_levels'][ $user_id ] )
+            : false;
+    }
+}
+
+if ( ! function_exists( 'pmpro_hasMembershipLevel' ) ) {
+    function pmpro_hasMembershipLevel( $level_id, $user_id ) {
+        return ( $GLOBALS['asn_test_pmpro_levels'][ $user_id ] ?? null ) === (int) $level_id;
+    }
+}
