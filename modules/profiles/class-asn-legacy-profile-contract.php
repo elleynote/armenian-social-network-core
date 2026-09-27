@@ -13,9 +13,9 @@ final class Legacy_Profile_Contract {
 
     public static function gender_options(): array {
         return array(
-            'male'       => 'Male',
-            'female'     => 'Female',
-            'non_binary' => 'Non Binary',
+            'Male',
+            'Female',
+            'Non Binary',
         );
     }
 

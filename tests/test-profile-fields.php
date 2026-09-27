@@ -22,7 +22,7 @@ final class ProfileFieldsTest extends TestCase {
     }
 
     public function test_gender_and_proficiency_use_audited_allowlists(): void {
-        foreach ( array_keys( Legacy_Profile_Contract::gender_options() ) as $value ) {
+        foreach ( Legacy_Profile_Contract::gender_options() as $value ) {
             $this->assertSame( $value, Profile_Fields::sanitize( 'gender', $value ) );
         }
         foreach ( Legacy_Profile_Contract::spoken_proficiency_options() as $value ) {

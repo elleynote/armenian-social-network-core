@@ -61,7 +61,7 @@ final class Profile_Fields {
 
         if ( 'gender' === $key ) {
             $value = (string) $value;
-            return array_key_exists( $value, Legacy_Profile_Contract::gender_options() ) ? $value : null;
+            return in_array( $value, Legacy_Profile_Contract::gender_options(), true ) ? $value : null;
         }
 
         if ( 'spoken_proficiency' === $key ) {

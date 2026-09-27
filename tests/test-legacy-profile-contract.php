@@ -10,7 +10,7 @@ final class LegacyProfileContractTest extends TestCase {
     }
 
     public function test_gender_options_match_active_legacy_registration(): void {
-        $this->assertSame( array( 'male' => 'Male', 'female' => 'Female', 'non_binary' => 'Non Binary' ), Legacy_Profile_Contract::gender_options() );
+        $this->assertSame( array( 'Male', 'Female', 'Non Binary' ), Legacy_Profile_Contract::gender_options() );
     }
 
     public function test_spoken_proficiency_options_match_active_legacy_registration(): void {

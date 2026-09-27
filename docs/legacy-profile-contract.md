@@ -11,9 +11,11 @@ Source audited: active `tunapp-customizations.old.php` implementation used by th
 
 ## Gender values
 
-- `male` => `Male`
-- `female` => `Female`
-- `non_binary` => `Non Binary`
+- `Male`
+- `Female`
+- `Non Binary`
+
+The legacy `<select>` does not emit explicit `value` attributes for gender, so the submitted/stored values are the visible labels above.
 
 ## Spoken proficiency values
 
