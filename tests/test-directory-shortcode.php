@@ -93,6 +93,15 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringNotContainsString( 'secret-hash', $html );
     }
 
+    public function test_profile_url_attribute_targets_parallel_asn_profile_page(): void {
+        $html = ( new Directory_Shortcode() )->render( array(
+            'profile_url' => 'https://example.test/asn-profile-test/',
+        ) );
+
+        $this->assertStringContainsString( 'https://example.test/asn-profile-test/?member=7', $html );
+        $this->assertStringNotContainsString( 'https://example.test/profile/?member=7', $html );
+    }
+
     public function test_empty_results_and_missing_transport_are_controlled(): void {
         global $wpdb;
         $wpdb->total = 0;
