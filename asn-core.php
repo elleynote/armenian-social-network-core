@@ -19,6 +19,7 @@ require_once ASN_CORE_PATH . 'includes/class-asn-database.php';
 require_once ASN_CORE_PATH . 'includes/class-asn-members.php';
 require_once ASN_CORE_PATH . 'modules/profiles/class-asn-legacy-profile-contract.php';
 require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-fields.php';
+require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-index.php';
 require_once ASN_CORE_PATH . 'integrations/pmpro/class-asn-pmpro.php';
 require_once ASN_CORE_PATH . 'integrations/woocommerce/class-asn-woocommerce.php';
 require_once ASN_CORE_PATH . 'includes/class-asn-memberships.php';

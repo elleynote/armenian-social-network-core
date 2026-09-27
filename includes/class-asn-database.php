@@ -4,7 +4,7 @@ namespace ASN\Core;
 defined( 'ABSPATH' ) || exit;
 
 final class Database {
-    public const VERSION = '1.0.0';
+    public const VERSION = '1.1.0';
     public const VERSION_OPTION = 'asn_core_db_version';
     public const ERROR_OPTION = 'asn_core_db_error';
 
@@ -79,15 +79,20 @@ final class Database {
                 user_id bigint(20) unsigned NOT NULL,
                 display_name varchar(191) NOT NULL DEFAULT '',
                 country varchar(100) NOT NULL DEFAULT '',
+                age smallint unsigned NULL,
                 gender varchar(50) NOT NULL DEFAULT '',
+                job_title varchar(191) NOT NULL DEFAULT '',
                 dialect varchar(50) NOT NULL DEFAULT '',
                 proficiency varchar(100) NOT NULL DEFAULT '',
+                registered_at datetime NULL DEFAULT NULL,
                 created_at datetime NOT NULL,
                 updated_at datetime NOT NULL,
                 PRIMARY KEY  (id),
                 UNIQUE KEY user_id (user_id),
                 KEY display_name (display_name),
                 KEY country (country),
+                KEY job_title (job_title),
+                KEY registered_at (registered_at),
                 KEY dialect (dialect),
                 KEY proficiency (proficiency)
             ) {$collate};",

@@ -8,6 +8,9 @@ $GLOBALS['asn_test_options'] = array();
 $GLOBALS['asn_test_tables'] = array();
 $GLOBALS['asn_test_fail_table'] = '';
 $GLOBALS['asn_test_current_user_can'] = true;
+$GLOBALS['asn_test_profile_rows'] = array();
+$GLOBALS['asn_test_sync_fail_user'] = 0;
+$GLOBALS['asn_test_dbdelta_sql'] = array();
 
 class ASN_Test_WPDB {
     public $prefix = 'wp_';
@@ -16,8 +19,14 @@ class ASN_Test_WPDB {
         return 'DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci';
     }
 
-    public function prepare( $sql, $value ) {
-        return str_replace( '%s', "'" . $value . "'", $sql );
+    public function prepare( $sql, ...$values ) {
+        foreach ( $values as $value ) {
+            if ( preg_match( '/%[sd]/', $sql, $match ) ) {
+                $replacement = '%d' === $match[0] ? (string) (int) $value : "'" . str_replace( "'", "''", (string) $value ) . "'";
+                $sql = preg_replace( '/%[sd]/', $replacement, $sql, 1 );
+            }
+        }
+        return $sql;
     }
 
     public function get_var( $sql ) {
@@ -27,6 +36,21 @@ class ASN_Test_WPDB {
                 return null;
             }
             return isset( $GLOBALS['asn_test_tables'][ $table ] ) ? $table : null;
+        }
+        return null;
+    }
+
+    public function replace( $table, $data, $formats = null ) {
+        if ( (int) ( $GLOBALS['asn_test_sync_fail_user'] ?? 0 ) === (int) $data['user_id'] ) {
+            return false;
+        }
+        $GLOBALS['asn_test_profile_rows'][ (int) $data['user_id'] ] = $data;
+        return 1;
+    }
+
+    public function get_row( $sql, $output = null ) {
+        if ( preg_match( '/user_id\\s*=\\s*(\\d+)/', $sql, $matches ) ) {
+            return $GLOBALS['asn_test_profile_rows'][ (int) $matches[1] ] ?? null;
         }
         return null;
     }
@@ -86,6 +110,7 @@ if ( ! function_exists( 'delete_option' ) ) {
 
 if ( ! function_exists( 'dbDelta' ) ) {
     function dbDelta( $sql ) {
+        $GLOBALS['asn_test_dbdelta_sql'][] = $sql;
         if ( preg_match( '/CREATE TABLE\s+([^\s(]+)/i', $sql, $matches ) ) {
             $GLOBALS['asn_test_tables'][ $matches[1] ] = true;
         }
@@ -120,12 +145,14 @@ $GLOBALS['asn_test_users'] = array(
         'display_name' => 'Test Member',
         'user_email'   => 'private@example.test',
         'user_pass'    => 'secret-hash',
+        'user_registered' => '2025-01-02 03:04:05',
     ),
     8 => (object) array(
         'ID'           => 8,
         'display_name' => 'Free Member',
         'user_email'   => 'private2@example.test',
         'user_pass'    => 'secret-hash-2',
+        'user_registered' => '2025-02-03 04:05:06',
     ),
 );
 $GLOBALS['asn_test_user_meta'] = array(
@@ -151,6 +178,19 @@ if ( ! function_exists( 'get_userdata' ) ) {
     function get_userdata( $user_id ) {
         return $GLOBALS['asn_test_users'][ $user_id ] ?? false;
     }
+}
+
+if ( ! function_exists( 'get_users' ) ) {
+    function get_users( $args = array() ) {
+        $ids = array_keys( $GLOBALS['asn_test_users'] );
+        sort( $ids, SORT_NUMERIC );
+        $offset = isset( $args['offset'] ) ? max( 0, (int) $args['offset'] ) : 0;
+        $number = isset( $args['number'] ) ? max( 0, (int) $args['number'] ) : count( $ids );
+        return array_slice( $ids, $offset, $number );
+    }
+}
+if ( ! function_exists( 'current_time' ) ) {
+    function current_time( $type ) { return '2026-09-28 00:00:00'; }
 }
 
 if ( ! function_exists( 'metadata_exists' ) ) {
