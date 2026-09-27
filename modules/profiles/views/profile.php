@@ -11,6 +11,7 @@ $summary_fields = array(
     'gender'             => 'Gender',
     'job_title'          => 'Job title',
     'spoken_proficiency' => 'Spoken proficiency',
+    'country'            => 'Country',
 );
 ?>
 <section class="asn-profile" aria-labelledby="asn-profile-name">
