@@ -25,6 +25,20 @@ final class ProfileIndexTest extends TestCase {
         $this->assertArrayNotHasKey( 'user_pass', $row );
     }
 
+    public function test_sync_user_never_indexes_email_like_display_name(): void {
+        $original_display_name = $GLOBALS['asn_test_users'][7]->display_name;
+        $GLOBALS['asn_test_users'][7]->display_name = 'private@example.test';
+
+        try {
+            $this->assertTrue( Profile_Index::sync_user( 7 ) );
+            $row = Profile_Index::find( 7 );
+            $this->assertSame( 'Test Member', $row['display_name'] );
+            $this->assertStringNotContainsString( '@', $row['display_name'] );
+        } finally {
+            $GLOBALS['asn_test_users'][7]->display_name = $original_display_name;
+        }
+    }
+
     public function test_syncing_same_user_twice_keeps_one_logical_row(): void {
         $this->assertTrue( Profile_Index::sync_user( 7 ) );
         $first = Profile_Index::find( 7 );
