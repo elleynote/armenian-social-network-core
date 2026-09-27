@@ -1,0 +1,46 @@
+<?php
+require_once dirname( __DIR__ ) . '/modules/profiles/class-asn-legacy-profile-contract.php';
+require_once dirname( __DIR__ ) . '/modules/profiles/class-asn-profile-fields.php';
+
+use ASN\Core\Profiles\Legacy_Profile_Contract;
+use ASN\Core\Profiles\Profile_Fields;
+use PHPUnit\Framework\TestCase;
+
+final class ProfileFieldsTest extends TestCase {
+    public function test_only_approved_fields_are_public_and_editable(): void {
+        $this->assertCount( 24, Profile_Fields::public_keys() );
+        $this->assertSame( Profile_Fields::public_keys(), Profile_Fields::editable_keys() );
+        $this->assertNotContains( 'user_email', Profile_Fields::editable_keys(), true );
+        $this->assertNotContains( 'wp_capabilities', Profile_Fields::editable_keys(), true );
+    }
+
+    public function test_age_is_bounded_to_defensive_legacy_compatible_range(): void {
+        $this->assertSame( 35, Profile_Fields::sanitize( 'age', '35' ) );
+        $this->assertNull( Profile_Fields::sanitize( 'age', '0' ) );
+        $this->assertNull( Profile_Fields::sanitize( 'age', '121' ) );
+        $this->assertNull( Profile_Fields::sanitize( 'age', 'abc' ) );
+    }
+
+    public function test_gender_and_proficiency_use_audited_allowlists(): void {
+        foreach ( array_keys( Legacy_Profile_Contract::gender_options() ) as $value ) {
+            $this->assertSame( $value, Profile_Fields::sanitize( 'gender', $value ) );
+        }
+        foreach ( Legacy_Profile_Contract::spoken_proficiency_options() as $value ) {
+            $this->assertSame( $value, Profile_Fields::sanitize( 'spoken_proficiency', $value ) );
+        }
+        $this->assertNull( Profile_Fields::sanitize( 'gender', '__invalid__' ) );
+        $this->assertNull( Profile_Fields::sanitize( 'spoken_proficiency', '__invalid__' ) );
+    }
+
+    public function test_spoken_proficiency_is_split_into_canonical_filter_values(): void {
+        $this->assertSame( array( 'dialect' => 'western', 'proficiency' => 'fluent' ), Profile_Fields::split_spoken_proficiency( 'Western Armenian - Fluent' ) );
+        $this->assertSame( array( 'dialect' => 'eastern', 'proficiency' => 'beginner' ), Profile_Fields::split_spoken_proficiency( 'Eastern Armenian - Beginner' ) );
+    }
+
+    public function test_text_and_prompt_values_are_sanitized_and_capped(): void {
+        $this->assertSame( 'Developer', Profile_Fields::sanitize( 'job_title', '<b>Developer</b>' ) );
+        $long = str_repeat( 'x', 1100 );
+        $this->assertSame( 1000, strlen( Profile_Fields::sanitize( 'my_favorite_music_is', $long ) ) );
+        $this->assertNull( Profile_Fields::sanitize( 'user_email', 'private@example.com' ) );
+    }
+}

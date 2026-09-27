@@ -178,3 +178,16 @@ if ( ! function_exists( 'pmpro_hasMembershipLevel' ) ) {
         return ( $GLOBALS['asn_test_pmpro_levels'][ $user_id ] ?? null ) === (int) $level_id;
     }
 }
+
+if ( ! function_exists( 'sanitize_text_field' ) ) {
+    function sanitize_text_field( $value ) {
+        $value = strip_tags( (string) $value );
+        return trim( preg_replace( '/\\s+/', ' ', $value ) );
+    }
+}
+if ( ! function_exists( 'sanitize_textarea_field' ) ) {
+    function sanitize_textarea_field( $value ) { return trim( strip_tags( (string) $value ) ); }
+}
+if ( ! function_exists( 'wp_json_encode' ) ) {
+    function wp_json_encode( $value ) { return json_encode( $value ); }
+}
