@@ -58,6 +58,41 @@ final class ProfileShortcodeTest extends TestCase {
         }
     }
 
+    public function test_summary_uses_requested_name_email_age_gender_job_and_proficiency_order(): void {
+        $html = ( new Profile_Shortcode() )->render();
+
+        $positions = array(
+            strpos( $html, 'Test Member' ),
+            strpos( $html, 'private@example.test' ),
+            strpos( $html, '>Age<' ),
+            strpos( $html, '>Gender<' ),
+            strpos( $html, '>Job title<' ),
+            strpos( $html, '>Spoken proficiency<' ),
+        );
+
+        foreach ( $positions as $position ) {
+            $this->assertNotFalse( $position );
+        }
+
+        $this->assertSame( $positions, array_values( array_unique( $positions ) ) );
+        $sorted = $positions;
+        sort( $sorted, SORT_NUMERIC );
+        $this->assertSame( $sorted, $positions );
+    }
+
+    public function test_owner_can_edit_profile_cards_inline_and_other_members_cannot(): void {
+        $owner_html = ( new Profile_Shortcode() )->render();
+        $this->assertStringContainsString( 'name="asn_profile[my_favorite_music_is]"', $owner_html );
+        $this->assertStringContainsString( '>Jazz</textarea>', $owner_html );
+        $this->assertSame( 23, substr_count( $owner_html, 'class="asn-profile-card__textarea"' ) );
+        $this->assertStringContainsString( 'Save profile cards', $owner_html );
+
+        $_GET['member'] = '8';
+        $other_html = ( new Profile_Shortcode() )->render();
+        $this->assertStringNotContainsString( 'asn-profile-card__textarea', $other_html );
+        $this->assertStringNotContainsString( 'Save profile cards', $other_html );
+    }
+
     public function test_other_member_does_not_show_edit_control(): void {
         $_GET['member'] = '8';
         $html = ( new Profile_Shortcode() )->render();
