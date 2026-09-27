@@ -8,7 +8,9 @@ final class SafetyContractTest extends TestCase {
             glob( $root . '/*.php' ) ?: array(),
             glob( $root . '/includes/*.php' ) ?: array(),
             glob( $root . '/admin/*.php' ) ?: array(),
-            glob( $root . '/integrations/*/*.php' ) ?: array()
+            glob( $root . '/integrations/*/*.php' ) ?: array(),
+            glob( $root . '/modules/*/*.php' ) ?: array(),
+            glob( $root . '/modules/*/views/*.php' ) ?: array()
         );
 
         $source = '';
@@ -19,7 +21,7 @@ final class SafetyContractTest extends TestCase {
         return $source;
     }
 
-    public function test_v01_does_not_override_legacy_social_shortcodes(): void {
+    public function test_v02_does_not_override_legacy_social_shortcodes(): void {
         $source = $this->production_php();
 
         foreach ( array( 'tac_contacts', 'tac_user_profile', 'tac_feeds', 'tac_reg_form' ) as $shortcode ) {
@@ -30,10 +32,29 @@ final class SafetyContractTest extends TestCase {
         }
     }
 
-    public function test_v01_does_not_remove_atomchat_hooks(): void {
+    public function test_v02_does_not_remove_atomchat_hooks_or_change_tun_sso_options(): void {
+        $source = $this->production_php();
+
         $this->assertDoesNotMatchRegularExpression(
             '/remove_(action|filter)\s*\([^;]*atomchat/i',
-            $this->production_php()
+            $source
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/(update|delete)_option\s*\([^;]*(miniorange|oauth)/i',
+            $source
+        );
+    }
+
+    public function test_v02_does_not_mutate_woocommerce_prices_or_subscriptions(): void {
+        $source = $this->production_php();
+
+        $this->assertDoesNotMatchRegularExpression(
+            '/update_post_meta\s*\([^;]*(_price|_regular_price|_sale_price)/i',
+            $source
+        );
+        $this->assertDoesNotMatchRegularExpression(
+            '/->\s*(save|update_status|cancel_order)\s*\([^;]*subscription/i',
+            $source
         );
     }
 
