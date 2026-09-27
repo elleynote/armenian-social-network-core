@@ -93,6 +93,26 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringNotContainsString( 'secret-hash', $html );
     }
 
+    public function test_filter_form_posts_get_parameters_to_current_page_explicitly(): void {
+        $previous_uri = $_SERVER['REQUEST_URI'] ?? null;
+        $_SERVER['REQUEST_URI'] = '/asn-explore-test/?country=Old';
+
+        try {
+            $html = ( new Directory_Shortcode() )->render();
+
+            $this->assertStringContainsString(
+                '<form class="asn-directory__filters" method="get" action="/asn-explore-test/">',
+                $html
+            );
+        } finally {
+            if ( null === $previous_uri ) {
+                unset( $_SERVER['REQUEST_URI'] );
+            } else {
+                $_SERVER['REQUEST_URI'] = $previous_uri;
+            }
+        }
+    }
+
     public function test_profile_url_attribute_targets_parallel_asn_profile_page(): void {
         $html = ( new Directory_Shortcode() )->render( array(
             'profile_url' => 'https://example.test/asn-profile-test/',
