@@ -33,7 +33,9 @@ final class Members {
     }
 
     public static function public_display_name( int $user_id, $user = null ): string {
-        $user = $user ?: get_userdata( $user_id );
+        if ( ! $user ) {
+            $user = get_userdata( $user_id );
+        }
         if ( ! $user ) {
             return '';
         }
