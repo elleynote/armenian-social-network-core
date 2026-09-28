@@ -113,6 +113,36 @@ final class DirectoryShortcodeTest extends TestCase {
         }
     }
 
+    public function test_explore_enqueues_ajax_directory_script_and_marks_results_live(): void {
+        $GLOBALS['asn_test_scripts'] = array();
+
+        $html = ( new Directory_Shortcode() )->render();
+
+        $handles = array_map(
+            static function ( $script ) {
+                return $script[0] ?? '';
+            },
+            $GLOBALS['asn_test_scripts']
+        );
+
+        $this->assertContains( 'asn-directory', $handles );
+        $this->assertStringContainsString( 'aria-live="polite"', $html );
+        $this->assertStringContainsString( 'data-asn-directory-results', $html );
+        $this->assertStringContainsString( 'data-asn-directory-submit', $html );
+    }
+
+    public function test_directory_script_supports_click_submit_ajax_and_pagination_without_reload(): void {
+        $script = file_get_contents( dirname( __DIR__ ) . '/public/js/asn-directory.js' );
+
+        $this->assertStringContainsString( "document.addEventListener('submit'", $script );
+        $this->assertStringContainsString( "document.addEventListener('click'", $script );
+        $this->assertStringContainsString( 'fetch(', $script );
+        $this->assertStringContainsString( 'event.preventDefault()', $script );
+        $this->assertStringContainsString( 'history.pushState', $script );
+        $this->assertStringContainsString( 'data-asn-directory-submit', $script );
+        $this->assertStringContainsString( 'asn-pagination__link', $script );
+    }
+
     public function test_profile_url_attribute_targets_parallel_asn_profile_page(): void {
         $html = ( new Directory_Shortcode() )->render( array(
             'profile_url' => 'https://example.test/asn-profile-test/',
