@@ -30,9 +30,10 @@ defined( 'ABSPATH' ) || exit;
                 <?php endforeach; ?>
             </select>
         </label>
-        <button class="asn-button asn-directory__submit" type="submit">Search</button>
+        <button class="asn-button asn-directory__submit" type="submit" data-asn-directory-submit>Search</button>
     </form>
 
+    <div class="asn-directory__results" data-asn-directory-results aria-live="polite">
     <?php if ( empty( $members ) ) : ?>
         <div class="asn-directory__empty"><p><?php echo esc_html( 'No members found.' ); ?></p></div>
     <?php else : ?>
@@ -50,4 +51,5 @@ defined( 'ABSPATH' ) || exit;
             <?php endforeach; ?>
         </nav>
     <?php endif; ?>
+    </div>
 </section>
