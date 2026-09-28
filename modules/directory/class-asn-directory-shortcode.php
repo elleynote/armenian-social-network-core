@@ -20,6 +20,7 @@ final class Directory_Shortcode {
     public function render( array $atts = array() ): string {
         wp_enqueue_style( 'asn-core', ASN_CORE_URL . 'public/css/asn-core.css', array(), ASN_CORE_VERSION );
         wp_enqueue_script( 'asn-messaging', ASN_CORE_URL . 'public/js/asn-messaging.js', array(), ASN_CORE_VERSION, true );
+        wp_enqueue_script( 'asn-directory', ASN_CORE_URL . 'public/js/asn-directory.js', array(), ASN_CORE_VERSION, true );
 
         $filters = Directory_Query::from_request( $_GET );
         $request_uri = isset( $_SERVER['REQUEST_URI'] ) && is_scalar( $_SERVER['REQUEST_URI'] )
