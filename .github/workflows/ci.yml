@@ -31,4 +31,4 @@ jobs:
 
       - name: Verify release package
         shell: pwsh
-        run: ./scripts/build-release.ps1 -Version 0.2.4
+        run: ./scripts/build-release.ps1 -Version 0.2.5
