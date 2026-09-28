@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.5 - AJAX Explore
+
+- Made the Explore Search button explicitly clickable and handled by the ASN directory controller.
+- Added AJAX search/filter submission so results update in place without a full page reload.
+- Added AJAX pagination while keeping normal GET-form behavior as a fallback when JavaScript is unavailable.
+- Added loading and live-result states for clearer interaction feedback.
+
+
 ## 0.2.4 - Explore filter form fix
 
 - Fixed the Explore filter form so Search submits GET parameters explicitly to the current Explore page.
