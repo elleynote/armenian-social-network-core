@@ -49,6 +49,7 @@ final class Directory_Shortcode {
                 continue;
             }
             $profile['message_action'] = Messaging::action( $user_id );
+            $profile['better_messages_action'] = Messaging::better_messages_action( $user_id );
             $members[] = $profile;
         }
 

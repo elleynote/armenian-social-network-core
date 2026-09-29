@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.6 - Parallel Better Messages evaluation
+
+- Added a Better Messages adapter behind the ASN messaging boundary using the plugin's public conversation-link API.
+- Added a separate `Test Better Messages` action on the parallel ASN Explore and Profile views while keeping the existing AtomChat Message action unchanged.
+- Kept WordPress user IDs as the member identity used for the Better Messages test link.
+- Kept AtomChat active and untouched so Better Messages can be verified safely in parallel before any transport cutover.
+
 ## 0.2.5 - AJAX Explore
 
 - Made the Explore Search button explicitly clickable and handled by the ASN directory controller.

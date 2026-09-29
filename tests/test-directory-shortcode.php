@@ -49,6 +49,7 @@ final class DirectoryShortcodeTest extends TestCase {
         $GLOBALS['asn_test_options']['active_plugins'] = array( 'atomchat/atomchat.php' );
         $GLOBALS['asn_test_current_user_id'] = 8;
         $GLOBALS['asn_test_shortcodes'] = array();
+        $GLOBALS['asn_test_better_messages_enabled'] = false;
         $_GET = array();
     }
 
@@ -91,6 +92,17 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'dialect=western', $html );
         $this->assertStringNotContainsString( 'private@example.test', $html );
         $this->assertStringNotContainsString( 'secret-hash', $html );
+    }
+
+    public function test_parallel_better_messages_action_renders_without_replacing_atomchat(): void {
+        $GLOBALS['asn_test_better_messages_enabled'] = true;
+
+        $html = ( new Directory_Shortcode() )->render();
+
+        $this->assertStringContainsString( 'data-asn-message-user="7"', $html );
+        $this->assertStringContainsString( '>Message</button>', $html );
+        $this->assertStringContainsString( 'Test Better Messages', $html );
+        $this->assertStringContainsString( 'https://example.test/messages/#conversation/7', $html );
     }
 
     public function test_filter_form_posts_get_parameters_to_current_page_explicitly(): void {

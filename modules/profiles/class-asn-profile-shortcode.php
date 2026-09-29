@@ -1,6 +1,8 @@
 <?php
 namespace ASN\Core\Profiles;
 
+use ASN\Core\Messaging;
+
 defined( 'ABSPATH' ) || exit;
 
 final class Profile_Shortcode {
@@ -28,6 +30,8 @@ final class Profile_Shortcode {
             echo '<div class="asn-profile asn-profile--empty"><p>' . esc_html( 'Member not found' ) . '</p></div>';
             return (string) ob_get_clean();
         }
+
+        $profile['better_messages_action'] = Messaging::better_messages_action( $user_id );
 
         require __DIR__ . '/views/profile.php';
         return (string) ob_get_clean();
