@@ -171,8 +171,15 @@ if ( ! function_exists( 'esc_url' ) ) {
 
 if ( ! class_exists( 'ASN_Test_Better_Messages_Functions' ) ) {
     final class ASN_Test_Better_Messages_Functions {
-        public function create_conversation_link( $user_id, $subject = '', $message = '', $fast_start = false, $scroll_to_container = false ) {
-            return 'https://example.test/messages/#conversation/' . (int) $user_id;
+        public function get_private_conversation_id( $to, $from = null, $create = true, $subject = '' ) {
+            return array(
+                'result'    => 'thread_found',
+                'thread_id' => 1000 + (int) $to,
+            );
+        }
+
+        public function get_user_messages_url( $user_id, $thread_id = null ) {
+            return 'https://example.test/messages/#conversation/' . (int) $thread_id;
         }
     }
 }
