@@ -109,7 +109,7 @@ final class ProfileShortcodeTest extends TestCase {
         $html = ( new Profile_Shortcode() )->render();
 
         $this->assertStringContainsString( 'Test Better Messages', $html );
-        $this->assertStringContainsString( 'https://example.test/messages/#conversation/8', $html );
+        $this->assertStringContainsString( 'https://example.test/messages/#conversation/1008', $html );
     }
 
     public function test_invalid_or_nonexistent_member_renders_controlled_not_found_state(): void {
