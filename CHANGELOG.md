@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.9 - Better Messages WebSocket call gating
+
+- Added Better Messages WebSocket audio-call permission checks backed by PMPro: Level 1 and Level 2 members can use live audio calls.
+- Added video-call permission checks so every participant in a video call must have PMPro Level 2.
+- Added server-side create/join errors so call permissions cannot be bypassed by opening Better Messages directly.
+- Kept recorded voice/video messages disabled and left AtomChat active during parallel testing.
+
 ## 0.2.8 - Better Messages membership gating
 
 - Added explicit ASN chat entitlements for the current PMPro plan contract: levels 1 and 2 can use text/voice, while video is premium level 2 only.

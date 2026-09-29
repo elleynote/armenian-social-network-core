@@ -101,6 +101,47 @@ final class MessagingTest extends TestCase {
         $this->assertFalse( Messaging::better_messages_action( 7 )['available'] );
     }
 
+    public function test_better_messages_audio_call_allows_level_one_and_level_two_members(): void {
+        $GLOBALS['asn_test_better_messages_enabled'] = true;
+
+        $this->assertTrue( Messaging::filter_better_messages_can_audio_call( true, 8, 1007 ) );
+        $this->assertTrue( Messaging::filter_better_messages_can_audio_call( true, 7, 1007 ) );
+        $this->assertFalse( Messaging::filter_better_messages_can_audio_call( false, 7, 1007 ) );
+    }
+
+    public function test_better_messages_video_call_requires_level_two_for_every_participant(): void {
+        $GLOBALS['asn_test_better_messages_enabled'] = true;
+
+        $this->assertFalse( Messaging::filter_better_messages_can_video_call( true, 8, 1007 ) );
+        $this->assertFalse( Messaging::filter_better_messages_can_video_call( true, 7, 1007 ) );
+
+        $previous = $GLOBALS['asn_test_pmpro_levels'][8];
+        $GLOBALS['asn_test_pmpro_levels'][8] = 2;
+
+        try {
+            $this->assertTrue( Messaging::filter_better_messages_can_video_call( true, 7, 1007 ) );
+        } finally {
+            $GLOBALS['asn_test_pmpro_levels'][8] = $previous;
+        }
+    }
+
+    public function test_better_messages_call_errors_match_membership_entitlements(): void {
+        $GLOBALS['asn_test_better_messages_enabled'] = true;
+
+        $this->assertSame(
+            '',
+            Messaging::filter_better_messages_call_create_error( '', 1007, 8, 'audio' )
+        );
+        $this->assertSame(
+            'Video calls are available to ASN Level 2 members only.',
+            Messaging::filter_better_messages_call_create_error( '', 1007, 8, 'video' )
+        );
+        $this->assertSame(
+            'existing error',
+            Messaging::filter_better_messages_call_join_error( 'existing error', 1007, 8, 'audio' )
+        );
+    }
+
     public function test_browser_launcher_checks_runtime_chain_and_contains_no_credentials(): void {
         $js = file_get_contents( dirname( __DIR__ ) . '/public/js/asn-messaging.js' );
         $this->assertStringContainsString( 'window.jqcc', $js );
