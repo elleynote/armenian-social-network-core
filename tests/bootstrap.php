@@ -23,6 +23,7 @@ $GLOBALS['asn_test_logged_in'] = true;
 $GLOBALS['asn_test_valid_nonce'] = 'valid-nonce';
 $GLOBALS['asn_test_redirect'] = '';
 $GLOBALS['asn_test_referer'] = 'https://example.test/asn-profile-test/';
+$GLOBALS['asn_test_better_messages_enabled'] = false;
 
 class ASN_Test_WPDB {
     public $prefix = 'wp_';
@@ -166,6 +167,38 @@ if ( ! function_exists( 'esc_attr' ) ) {
 }
 if ( ! function_exists( 'esc_url' ) ) {
     function esc_url( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
+}
+
+if ( ! class_exists( 'ASN_Test_Better_Messages_Functions' ) ) {
+    final class ASN_Test_Better_Messages_Functions {
+        public function create_conversation_link( $user_id, $subject = '', $message = '', $fast_start = false, $scroll_to_container = false ) {
+            return 'https://example.test/messages/#conversation/' . (int) $user_id;
+        }
+    }
+}
+
+if ( ! class_exists( 'ASN_Test_Better_Messages' ) ) {
+    final class ASN_Test_Better_Messages {
+        public $functions;
+
+        public function __construct() {
+            $this->functions = new ASN_Test_Better_Messages_Functions();
+        }
+    }
+}
+
+if ( ! function_exists( 'Better_Messages' ) ) {
+    function Better_Messages() {
+        if ( empty( $GLOBALS['asn_test_better_messages_enabled'] ) ) {
+            return null;
+        }
+
+        static $instance = null;
+        if ( null === $instance ) {
+            $instance = new ASN_Test_Better_Messages();
+        }
+        return $instance;
+    }
 }
 
 require_once dirname( __DIR__ ) . '/asn-core.php';

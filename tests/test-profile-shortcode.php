@@ -7,6 +7,7 @@ final class ProfileShortcodeTest extends TestCase {
         $_GET = array();
         $GLOBALS['asn_test_current_user_id'] = 7;
         $GLOBALS['asn_test_shortcodes'] = array();
+        $GLOBALS['asn_test_better_messages_enabled'] = false;
     }
 
     public function test_shortcode_registers_once(): void {
@@ -99,6 +100,16 @@ final class ProfileShortcodeTest extends TestCase {
 
         $this->assertStringContainsString( 'Free Member', $html );
         $this->assertStringNotContainsString( 'Edit profile', $html );
+    }
+
+    public function test_other_member_shows_parallel_better_messages_test_action_when_available(): void {
+        $GLOBALS['asn_test_better_messages_enabled'] = true;
+        $_GET['member'] = '8';
+
+        $html = ( new Profile_Shortcode() )->render();
+
+        $this->assertStringContainsString( 'Test Better Messages', $html );
+        $this->assertStringContainsString( 'https://example.test/messages/#conversation/8', $html );
     }
 
     public function test_invalid_or_nonexistent_member_renders_controlled_not_found_state(): void {

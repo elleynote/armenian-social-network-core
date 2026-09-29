@@ -2,7 +2,7 @@
 
 ASN Core is the custom WordPress social-network application layer for ArmenianSocialNetwork.com.
 
-## v0.2.5 candidate
+## v0.2.6 candidate
 
 Version 0.2 adds the first parallel member-facing replacements while keeping the current live social experience intact.
 
@@ -15,11 +15,14 @@ It provides:
 - the `[asn_explore]` member directory
 - search plus dialect, proficiency, and country filters
 - fixed 20-member pagination
-- a transport-neutral message action backed by the existing AtomChat launcher
+- a transport-neutral AtomChat message action
+- a parallel Better Messages test action using the same WordPress user IDs
 - responsive, `asn-` scoped front-end styles
 - a repeatable WordPress-safe release ZIP builder
 
 The new Profile and Explore shortcodes are intended for separate test pages first. v0.2 does **not** automatically replace `[tac_user_profile]` or `[tac_contacts]`.
+
+The Better Messages action is intentionally labeled as a test action. AtomChat remains the current production transport until Better Messages passes live testing and a controlled transport cutover is approved.
 
 It also does not change Feed, registration, login, billing, WooCommerce subscriptions/prices, AtomChat configuration, or Tun SSO / miniOrange.
 
@@ -43,13 +46,13 @@ composer test
 Build the manual WordPress package with PowerShell:
 
 ```powershell
-pwsh -File scripts/build-release.ps1 -Version 0.2.5
+pwsh -File scripts/build-release.ps1 -Version 0.2.6
 ```
 
 The verified output is:
 
 ```
-build/asn-core-v0.2.5.zip
+build/asn-core-v0.2.6.zip
 ```
 
 The archive contains one top-level `asn-core/` folder and runtime files only.

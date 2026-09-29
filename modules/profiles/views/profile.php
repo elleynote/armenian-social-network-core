@@ -13,6 +13,7 @@ $summary_fields = array(
     'spoken_proficiency' => 'Spoken proficiency',
     'country'            => 'Country',
 );
+$better_messages = $profile['better_messages_action'] ?? array();
 ?>
 <section class="asn-profile" aria-labelledby="asn-profile-name">
     <header class="asn-profile__header">
@@ -34,6 +35,8 @@ $summary_fields = array(
 
             <?php if ( ! empty( $profile['is_owner'] ) ) : ?>
                 <a class="asn-button asn-profile__edit" href="?member=<?php echo esc_attr( (string) $profile['id'] ); ?>&amp;asn_edit_profile=1">Edit profile details</a>
+            <?php elseif ( ! empty( $better_messages['available'] ) && ! empty( $better_messages['url'] ) ) : ?>
+                <a class="asn-button asn-profile__message-test" href="<?php echo esc_url( $better_messages['url'] ); ?>">Test Better Messages</a>
             <?php endif; ?>
         </div>
     </header>
