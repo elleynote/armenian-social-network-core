@@ -190,6 +190,10 @@ if ( ! class_exists( 'ASN_Test_Better_Messages_Functions' ) ) {
         public function get_user_messages_url( $user_id, $thread_id = null ) {
             return 'https://example.test/messages/#conversation/' . (int) $thread_id;
         }
+
+        public function get_recipients_ids( $thread_id ) {
+            return array( 7, 8 );
+        }
     }
 }
 
