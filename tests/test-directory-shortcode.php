@@ -102,7 +102,7 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'data-asn-message-user="7"', $html );
         $this->assertStringContainsString( '>Message</button>', $html );
         $this->assertStringContainsString( 'Test Better Messages', $html );
-        $this->assertStringContainsString( 'https://example.test/messages/#conversation/7', $html );
+        $this->assertStringContainsString( 'https://example.test/messages/#conversation/1007', $html );
     }
 
     public function test_filter_form_posts_get_parameters_to_current_page_explicitly(): void {

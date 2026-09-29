@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.7 - Better Messages direct-thread fix
+
+- Replaced the initial Better Messages conversation-link shortcut with an explicit private-thread lookup/create flow.
+- The ASN test action now resolves the exact private thread first, then generates the current user's inbox URL for that thread.
+- This prevents the test action from landing on the generic `/messages/` inbox without selecting the intended member conversation.
+- AtomChat remains unchanged and active in parallel.
+
+
 ## 0.2.6 - Parallel Better Messages evaluation
 
 - Added a Better Messages adapter behind the ASN messaging boundary using the plugin's public conversation-link API.

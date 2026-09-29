@@ -47,7 +47,7 @@ final class MessagingTest extends TestCase {
         $this->assertTrue( $action['available'] );
         $this->assertSame( 7, $action['target_user_id'] );
         $this->assertSame( 'better-messages', $action['transport'] );
-        $this->assertSame( 'https://example.test/messages/#conversation/7', $action['url'] );
+        $this->assertSame( 'https://example.test/messages/#conversation/1007', $action['url'] );
     }
 
     public function test_better_messages_parallel_action_fails_closed_for_self_invalid_or_unavailable_transport(): void {
