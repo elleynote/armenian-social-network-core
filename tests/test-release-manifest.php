@@ -6,8 +6,8 @@ final class ReleaseManifestTest extends TestCase {
     public function test_release_versions_are_consistent(): void {
         $main = file_get_contents( dirname( __DIR__ ) . '/asn-core.php' );
 
-        $this->assertStringContainsString( 'Version: 0.2.8', $main );
-        $this->assertSame( '0.2.8', ASN_CORE_VERSION );
+        $this->assertStringContainsString( 'Version: 0.2.9', $main );
+        $this->assertSame( '0.2.9', ASN_CORE_VERSION );
         $this->assertSame( '1.1.0', Database::VERSION );
     }
 
