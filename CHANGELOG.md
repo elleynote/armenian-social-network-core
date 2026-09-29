@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.8 - Better Messages membership gating
+
+- Added explicit ASN chat entitlements for the current PMPro plan contract: levels 1 and 2 can use text/voice, while video is premium level 2 only.
+- Better Messages test actions now require both the current member and the target member to have an active chat-enabled PMPro level.
+- Added a Better Messages send-permission filter so users without a chat-enabled membership cannot bypass ASN Core by opening the Better Messages page directly.
+- Kept AtomChat behavior unchanged during the parallel test phase.
+
+
 ## 0.2.7 - Better Messages direct-thread fix
 
 - Replaced the initial Better Messages conversation-link shortcut with an explicit private-thread lookup/create flow.

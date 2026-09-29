@@ -50,6 +50,47 @@ final class MessagingTest extends TestCase {
         $this->assertSame( 'https://example.test/messages/#conversation/1007', $action['url'] );
     }
 
+    public function test_better_messages_parallel_action_requires_active_chat_membership_for_both_members(): void {
+        $GLOBALS['asn_test_better_messages_enabled'] = true;
+
+        $previous = $GLOBALS['asn_test_pmpro_levels'][8] ?? null;
+        unset( $GLOBALS['asn_test_pmpro_levels'][8] );
+
+        try {
+            $action = Messaging::better_messages_action( 7 );
+            $this->assertFalse( $action['available'] );
+            $this->assertFalse( $action['entitled'] );
+            $this->assertSame( '', $action['url'] );
+        } finally {
+            if ( null === $previous ) {
+                unset( $GLOBALS['asn_test_pmpro_levels'][8] );
+            } else {
+                $GLOBALS['asn_test_pmpro_levels'][8] = $previous;
+            }
+        }
+    }
+
+    public function test_better_messages_send_filter_blocks_non_members_with_clear_error(): void {
+        global $bp_better_messages_restrict_send_message;
+
+        $previous = $GLOBALS['asn_test_pmpro_levels'][8] ?? null;
+        $previous_errors = $bp_better_messages_restrict_send_message ?? null;
+        unset( $GLOBALS['asn_test_pmpro_levels'][8] );
+        $bp_better_messages_restrict_send_message = array();
+
+        try {
+            $this->assertFalse( Messaging::filter_better_messages_can_send_message( true, 8, 123 ) );
+            $this->assertArrayHasKey( 'asn_membership', $bp_better_messages_restrict_send_message );
+        } finally {
+            if ( null === $previous ) {
+                unset( $GLOBALS['asn_test_pmpro_levels'][8] );
+            } else {
+                $GLOBALS['asn_test_pmpro_levels'][8] = $previous;
+            }
+            $bp_better_messages_restrict_send_message = $previous_errors;
+        }
+    }
+
     public function test_better_messages_parallel_action_fails_closed_for_self_invalid_or_unavailable_transport(): void {
         $this->assertFalse( Messaging::better_messages_action( 7 )['available'] );
 

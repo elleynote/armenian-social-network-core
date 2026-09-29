@@ -30,6 +30,7 @@ final class Plugin {
 
         $this->booted = true;
         add_action( 'init', array( $this, 'init' ) );
+        add_filter( 'better_messages_can_send_message', array( Messaging::class, 'filter_better_messages_can_send_message' ), 10, 3 );
 
         $admin = new Admin();
         $admin->register_hooks();

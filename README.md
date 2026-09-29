@@ -2,7 +2,7 @@
 
 ASN Core is the custom WordPress social-network application layer for ArmenianSocialNetwork.com.
 
-## v0.2.7 candidate
+## v0.2.8 candidate
 
 Version 0.2 adds the first parallel member-facing replacements while keeping the current live social experience intact.
 
@@ -17,6 +17,7 @@ It provides:
 - fixed 20-member pagination
 - a transport-neutral AtomChat message action
 - a parallel Better Messages test action using the same WordPress user IDs
+- PMPro-backed Better Messages text-chat gating for levels 1 and 2, with premium-only video entitlement prepared for WebSocket
 - responsive, `asn-` scoped front-end styles
 - a repeatable WordPress-safe release ZIP builder
 
@@ -46,13 +47,13 @@ composer test
 Build the manual WordPress package with PowerShell:
 
 ```powershell
-pwsh -File scripts/build-release.ps1 -Version 0.2.7
+pwsh -File scripts/build-release.ps1 -Version 0.2.8
 ```
 
 The verified output is:
 
 ```
-build/asn-core-v0.2.7.zip
+build/asn-core-v0.2.8.zip
 ```
 
 The archive contains one top-level `asn-core/` folder and runtime files only.

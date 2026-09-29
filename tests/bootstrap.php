@@ -100,6 +100,15 @@ if ( ! function_exists( 'add_action' ) ) {
         $GLOBALS['asn_test_hooks'][ $hook ][] = $callback;
     }
 }
+if ( ! function_exists( 'add_filter' ) ) {
+    function add_filter( $hook, $callback, $priority = 10, $accepted_args = 1 ) {
+        $GLOBALS['asn_test_filters'][ $hook ][] = array(
+            'callback'      => $callback,
+            'priority'      => $priority,
+            'accepted_args' => $accepted_args,
+        );
+    }
+}
 
 if ( ! function_exists( 'get_option' ) ) {
     function get_option( $key, $default = false ) {

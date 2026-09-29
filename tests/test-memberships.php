@@ -16,6 +16,16 @@ final class MembershipsTest extends TestCase {
         $this->assertFalse( Memberships::is_premium( 8 ) );
     }
 
+    public function test_chat_entitlements_match_current_pmpro_plan_contract(): void {
+        $this->assertTrue( Memberships::can_text_chat( 7 ) );
+        $this->assertTrue( Memberships::can_voice_chat( 7 ) );
+        $this->assertTrue( Memberships::can_video_chat( 7 ) );
+
+        $this->assertTrue( Memberships::can_text_chat( 8 ) );
+        $this->assertTrue( Memberships::can_voice_chat( 8 ) );
+        $this->assertFalse( Memberships::can_video_chat( 8 ) );
+    }
+
     public function test_woocommerce_is_defensive_when_plugin_is_absent(): void {
         $this->assertFalse( WooCommerce_Integration::is_available() );
         $this->assertFalse( WooCommerce_Integration::subscriptions_available() );
