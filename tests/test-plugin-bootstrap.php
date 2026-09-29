@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 final class PluginBootstrapTest extends TestCase {
     public function test_plugin_constants_are_defined(): void {
         $this->assertTrue( defined( 'ASN_CORE_VERSION' ) );
-        $this->assertSame( '0.2.8', ASN_CORE_VERSION );
+        $this->assertSame( '0.2.9', ASN_CORE_VERSION );
         $this->assertTrue( defined( 'ASN_CORE_FILE' ) );
         $this->assertTrue( defined( 'ASN_CORE_PATH' ) );
         $this->assertTrue( defined( 'ASN_CORE_URL' ) );
@@ -16,6 +16,18 @@ final class PluginBootstrapTest extends TestCase {
         $filters = $GLOBALS['asn_test_filters']['better_messages_can_send_message'] ?? array();
         $this->assertNotEmpty( $filters );
         $this->assertSame( 3, $filters[0]['accepted_args'] );
+    }
+
+    public function test_better_messages_call_filters_are_registered(): void {
+        $audio = $GLOBALS['asn_test_filters']['bp_better_messages_can_audio_call'] ?? array();
+        $video = $GLOBALS['asn_test_filters']['bp_better_messages_can_video_call'] ?? array();
+        $create = $GLOBALS['asn_test_filters']['better_messages_call_create_custom_error'] ?? array();
+        $join = $GLOBALS['asn_test_filters']['better_messages_call_join_custom_error'] ?? array();
+
+        $this->assertSame( 3, $audio[0]['accepted_args'] ?? 0 );
+        $this->assertSame( 3, $video[0]['accepted_args'] ?? 0 );
+        $this->assertSame( 4, $create[0]['accepted_args'] ?? 0 );
+        $this->assertSame( 4, $join[0]['accepted_args'] ?? 0 );
     }
 
     public function test_plugin_instance_is_singleton(): void {
