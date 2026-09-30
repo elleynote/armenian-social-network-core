@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3 - Legacy profile metadata compatibility
+
+- New ASN registrations now save the legacy `dob_date` and `dob` user-meta keys in addition to ASN profile data.
+- This prevents the still-active TunApp profile-completion guard from forcing newly registered Level 1 members back to `/register/?step=2`.
+- The live legacy plugin remains untouched.
+
 ## 0.3.2 - Robust free signup redirect
 
 - Added a short-lived onboarding redirect marker before PMPro Level 1 assignment.
