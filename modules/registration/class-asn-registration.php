@@ -150,13 +150,41 @@ final class Registration {
             return;
         }
 
-        if ( ! PMPro_Integration::assign_level( Memberships::FREE_LEVEL_ID, $user_id ) ) {
+        $redirect_filter = static function ( $location, $status ) use ( $explore_url ) {
+            return self::rewrite_legacy_free_plan_redirect( (string) $location, $explore_url );
+        };
+        add_filter( 'wp_redirect', $redirect_filter, 999, 2 );
+
+        $assigned = PMPro_Integration::assign_level( Memberships::FREE_LEVEL_ID, $user_id );
+
+        remove_filter( 'wp_redirect', $redirect_filter, 999 );
+
+        if ( ! $assigned ) {
             $this->redirect_with_error( add_query_arg( 'asn_step', 'plan', $return_url ), 'membership' );
             return;
         }
 
         Profile_Index::sync_user( $user_id );
         $this->redirect( $explore_url );
+    }
+
+    public static function rewrite_legacy_free_plan_redirect( string $location, string $explore_url ): string {
+        $parts = parse_url( $location );
+        if ( false === $parts ) {
+            return $location;
+        }
+
+        $path = isset( $parts['path'] ) ? rtrim( (string) $parts['path'], '/' ) : '';
+        if ( '/register' !== $path ) {
+            return $location;
+        }
+
+        $query = array();
+        if ( isset( $parts['query'] ) ) {
+            parse_str( (string) $parts['query'], $query );
+        }
+
+        return isset( $query['step'] ) && '2' === (string) $query['step'] ? $explore_url : $location;
     }
 
     public static function age_from_birth_date( string $birth_date ): ?int {
