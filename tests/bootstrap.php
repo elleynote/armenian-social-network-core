@@ -355,6 +355,17 @@ if ( ! function_exists( 'delete_user_meta' ) ) {
 }
 if ( ! function_exists( 'trailingslashit' ) ) {
     function trailingslashit( $value ) {
+        return rtrim( (string) $value, '/\\\\' ) . '/';
+    }
+}
+if ( ! function_exists( 'delete_user_meta' ) ) {
+    function delete_user_meta( $user_id, $key ) {
+        unset( $GLOBALS['asn_test_user_meta'][ $user_id ][ $key ] );
+        return true;
+    }
+}
+if ( ! function_exists( 'trailingslashit' ) ) {
+    function trailingslashit( $value ) {
         return rtrim( (string) $value, '/\\' ) . '/';
     }
 }
