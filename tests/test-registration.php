@@ -80,6 +80,30 @@ final class RegistrationTest extends TestCase {
         }
     }
 
+    public function test_registration_saves_legacy_birth_meta_for_tunapp_guard(): void {
+        $previous_dob_date = $GLOBALS['asn_test_user_meta'][8]['dob_date'] ?? null;
+        $previous_dob = $GLOBALS['asn_test_user_meta'][8]['dob'] ?? null;
+
+        try {
+            Registration::save_legacy_birth_meta( 8, '1990-05-10', 36 );
+
+            $this->assertSame( '1990-05-10', $GLOBALS['asn_test_user_meta'][8]['dob_date'] );
+            $this->assertSame( 36, $GLOBALS['asn_test_user_meta'][8]['dob'] );
+        } finally {
+            if ( null === $previous_dob_date ) {
+                unset( $GLOBALS['asn_test_user_meta'][8]['dob_date'] );
+            } else {
+                $GLOBALS['asn_test_user_meta'][8]['dob_date'] = $previous_dob_date;
+            }
+
+            if ( null === $previous_dob ) {
+                unset( $GLOBALS['asn_test_user_meta'][8]['dob'] );
+            } else {
+                $GLOBALS['asn_test_user_meta'][8]['dob'] = $previous_dob;
+            }
+        }
+    }
+
     public function test_pmpro_helper_assigns_free_level(): void {
         $previous = $GLOBALS['asn_test_pmpro_levels'][8] ?? null;
         unset( $GLOBALS['asn_test_pmpro_levels'][8] );
