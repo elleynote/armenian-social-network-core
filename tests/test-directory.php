@@ -17,7 +17,7 @@ final class ASN_Directory_Test_WPDB extends ASN_Test_WPDB {
     }
 
     public function get_var( $sql ) {
-        if ( false !== stripos( $sql, 'SELECT COUNT(*) FROM' ) && false !== stripos( $sql, 'asn_profiles' ) ) {
+        if ( false !== stripos( $sql, 'SELECT COUNT(' ) && false !== stripos( $sql, 'asn_profiles' ) ) {
             return count( $this->filtered_rows( $sql ) );
         }
         return parent::get_var( $sql );
@@ -41,6 +41,13 @@ final class ASN_Directory_Test_WPDB extends ASN_Test_WPDB {
 
     private function filtered_rows( string $sql ): array {
         $rows = array_values( $GLOBALS['asn_test_profile_rows'] );
+
+        if ( false !== stripos( $sql, 'pmpro_memberships_users' ) ) {
+            $rows = array_values( array_filter( $rows, static function ( $row ) {
+                $level = $GLOBALS['asn_test_pmpro_levels'][ (int) ( $row['user_id'] ?? 0 ) ] ?? null;
+                return in_array( (int) $level, array( 1, 2 ), true );
+            } ) );
+        }
 
         foreach ( array( 'dialect', 'proficiency', 'country' ) as $key ) {
             if ( preg_match( "/" . $key . " = '([^']*)'/i", $sql, $match ) ) {
@@ -71,15 +78,18 @@ final class ASN_Directory_Test_WPDB extends ASN_Test_WPDB {
 final class DirectoryTest extends TestCase {
     private $wpdb;
     private $rows;
+    private $levels;
 
     protected function setUp(): void {
         global $wpdb;
         $this->wpdb = $wpdb;
         $this->rows = $GLOBALS['asn_test_profile_rows'];
+        $this->levels = $GLOBALS['asn_test_pmpro_levels'];
         $wpdb = new ASN_Directory_Test_WPDB();
         $wpdb->prefix = 'custom_';
         $GLOBALS['asn_test_profile_rows'] = array();
 
+        $GLOBALS['asn_test_pmpro_levels'] = array();
         for ( $id = 1; $id <= 25; ++$id ) {
             $GLOBALS['asn_test_profile_rows'][ $id ] = array(
                 'user_id' => $id,
@@ -93,13 +103,28 @@ final class DirectoryTest extends TestCase {
                 'registered_at' => sprintf( '2025-01-%02d 00:00:00', $id ),
                 'user_email' => 'private@example.test',
             );
+            $GLOBALS['asn_test_pmpro_levels'][ $id ] = 0 === $id % 2 ? 2 : 1;
         }
+
+        $GLOBALS['asn_test_profile_rows'][26] = array(
+            'user_id' => 26,
+            'display_name' => 'Legacy Nonmember',
+            'country' => 'Canada',
+            'age' => 40,
+            'gender' => 'Male',
+            'job_title' => 'Legacy',
+            'dialect' => 'eastern',
+            'proficiency' => 'fluent',
+            'registered_at' => '2025-01-26 00:00:00',
+            'user_email' => 'legacy@example.test',
+        );
     }
 
     protected function tearDown(): void {
         global $wpdb;
         $wpdb = $this->wpdb;
         $GLOBALS['asn_test_profile_rows'] = $this->rows;
+        $GLOBALS['asn_test_pmpro_levels'] = $this->levels;
     }
 
     public function test_request_normalization_is_bounded_and_allowlisted(): void {
@@ -133,6 +158,20 @@ final class DirectoryTest extends TestCase {
         $this->assertSame( 25, $page1['items'][0]['user_id'] );
         $this->assertCount( 5, $page2['items'] );
         $this->assertSame( 2, Directory_Service::search( array( 'page' => 9999 ) )['page'] );
+    }
+
+    public function test_search_excludes_profiles_without_level_one_or_level_two(): void {
+        $result = Directory_Service::search( array() );
+
+        $ids = array_map(
+            static function ( $item ) {
+                return (int) $item['user_id'];
+            },
+            $result['items']
+        );
+
+        $this->assertSame( 25, $result['total'] );
+        $this->assertNotContains( 26, $ids );
     }
 
     public function test_private_fields_are_not_returned_and_hostile_search_stays_data(): void {
