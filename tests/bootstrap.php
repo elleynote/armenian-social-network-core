@@ -305,6 +305,16 @@ if ( ! function_exists( 'pmpro_hasMembershipLevel' ) ) {
     }
 }
 
+if ( ! function_exists( 'pmpro_changeMembershipLevel' ) ) {
+    function pmpro_changeMembershipLevel( $level_id, $user_id ) {
+        if ( (int) $level_id <= 0 || (int) $user_id <= 0 ) {
+            return false;
+        }
+        $GLOBALS['asn_test_pmpro_levels'][ (int) $user_id ] = (int) $level_id;
+        return true;
+    }
+}
+
 if ( ! function_exists( 'sanitize_text_field' ) ) {
     function sanitize_text_field( $value ) {
         $value = strip_tags( (string) $value );
