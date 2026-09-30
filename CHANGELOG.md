@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.8 - Explore active members only
+
+- The ASN Explore directory now includes only users with an active PMPro Level 1 or Level 2 membership.
+- Legacy WordPress profiles without an active ASN chat membership are excluded from Explore results and pagination.
+- This keeps Explore aligned with the Better Messages entitlement rules while AtomChat remains installed as the fallback transport during the remaining cutover work.
+
 ## 0.3.7 - Paid checkout success redirect
 
 - Successful paid orders containing WooCommerce product 152 now return the member directly to `/asn-explore-test/` instead of the WooCommerce order-received page.
