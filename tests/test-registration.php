@@ -63,6 +63,8 @@ final class ASN_Test_WC_Product {
 final class RegistrationTest extends TestCase {
     protected function setUp(): void {
         $GLOBALS['asn_test_wc_products'] = array();
+        $GLOBALS['asn_test_scheduled_events'] = array();
+        $GLOBALS['asn_test_new_user_notifications'] = array();
     }
     public function test_registration_shortcode_and_handlers_are_registered(): void {
         $GLOBALS['asn_test_shortcodes'] = array();
@@ -79,7 +81,31 @@ final class RegistrationTest extends TestCase {
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_nopriv_asn_register_account'] ?? array() );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_register_profile'] ?? array() );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_choose_free_plan'] ?? array() );
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['asn_send_new_user_notification'] ?? array() );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['template_redirect'] ?? array() );
+    }
+
+    public function test_new_user_notification_is_scheduled_instead_of_sent_inline(): void {
+        $this->assertTrue( Registration::schedule_new_user_notification( 8 ) );
+        $this->assertCount( 1, $GLOBALS['asn_test_scheduled_events'] );
+        $this->assertSame( 'asn_send_new_user_notification', $GLOBALS['asn_test_scheduled_events'][0]['hook'] );
+        $this->assertSame( array( 8 ), $GLOBALS['asn_test_scheduled_events'][0]['args'] );
+        $this->assertSame( array(), $GLOBALS['asn_test_new_user_notifications'] );
+
+        $this->assertTrue( Registration::schedule_new_user_notification( 8 ) );
+        $this->assertCount( 1, $GLOBALS['asn_test_scheduled_events'] );
+
+        ( new Registration() )->send_new_user_notification( 8 );
+
+        $this->assertSame(
+            array(
+                array(
+                    'user_id' => 8,
+                    'notify'  => 'both',
+                ),
+            ),
+            $GLOBALS['asn_test_new_user_notifications']
+        );
     }
 
     public function test_birth_date_validation_returns_age_or_null(): void {
