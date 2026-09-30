@@ -94,7 +94,11 @@ final class Registration {
 
         $scheduled = wp_schedule_single_event( time() + 5, $hook, $args, true );
 
-        return ! is_wp_error( $scheduled ) && false !== $scheduled;
+        if ( false === $scheduled ) {
+            return false;
+        }
+
+        return ! function_exists( 'is_wp_error' ) || ! is_wp_error( $scheduled );
     }
 
     public function send_new_user_notification( $user_id ): void {
