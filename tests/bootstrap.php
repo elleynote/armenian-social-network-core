@@ -24,6 +24,7 @@ $GLOBALS['asn_test_valid_nonce'] = 'valid-nonce';
 $GLOBALS['asn_test_redirect'] = '';
 $GLOBALS['asn_test_referer'] = 'https://example.test/asn-profile-test/';
 $GLOBALS['asn_test_better_messages_enabled'] = false;
+$GLOBALS['asn_test_wc_products'] = array();
 
 class ASN_Test_WPDB {
     public $prefix = 'wp_';
@@ -218,6 +219,18 @@ if ( ! function_exists( 'Better_Messages' ) ) {
             $instance = new ASN_Test_Better_Messages();
         }
         return $instance;
+    }
+}
+
+if ( ! function_exists( 'wc_get_product' ) ) {
+    function wc_get_product( $product_id ) {
+        return $GLOBALS['asn_test_wc_products'][ (int) $product_id ] ?? null;
+    }
+}
+
+if ( ! function_exists( 'wc_get_checkout_url' ) ) {
+    function wc_get_checkout_url() {
+        return 'https://example.test/checkout/';
     }
 }
 
