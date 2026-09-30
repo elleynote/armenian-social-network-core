@@ -30,6 +30,14 @@ final class PluginBootstrapTest extends TestCase {
         $this->assertSame( 4, $join[0]['accepted_args'] ?? 0 );
     }
 
+    public function test_paid_checkout_return_filter_is_registered(): void {
+        $filters = $GLOBALS['asn_test_filters']['woocommerce_get_return_url'] ?? array();
+
+        $this->assertNotEmpty( $filters );
+        $this->assertSame( 20, $filters[0]['priority'] ?? 0 );
+        $this->assertSame( 2, $filters[0]['accepted_args'] ?? 0 );
+    }
+
     public function test_plugin_instance_is_singleton(): void {
         $this->assertSame( Plugin::instance(), Plugin::instance() );
     }
