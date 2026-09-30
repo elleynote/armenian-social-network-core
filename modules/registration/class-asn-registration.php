@@ -17,6 +17,7 @@ final class Registration {
         add_action( 'admin_post_nopriv_asn_register_account', array( $this, 'handle_account' ) );
         add_action( 'admin_post_asn_register_profile', array( $this, 'handle_profile' ) );
         add_action( 'admin_post_asn_choose_free_plan', array( $this, 'handle_free_plan' ) );
+        add_action( 'template_redirect', array( $this, 'maybe_redirect_completed_free_signup' ), 1 );
     }
 
     public function handle_account(): void {
@@ -150,6 +151,9 @@ final class Registration {
             return;
         }
 
+        update_user_meta( $user_id, '_asn_free_onboarding_redirect_url', $explore_url );
+        update_user_meta( $user_id, '_asn_free_onboarding_redirect_expires', time() + 900 );
+
         $redirect_filter = static function ( $location, $status ) use ( $explore_url ) {
             return self::rewrite_legacy_free_plan_redirect( (string) $location, $explore_url );
         };
@@ -160,11 +164,43 @@ final class Registration {
         remove_filter( 'wp_redirect', $redirect_filter, 999 );
 
         if ( ! $assigned ) {
+            delete_user_meta( $user_id, '_asn_free_onboarding_redirect_url' );
+            delete_user_meta( $user_id, '_asn_free_onboarding_redirect_expires' );
             $this->redirect_with_error( add_query_arg( 'asn_step', 'plan', $return_url ), 'membership' );
             return;
         }
 
         Profile_Index::sync_user( $user_id );
+        $this->redirect( $explore_url );
+    }
+
+    public function maybe_redirect_completed_free_signup(): void {
+        $user_id = (int) get_current_user_id();
+        if ( ! is_user_logged_in() || $user_id <= 0 ) {
+            return;
+        }
+
+        $step = isset( $_GET['step'] ) ? sanitize_text_field( wp_unslash( $_GET['step'] ) ) : '';
+        $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '';
+        $path = (string) parse_url( $request_uri, PHP_URL_PATH );
+
+        if ( '2' !== $step || '/register/' !== trailingslashit( $path ) ) {
+            return;
+        }
+
+        $explore_url = (string) get_user_meta( $user_id, '_asn_free_onboarding_redirect_url', true );
+        $expires = (int) get_user_meta( $user_id, '_asn_free_onboarding_redirect_expires', true );
+
+        if ( '' === $explore_url || $expires < time() || ! Memberships::can_text_chat( $user_id ) ) {
+            if ( $expires > 0 && $expires < time() ) {
+                delete_user_meta( $user_id, '_asn_free_onboarding_redirect_url' );
+                delete_user_meta( $user_id, '_asn_free_onboarding_redirect_expires' );
+            }
+            return;
+        }
+
+        delete_user_meta( $user_id, '_asn_free_onboarding_redirect_url' );
+        delete_user_meta( $user_id, '_asn_free_onboarding_redirect_expires' );
         $this->redirect( $explore_url );
     }
 

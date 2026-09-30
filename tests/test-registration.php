@@ -20,6 +20,7 @@ final class RegistrationTest extends TestCase {
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_nopriv_asn_register_account'] ?? array() );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_register_profile'] ?? array() );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_choose_free_plan'] ?? array() );
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['template_redirect'] ?? array() );
     }
 
     public function test_birth_date_validation_returns_age_or_null(): void {
@@ -47,6 +48,36 @@ final class RegistrationTest extends TestCase {
             'https://example.test/other/?step=2',
             Registration::rewrite_legacy_free_plan_redirect( 'https://example.test/other/?step=2', $explore )
         );
+    }
+
+    public function test_completed_free_signup_redirects_legacy_step_two_to_parallel_explore(): void {
+        $previous_uri = $_SERVER['REQUEST_URI'] ?? null;
+        $previous_get = $_GET;
+        $previous_redirect = $GLOBALS['asn_test_redirect'];
+        $previous_url = $GLOBALS['asn_test_user_meta'][8]['_asn_free_onboarding_redirect_url'] ?? null;
+        $previous_expires = $GLOBALS['asn_test_user_meta'][8]['_asn_free_onboarding_redirect_expires'] ?? null;
+
+        $_SERVER['REQUEST_URI'] = '/register/?step=2';
+        $_GET = array( 'step' => '2' );
+        $GLOBALS['asn_test_current_user_id'] = 8;
+        $GLOBALS['asn_test_logged_in'] = true;
+        $GLOBALS['asn_test_pmpro_levels'][8] = 1;
+        $GLOBALS['asn_test_user_meta'][8]['_asn_free_onboarding_redirect_url'] = 'https://example.test/asn-explore-test/';
+        $GLOBALS['asn_test_user_meta'][8]['_asn_free_onboarding_redirect_expires'] = time() + 300;
+        $GLOBALS['asn_test_redirect'] = '';
+
+        try {
+            ( new Registration() )->maybe_redirect_completed_free_signup();
+            $this->assertSame( 'https://example.test/asn-explore-test/', $GLOBALS['asn_test_redirect'] );
+            $this->assertArrayNotHasKey( '_asn_free_onboarding_redirect_url', $GLOBALS['asn_test_user_meta'][8] );
+            $this->assertArrayNotHasKey( '_asn_free_onboarding_redirect_expires', $GLOBALS['asn_test_user_meta'][8] );
+        } finally {
+            $_GET = $previous_get;
+            if ( null === $previous_uri ) { unset( $_SERVER['REQUEST_URI'] ); } else { $_SERVER['REQUEST_URI'] = $previous_uri; }
+            $GLOBALS['asn_test_redirect'] = $previous_redirect;
+            if ( null === $previous_url ) { unset( $GLOBALS['asn_test_user_meta'][8]['_asn_free_onboarding_redirect_url'] ); } else { $GLOBALS['asn_test_user_meta'][8]['_asn_free_onboarding_redirect_url'] = $previous_url; }
+            if ( null === $previous_expires ) { unset( $GLOBALS['asn_test_user_meta'][8]['_asn_free_onboarding_redirect_expires'] ); } else { $GLOBALS['asn_test_user_meta'][8]['_asn_free_onboarding_redirect_expires'] = $previous_expires; }
+        }
     }
 
     public function test_pmpro_helper_assigns_free_level(): void {
