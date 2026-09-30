@@ -7,6 +7,8 @@ use ASN\Core\Profiles\Legacy_Profile_Contract;
 defined( 'ABSPATH' ) || exit;
 
 final class Registration_Shortcode {
+    private const PAID_PRODUCT_ID = 152;
+
     private $registered = false;
 
     public function register(): void {
@@ -62,7 +64,89 @@ final class Registration_Shortcode {
     }
 
     public static function default_paid_checkout_url(): string {
-        return site_url( '/checkout/?add-to-cart=152&quantity=1' );
+        $fallback = site_url( '/checkout/?add-to-cart=' . self::PAID_PRODUCT_ID . '&quantity=1' );
+
+        if ( ! function_exists( 'wc_get_product' ) ) {
+            return $fallback;
+        }
+
+        $product = wc_get_product( self::PAID_PRODUCT_ID );
+        if ( ! is_object( $product ) || ! is_callable( array( $product, 'is_type' ) ) ) {
+            return $fallback;
+        }
+
+        if ( ! $product->is_type( array( 'variable', 'variable-subscription' ) ) ) {
+            return $fallback;
+        }
+
+        $product_url = is_callable( array( $product, 'get_permalink' ) )
+            ? (string) $product->get_permalink()
+            : site_url( '/?p=' . self::PAID_PRODUCT_ID );
+
+        if ( ! is_callable( array( $product, 'get_children' ) ) ) {
+            return $product_url;
+        }
+
+        $variations = array();
+        foreach ( (array) $product->get_children() as $variation_id ) {
+            $variation_id = absint( $variation_id );
+            if ( $variation_id <= 0 ) {
+                continue;
+            }
+
+            $variation = wc_get_product( $variation_id );
+            if ( ! is_object( $variation ) ) {
+                continue;
+            }
+
+            if ( is_callable( array( $variation, 'is_purchasable' ) ) && ! $variation->is_purchasable() ) {
+                continue;
+            }
+
+            if ( is_callable( array( $variation, 'is_in_stock' ) ) && ! $variation->is_in_stock() ) {
+                continue;
+            }
+
+            $variations[] = $variation;
+        }
+
+        if ( 1 !== count( $variations ) ) {
+            return $product_url;
+        }
+
+        $variation = $variations[0];
+        $variation_id = is_callable( array( $variation, 'get_id' ) ) ? (int) $variation->get_id() : 0;
+        if ( $variation_id <= 0 ) {
+            return $product_url;
+        }
+
+        $attributes = is_callable( array( $variation, 'get_variation_attributes' ) )
+            ? (array) $variation->get_variation_attributes()
+            : array();
+
+        foreach ( $attributes as $attribute_value ) {
+            if ( '' === (string) $attribute_value ) {
+                return $product_url;
+            }
+        }
+
+        $checkout_url = function_exists( 'wc_get_checkout_url' )
+            ? (string) wc_get_checkout_url()
+            : site_url( '/checkout/' );
+
+        $checkout_url = add_query_arg( 'add-to-cart', self::PAID_PRODUCT_ID, $checkout_url );
+        $checkout_url = add_query_arg( 'variation_id', $variation_id, $checkout_url );
+        $checkout_url = add_query_arg( 'quantity', 1, $checkout_url );
+
+        foreach ( $attributes as $attribute_name => $attribute_value ) {
+            $checkout_url = add_query_arg(
+                sanitize_key( (string) $attribute_name ),
+                (string) $attribute_value,
+                $checkout_url
+            );
+        }
+
+        return $checkout_url;
     }
 
     private static function render_account_form( string $register_url ): void {

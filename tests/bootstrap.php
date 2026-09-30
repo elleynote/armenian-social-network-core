@@ -24,6 +24,7 @@ $GLOBALS['asn_test_valid_nonce'] = 'valid-nonce';
 $GLOBALS['asn_test_redirect'] = '';
 $GLOBALS['asn_test_referer'] = 'https://example.test/asn-profile-test/';
 $GLOBALS['asn_test_better_messages_enabled'] = false;
+$GLOBALS['asn_test_wc_products'] = array();
 
 class ASN_Test_WPDB {
     public $prefix = 'wp_';
@@ -221,6 +222,18 @@ if ( ! function_exists( 'Better_Messages' ) ) {
     }
 }
 
+if ( ! function_exists( 'wc_get_product' ) ) {
+    function wc_get_product( $product_id ) {
+        return $GLOBALS['asn_test_wc_products'][ (int) $product_id ] ?? null;
+    }
+}
+
+if ( ! function_exists( 'wc_get_checkout_url' ) ) {
+    function wc_get_checkout_url() {
+        return 'https://example.test/checkout/';
+    }
+}
+
 require_once dirname( __DIR__ ) . '/asn-core.php';
 
 $GLOBALS['asn_test_users'] = array(
@@ -323,6 +336,11 @@ if ( ! function_exists( 'sanitize_text_field' ) ) {
 }
 if ( ! function_exists( 'sanitize_textarea_field' ) ) {
     function sanitize_textarea_field( $value ) { return trim( strip_tags( (string) $value ) ); }
+}
+if ( ! function_exists( 'sanitize_key' ) ) {
+    function sanitize_key( $value ) {
+        return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $value ) );
+    }
 }
 if ( ! function_exists( 'sanitize_email' ) ) {
     function sanitize_email( $value ) { return filter_var( (string) $value, FILTER_SANITIZE_EMAIL ); }

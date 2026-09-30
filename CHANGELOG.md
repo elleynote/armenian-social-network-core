@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.5 - Paid subscription variation auto-selection
+
+- Detects WooCommerce product 152 at runtime when the Level 2 paid signup button is rendered.
+- If product 152 has exactly one available purchasable variation, ASN Core automatically includes that variation and its attributes in the checkout URL so the member does not have to choose product options manually.
+- If multiple paid variations exist, the member is sent to the product page instead of an invalid empty-cart checkout.
+- WooCommerce Subscriptions and WooPayments remain the billing source of truth.
+
 ## 0.3.4 - Paid signup checkout routing
 
 - Changed the parallel Level 2 paid signup button from the missing `/upgrade/` page to the site's existing WooCommerce subscription checkout for product 152.
