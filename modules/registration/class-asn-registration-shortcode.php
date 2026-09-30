@@ -23,7 +23,7 @@ final class Registration_Shortcode {
             array(
                 'register_url' => site_url( '/asn-register-test/' ),
                 'explore_url'  => site_url( '/asn-explore-test/' ),
-                'paid_url'     => site_url( '/upgrade/' ),
+                'paid_url'     => self::default_paid_checkout_url(),
             ),
             $atts,
             'asn_register'
@@ -59,6 +59,10 @@ final class Registration_Shortcode {
 
         echo '</div>';
         return (string) ob_get_clean();
+    }
+
+    public static function default_paid_checkout_url(): string {
+        return site_url( '/checkout/?add-to-cart=152&quantity=1' );
     }
 
     private static function render_account_form( string $register_url ): void {

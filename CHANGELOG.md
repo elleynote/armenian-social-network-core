@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.4 - Paid signup checkout routing
+
+- Changed the parallel Level 2 paid signup button from the missing `/upgrade/` page to the site's existing WooCommerce subscription checkout for product 152.
+- The paid path now uses `/checkout/?add-to-cart=152&quantity=1`, matching the existing TunApp paid-plan flow.
+- WooCommerce Subscriptions and WooPayments remain the billing source of truth; ASN Core does not create billing records itself.
+
 ## 0.3.3 - Legacy profile metadata compatibility
 
 - New ASN registrations now save the legacy `dob_date` and `dob` user-meta keys in addition to ASN profile data.

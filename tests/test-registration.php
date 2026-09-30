@@ -104,6 +104,13 @@ final class RegistrationTest extends TestCase {
         }
     }
 
+    public function test_paid_signup_uses_existing_subscription_checkout_product(): void {
+        $this->assertSame(
+            'https://example.test/checkout/?add-to-cart=152&quantity=1',
+            Registration_Shortcode::default_paid_checkout_url()
+        );
+    }
+
     public function test_pmpro_helper_assigns_free_level(): void {
         $previous = $GLOBALS['asn_test_pmpro_levels'][8] ?? null;
         unset( $GLOBALS['asn_test_pmpro_levels'][8] );
