@@ -347,6 +347,17 @@ if ( ! function_exists( 'update_user_meta' ) ) {
         return true;
     }
 }
+if ( ! function_exists( 'delete_user_meta' ) ) {
+    function delete_user_meta( $user_id, $key ) {
+        unset( $GLOBALS['asn_test_user_meta'][ $user_id ][ $key ] );
+        return true;
+    }
+}
+if ( ! function_exists( 'trailingslashit' ) ) {
+    function trailingslashit( $value ) {
+        return rtrim( (string) $value, '/\\' ) . '/';
+    }
+}
 if ( ! function_exists( 'is_user_logged_in' ) ) {
     function is_user_logged_in() { return (bool) $GLOBALS['asn_test_logged_in']; }
 }
