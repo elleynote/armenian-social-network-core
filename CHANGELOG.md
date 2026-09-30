@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 - Parallel registration and Level 1 onboarding
+
+- Added a parallel `[asn_register]` flow for testing signup without replacing the live legacy `[tac_reg_form]` page.
+- Added account creation, core profile details, plan selection, and automatic PMPro Level 1 assignment for the free path.
+- Free members are redirected to the parallel ASN Explore page after Level 1 activation so text and live voice entitlements are immediately available.
+- The paid choice continues through the existing WooCommerce upgrade/subscription flow; ASN Core does not create or modify paid billing records.
+- Kept the legacy registration page, AtomChat, WooCommerce billing, PMPro paid mapping, and Tun SSO unchanged during parallel testing.
+
 ## 0.2.9 - Better Messages WebSocket call gating
 
 - Added Better Messages WebSocket audio-call permission checks backed by PMPro: Level 1 and Level 2 members can use live audio calls.

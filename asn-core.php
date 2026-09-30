@@ -3,14 +3,14 @@
  * Plugin Name: ASN Core
  * Plugin URI: https://armeniansocialnetwork.com/
  * Description: Core social-network foundation for Armenian Social Network.
- * Version: 0.2.9
+ * Version: 0.3.0
  * Author: Imran Gul
  * Text Domain: asn-core
  */
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'ASN_CORE_VERSION', '0.2.9' );
+define( 'ASN_CORE_VERSION', '0.3.0' );
 define( 'ASN_CORE_FILE', __FILE__ );
 define( 'ASN_CORE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'ASN_CORE_URL', plugin_dir_url( __FILE__ ) );
@@ -27,6 +27,8 @@ require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-form.php';
 require_once ASN_CORE_PATH . 'modules/directory/class-asn-directory-query.php';
 require_once ASN_CORE_PATH . 'modules/directory/class-asn-directory-service.php';
 require_once ASN_CORE_PATH . 'modules/directory/class-asn-directory-shortcode.php';
+require_once ASN_CORE_PATH . 'modules/registration/class-asn-registration.php';
+require_once ASN_CORE_PATH . 'modules/registration/class-asn-registration-shortcode.php';
 require_once ASN_CORE_PATH . 'integrations/pmpro/class-asn-pmpro.php';
 require_once ASN_CORE_PATH . 'integrations/atomchat/class-asn-atomchat.php';
 require_once ASN_CORE_PATH . 'integrations/better-messages/class-asn-better-messages.php';

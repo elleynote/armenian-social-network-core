@@ -26,6 +26,14 @@ final class PMPro_Integration {
         return null;
     }
 
+    public static function assign_level( int $level_id, int $user_id ): bool {
+        if ( $level_id <= 0 || $user_id <= 0 || ! function_exists( 'pmpro_changeMembershipLevel' ) ) {
+            return false;
+        }
+
+        return (bool) pmpro_changeMembershipLevel( $level_id, $user_id );
+    }
+
     public static function has_level( int $level_id, int $user_id ): bool {
         if ( ! self::is_available() ) {
             return false;
