@@ -4,7 +4,66 @@ use ASN\Core\Registration\Registration;
 use ASN\Core\Registration\Registration_Shortcode;
 use PHPUnit\Framework\TestCase;
 
+final class ASN_Test_WC_Product {
+    private $id;
+    private $type;
+    private $children;
+    private $permalink;
+    private $purchasable;
+    private $in_stock;
+    private $attributes;
+
+    public function __construct(
+        int $id,
+        string $type,
+        array $children = array(),
+        string $permalink = '',
+        bool $purchasable = true,
+        bool $in_stock = true,
+        array $attributes = array()
+    ) {
+        $this->id = $id;
+        $this->type = $type;
+        $this->children = $children;
+        $this->permalink = $permalink;
+        $this->purchasable = $purchasable;
+        $this->in_stock = $in_stock;
+        $this->attributes = $attributes;
+    }
+
+    public function is_type( $types ): bool {
+        return in_array( $this->type, (array) $types, true );
+    }
+
+    public function get_children(): array {
+        return $this->children;
+    }
+
+    public function get_permalink(): string {
+        return $this->permalink;
+    }
+
+    public function get_id(): int {
+        return $this->id;
+    }
+
+    public function is_purchasable(): bool {
+        return $this->purchasable;
+    }
+
+    public function is_in_stock(): bool {
+        return $this->in_stock;
+    }
+
+    public function get_variation_attributes(): array {
+        return $this->attributes;
+    }
+}
+
 final class RegistrationTest extends TestCase {
+    protected function setUp(): void {
+        $GLOBALS['asn_test_wc_products'] = array();
+    }
     public function test_registration_shortcode_and_handlers_are_registered(): void {
         $GLOBALS['asn_test_shortcodes'] = array();
 
@@ -107,6 +166,45 @@ final class RegistrationTest extends TestCase {
     public function test_paid_signup_uses_existing_subscription_checkout_product(): void {
         $this->assertSame(
             'https://example.test/checkout/?add-to-cart=152&quantity=1',
+            Registration_Shortcode::default_paid_checkout_url()
+        );
+    }
+
+    public function test_paid_signup_auto_selects_the_only_available_variation(): void {
+        $GLOBALS['asn_test_wc_products'][152] = new ASN_Test_WC_Product(
+            152,
+            'variable-subscription',
+            array( 315 ),
+            'https://example.test/product/unlimited-text-voice-and-video-chat/'
+        );
+        $GLOBALS['asn_test_wc_products'][315] = new ASN_Test_WC_Product(
+            315,
+            'subscription_variation',
+            array(),
+            '',
+            true,
+            true,
+            array( 'attribute_billing_period' => 'month' )
+        );
+
+        $this->assertSame(
+            'https://example.test/checkout/?add-to-cart=152&variation_id=315&quantity=1&attribute_billing_period=month',
+            Registration_Shortcode::default_paid_checkout_url()
+        );
+    }
+
+    public function test_paid_signup_uses_product_page_when_multiple_variations_need_a_choice(): void {
+        $GLOBALS['asn_test_wc_products'][152] = new ASN_Test_WC_Product(
+            152,
+            'variable-subscription',
+            array( 315, 316 ),
+            'https://example.test/product/unlimited-text-voice-and-video-chat/'
+        );
+        $GLOBALS['asn_test_wc_products'][315] = new ASN_Test_WC_Product( 315, 'subscription_variation' );
+        $GLOBALS['asn_test_wc_products'][316] = new ASN_Test_WC_Product( 316, 'subscription_variation' );
+
+        $this->assertSame(
+            'https://example.test/product/unlimited-text-voice-and-video-chat/',
             Registration_Shortcode::default_paid_checkout_url()
         );
     }
