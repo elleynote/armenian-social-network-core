@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.2 - Robust free signup redirect
+
+- Added a short-lived onboarding redirect marker before PMPro Level 1 assignment.
+- If legacy code sends the new free member to `/register/?step=2`, ASN Core now catches that next request and redirects directly to the configured ASN Explore page.
+- The redirect only applies to the user who just completed the ASN free onboarding flow and expires automatically.
+
 ## 0.3.1 - Free plan Explore redirect fix
 
 - Scoped the parallel free-plan signup request so any legacy redirect to `/register/?step=2` is rewritten to the configured ASN Explore test page.
