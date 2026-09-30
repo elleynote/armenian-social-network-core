@@ -27,6 +27,8 @@ require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-form.php';
 require_once ASN_CORE_PATH . 'modules/directory/class-asn-directory-query.php';
 require_once ASN_CORE_PATH . 'modules/directory/class-asn-directory-service.php';
 require_once ASN_CORE_PATH . 'modules/directory/class-asn-directory-shortcode.php';
+require_once ASN_CORE_PATH . 'modules/registration/class-asn-registration.php';
+require_once ASN_CORE_PATH . 'modules/registration/class-asn-registration-shortcode.php';
 require_once ASN_CORE_PATH . 'integrations/pmpro/class-asn-pmpro.php';
 require_once ASN_CORE_PATH . 'integrations/atomchat/class-asn-atomchat.php';
 require_once ASN_CORE_PATH . 'integrations/better-messages/class-asn-better-messages.php';
