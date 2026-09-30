@@ -1,11 +1,22 @@
 <?php
 use ASN\Core\Integrations\PMPro_Integration;
 use ASN\Core\Registration\Registration;
+use ASN\Core\Registration\Registration_Shortcode;
 use PHPUnit\Framework\TestCase;
 
 final class RegistrationTest extends TestCase {
     public function test_registration_shortcode_and_handlers_are_registered(): void {
+        $GLOBALS['asn_test_shortcodes'] = array();
+
+        $shortcode = new Registration_Shortcode();
+        $shortcode->register();
+        $shortcode->register();
+
+        $registration = new Registration();
+        $registration->register();
+
         $this->assertArrayHasKey( 'asn_register', $GLOBALS['asn_test_shortcodes'] );
+        $this->assertCount( 1, $GLOBALS['asn_test_shortcodes'] );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_nopriv_asn_register_account'] ?? array() );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_register_profile'] ?? array() );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_choose_free_plan'] ?? array() );
