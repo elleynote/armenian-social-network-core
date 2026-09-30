@@ -32,6 +32,23 @@ final class RegistrationTest extends TestCase {
         $this->assertNull( Registration::age_from_birth_date( '2999-01-01' ) );
     }
 
+    public function test_legacy_free_plan_redirect_is_rewritten_to_parallel_explore(): void {
+        $explore = 'https://example.test/asn-explore-test/';
+
+        $this->assertSame(
+            $explore,
+            Registration::rewrite_legacy_free_plan_redirect( 'https://example.test/register/?step=2', $explore )
+        );
+        $this->assertSame(
+            'https://example.test/register/?step=1',
+            Registration::rewrite_legacy_free_plan_redirect( 'https://example.test/register/?step=1', $explore )
+        );
+        $this->assertSame(
+            'https://example.test/other/?step=2',
+            Registration::rewrite_legacy_free_plan_redirect( 'https://example.test/other/?step=2', $explore )
+        );
+    }
+
     public function test_pmpro_helper_assigns_free_level(): void {
         $previous = $GLOBALS['asn_test_pmpro_levels'][8] ?? null;
         unset( $GLOBALS['asn_test_pmpro_levels'][8] );
