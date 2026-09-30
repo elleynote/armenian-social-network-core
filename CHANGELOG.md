@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 - Free plan Explore redirect fix
+
+- Scoped the parallel free-plan signup request so any legacy redirect to `/register/?step=2` is rewritten to the configured ASN Explore test page.
+- Kept PMPro Level 1 assignment as the entitlement source and left the live legacy registration page unchanged.
+
 ## 0.3.0 - Parallel registration and Level 1 onboarding
 
 - Added a parallel `[asn_register]` flow for testing signup without replacing the live legacy `[tac_reg_form]` page.
