@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.6 - Monthly Level 2 checkout selection
+
+- Product 152 currently offers Monthly and Annually subscription variations.
+- The ASN Level 2 paid signup now automatically selects the Monthly variation, matching the current monthly signup offer, and sends the member directly to WooCommerce checkout.
+- If the variation setup becomes ambiguous in the future, ASN Core falls back to the product page instead of guessing.
+- WooCommerce Subscriptions and WooPayments remain the billing source of truth.
+
 ## 0.3.5 - Paid subscription variation auto-selection
 
 - Detects WooCommerce product 152 at runtime when the Level 2 paid signup button is rendered.

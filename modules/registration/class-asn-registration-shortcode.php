@@ -110,11 +110,10 @@ final class Registration_Shortcode {
             $variations[] = $variation;
         }
 
-        if ( 1 !== count( $variations ) ) {
+        $variation = self::select_paid_variation( $variations );
+        if ( null === $variation ) {
             return $product_url;
         }
-
-        $variation = $variations[0];
         $variation_id = is_callable( array( $variation, 'get_id' ) ) ? (int) $variation->get_id() : 0;
         if ( $variation_id <= 0 ) {
             return $product_url;
@@ -147,6 +146,29 @@ final class Registration_Shortcode {
         }
 
         return $checkout_url;
+    }
+
+    public static function select_paid_variation( array $variations ) {
+        if ( 1 === count( $variations ) ) {
+            return $variations[0];
+        }
+
+        $monthly = array();
+        foreach ( $variations as $variation ) {
+            if ( ! is_object( $variation ) || ! is_callable( array( $variation, 'get_variation_attributes' ) ) ) {
+                continue;
+            }
+
+            foreach ( (array) $variation->get_variation_attributes() as $attribute_value ) {
+                $normalized = strtolower( trim( (string) $attribute_value ) );
+                if ( in_array( $normalized, array( 'month', 'monthly' ), true ) ) {
+                    $monthly[] = $variation;
+                    break;
+                }
+            }
+        }
+
+        return 1 === count( $monthly ) ? $monthly[0] : null;
     }
 
     private static function render_account_form( string $register_url ): void {

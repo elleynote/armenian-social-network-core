@@ -193,15 +193,63 @@ final class RegistrationTest extends TestCase {
         );
     }
 
-    public function test_paid_signup_uses_product_page_when_multiple_variations_need_a_choice(): void {
+    public function test_paid_signup_prefers_monthly_when_monthly_and_annual_are_available(): void {
         $GLOBALS['asn_test_wc_products'][152] = new ASN_Test_WC_Product(
             152,
             'variable-subscription',
             array( 315, 316 ),
             'https://example.test/product/unlimited-text-voice-and-video-chat/'
         );
-        $GLOBALS['asn_test_wc_products'][315] = new ASN_Test_WC_Product( 315, 'subscription_variation' );
-        $GLOBALS['asn_test_wc_products'][316] = new ASN_Test_WC_Product( 316, 'subscription_variation' );
+        $GLOBALS['asn_test_wc_products'][315] = new ASN_Test_WC_Product(
+            315,
+            'subscription_variation',
+            array(),
+            '',
+            true,
+            true,
+            array( 'attribute_please-select' => 'Monthly' )
+        );
+        $GLOBALS['asn_test_wc_products'][316] = new ASN_Test_WC_Product(
+            316,
+            'subscription_variation',
+            array(),
+            '',
+            true,
+            true,
+            array( 'attribute_please-select' => 'Annually' )
+        );
+
+        $this->assertSame(
+            'https://example.test/checkout/?add-to-cart=152&variation_id=315&quantity=1&attribute_please-select=Monthly',
+            Registration_Shortcode::default_paid_checkout_url()
+        );
+    }
+
+    public function test_paid_signup_uses_product_page_when_multiple_variations_are_ambiguous(): void {
+        $GLOBALS['asn_test_wc_products'][152] = new ASN_Test_WC_Product(
+            152,
+            'variable-subscription',
+            array( 315, 316 ),
+            'https://example.test/product/unlimited-text-voice-and-video-chat/'
+        );
+        $GLOBALS['asn_test_wc_products'][315] = new ASN_Test_WC_Product(
+            315,
+            'subscription_variation',
+            array(),
+            '',
+            true,
+            true,
+            array( 'attribute_plan' => 'Standard' )
+        );
+        $GLOBALS['asn_test_wc_products'][316] = new ASN_Test_WC_Product(
+            316,
+            'subscription_variation',
+            array(),
+            '',
+            true,
+            true,
+            array( 'attribute_plan' => 'Premium' )
+        );
 
         $this->assertSame(
             'https://example.test/product/unlimited-text-voice-and-video-chat/',
