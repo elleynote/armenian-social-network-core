@@ -131,6 +131,7 @@ final class Registration {
         }
 
         update_user_meta( $user_id, 'birth_date', $birth_date );
+        self::save_legacy_birth_meta( $user_id, $birth_date, $age );
 
         $this->redirect( add_query_arg( 'asn_step', 'plan', $return_url ) );
     }
@@ -202,6 +203,15 @@ final class Registration {
         delete_user_meta( $user_id, '_asn_free_onboarding_redirect_url' );
         delete_user_meta( $user_id, '_asn_free_onboarding_redirect_expires' );
         $this->redirect( $explore_url );
+    }
+
+    public static function save_legacy_birth_meta( int $user_id, string $birth_date, int $age ): void {
+        if ( $user_id <= 0 || '' === trim( $birth_date ) || $age <= 0 ) {
+            return;
+        }
+
+        update_user_meta( $user_id, 'dob_date', $birth_date );
+        update_user_meta( $user_id, 'dob', $age );
     }
 
     public static function rewrite_legacy_free_plan_redirect( string $location, string $explore_url ): string {
