@@ -17,6 +17,7 @@ final class Registration {
         add_action( 'admin_post_nopriv_asn_register_account', array( $this, 'handle_account' ) );
         add_action( 'admin_post_asn_register_profile', array( $this, 'handle_profile' ) );
         add_action( 'admin_post_asn_choose_free_plan', array( $this, 'handle_free_plan' ) );
+        add_action( 'asn_send_new_user_notification', array( $this, 'send_new_user_notification' ), 10, 1 );
         add_action( 'template_redirect', array( $this, 'maybe_redirect_completed_free_signup' ), 1 );
     }
 
@@ -74,11 +75,40 @@ final class Registration {
         wp_set_current_user( $user_id );
         wp_set_auth_cookie( $user_id, true );
 
-        if ( function_exists( 'wp_new_user_notification' ) ) {
-            wp_new_user_notification( $user_id, null, 'both' );
-        }
+        self::schedule_new_user_notification( $user_id );
 
         $this->redirect( add_query_arg( 'asn_step', 'profile', $return_url ) );
+    }
+
+    public static function schedule_new_user_notification( int $user_id ): bool {
+        if ( $user_id <= 0 || ! function_exists( 'wp_schedule_single_event' ) ) {
+            return false;
+        }
+
+        $hook = 'asn_send_new_user_notification';
+        $args = array( $user_id );
+
+        if ( function_exists( 'wp_next_scheduled' ) && wp_next_scheduled( $hook, $args ) ) {
+            return true;
+        }
+
+        $scheduled = wp_schedule_single_event( time() + 5, $hook, $args, true );
+
+        if ( false === $scheduled ) {
+            return false;
+        }
+
+        return ! function_exists( 'is_wp_error' ) || ! is_wp_error( $scheduled );
+    }
+
+    public function send_new_user_notification( $user_id ): void {
+        $user_id = (int) $user_id;
+
+        if ( $user_id <= 0 || ! function_exists( 'wp_new_user_notification' ) ) {
+            return;
+        }
+
+        wp_new_user_notification( $user_id, null, 'both' );
     }
 
     public function handle_profile(): void {

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.9 - Faster signup step transition
+
+- Moved WordPress new-user notification email sending out of the synchronous registration request and into a short-lived WP-Cron event.
+- Account creation now redirects to the profile step immediately instead of waiting for the site's outbound mail transport.
+- The same admin/user new-account notifications are still sent asynchronously.
+- No signup fields, PMPro entitlements, WooCommerce billing, or legacy registration behavior were changed.
+
 ## 0.3.8 - Explore active members only
 
 - The ASN Explore directory now includes only users with an active PMPro Level 1 or Level 2 membership.

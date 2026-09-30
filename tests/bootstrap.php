@@ -25,6 +25,8 @@ $GLOBALS['asn_test_redirect'] = '';
 $GLOBALS['asn_test_referer'] = 'https://example.test/asn-profile-test/';
 $GLOBALS['asn_test_better_messages_enabled'] = false;
 $GLOBALS['asn_test_wc_products'] = array();
+$GLOBALS['asn_test_scheduled_events'] = array();
+$GLOBALS['asn_test_new_user_notifications'] = array();
 
 class ASN_Test_WPDB {
     public $prefix = 'wp_';
@@ -231,6 +233,37 @@ if ( ! function_exists( 'wc_get_product' ) ) {
 if ( ! function_exists( 'wc_get_checkout_url' ) ) {
     function wc_get_checkout_url() {
         return 'https://example.test/checkout/';
+    }
+}
+
+if ( ! function_exists( 'wp_schedule_single_event' ) ) {
+    function wp_schedule_single_event( $timestamp, $hook, $args = array(), $wp_error = false ) {
+        $GLOBALS['asn_test_scheduled_events'][] = array(
+            'timestamp' => (int) $timestamp,
+            'hook'      => (string) $hook,
+            'args'      => (array) $args,
+        );
+        return true;
+    }
+}
+
+if ( ! function_exists( 'wp_next_scheduled' ) ) {
+    function wp_next_scheduled( $hook, $args = array() ) {
+        foreach ( $GLOBALS['asn_test_scheduled_events'] as $event ) {
+            if ( $event['hook'] === (string) $hook && $event['args'] === (array) $args ) {
+                return (int) $event['timestamp'];
+            }
+        }
+        return false;
+    }
+}
+
+if ( ! function_exists( 'wp_new_user_notification' ) ) {
+    function wp_new_user_notification( $user_id, $deprecated = null, $notify = '' ) {
+        $GLOBALS['asn_test_new_user_notifications'][] = array(
+            'user_id' => (int) $user_id,
+            'notify'  => (string) $notify,
+        );
     }
 }
 
