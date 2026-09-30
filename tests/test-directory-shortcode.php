@@ -10,7 +10,7 @@ final class ASN_Directory_Shortcode_Test_WPDB extends ASN_Test_WPDB {
     }
 
     public function get_var( $sql ) {
-        if ( false !== stripos( $sql, 'SELECT COUNT(*) FROM' ) ) {
+        if ( false !== stripos( $sql, 'SELECT COUNT(' ) ) {
             return $this->total;
         }
         return parent::get_var( $sql );
