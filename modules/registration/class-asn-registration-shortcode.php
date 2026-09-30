@@ -23,7 +23,7 @@ final class Registration_Shortcode {
             array(
                 'register_url' => site_url( '/asn-register-test/' ),
                 'explore_url'  => site_url( '/asn-explore-test/' ),
-                'paid_url'     => site_url( '/upgrade/' ),
+                'paid_url'     => site_url( '/checkout/?add-to-cart=152&quantity=1' ),
             ),
             $atts,
             'asn_register'
