@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.7 - Paid checkout success redirect
+
+- Successful paid orders containing WooCommerce product 152 now return the member directly to `/asn-explore-test/` instead of the WooCommerce order-received page.
+- The redirect only applies to paid orders for the logged-in customer and leaves other WooCommerce orders unchanged.
+- Billing, subscription creation, WooPayments processing, and PMPro Level 2 mapping remain owned by the existing WooCommerce/PMPro setup.
+
 ## 0.3.6 - Monthly Level 2 checkout selection
 
 - Product 152 currently offers Monthly and Annually subscription variations.

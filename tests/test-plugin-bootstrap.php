@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 final class PluginBootstrapTest extends TestCase {
     public function test_plugin_constants_are_defined(): void {
         $this->assertTrue( defined( 'ASN_CORE_VERSION' ) );
-        $this->assertSame( '0.3.6', ASN_CORE_VERSION );
+        $this->assertSame( '0.3.7', ASN_CORE_VERSION );
         $this->assertTrue( defined( 'ASN_CORE_FILE' ) );
         $this->assertTrue( defined( 'ASN_CORE_PATH' ) );
         $this->assertTrue( defined( 'ASN_CORE_URL' ) );
@@ -28,6 +28,14 @@ final class PluginBootstrapTest extends TestCase {
         $this->assertSame( 3, $video[0]['accepted_args'] ?? 0 );
         $this->assertSame( 4, $create[0]['accepted_args'] ?? 0 );
         $this->assertSame( 4, $join[0]['accepted_args'] ?? 0 );
+    }
+
+    public function test_paid_checkout_return_filter_is_registered(): void {
+        $filters = $GLOBALS['asn_test_filters']['woocommerce_get_return_url'] ?? array();
+
+        $this->assertNotEmpty( $filters );
+        $this->assertSame( 20, $filters[0]['priority'] ?? 0 );
+        $this->assertSame( 2, $filters[0]['accepted_args'] ?? 0 );
     }
 
     public function test_plugin_instance_is_singleton(): void {

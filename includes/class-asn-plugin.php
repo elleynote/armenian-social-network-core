@@ -8,6 +8,7 @@ use ASN\Core\Profiles\Profile_Form;
 use ASN\Core\Directory\Directory_Shortcode;
 use ASN\Core\Registration\Registration;
 use ASN\Core\Registration\Registration_Shortcode;
+use ASN\Core\Integrations\WooCommerce_Integration;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -37,6 +38,7 @@ final class Plugin {
         add_filter( 'bp_better_messages_can_video_call', array( Messaging::class, 'filter_better_messages_can_video_call' ), 10, 3 );
         add_filter( 'better_messages_call_create_custom_error', array( Messaging::class, 'filter_better_messages_call_create_error' ), 10, 4 );
         add_filter( 'better_messages_call_join_custom_error', array( Messaging::class, 'filter_better_messages_call_join_error' ), 10, 4 );
+        add_filter( 'woocommerce_get_return_url', array( WooCommerce_Integration::class, 'filter_paid_return_url' ), 20, 2 );
 
         $admin = new Admin();
         $admin->register_hooks();
