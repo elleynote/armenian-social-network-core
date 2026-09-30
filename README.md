@@ -2,9 +2,9 @@
 
 ASN Core is the custom WordPress social-network application layer for ArmenianSocialNetwork.com.
 
-## v0.2.9 candidate
+## v0.3.0 candidate
 
-Version 0.2 adds the first parallel member-facing replacements while keeping the current live social experience intact.
+Version 0.3 adds a parallel registration/onboarding path while keeping the current live registration and billing flows intact.
 
 It provides:
 
@@ -19,14 +19,15 @@ It provides:
 - a parallel Better Messages test action using the same WordPress user IDs
 - PMPro-backed Better Messages text-chat gating for levels 1 and 2
 - WebSocket live-call gating: Level 1 and Level 2 can use audio calls; video calls require Level 2 for every participant
+- a parallel `[asn_register]` signup/onboarding flow for testing account creation, profile details, plan selection, and automatic PMPro Level 1 assignment
 - responsive, `asn-` scoped front-end styles
 - a repeatable WordPress-safe release ZIP builder
 
-The new Profile and Explore shortcodes are intended for separate test pages first. v0.2 does **not** automatically replace `[tac_user_profile]` or `[tac_contacts]`.
+The new Profile, Explore, and Registration shortcodes are intended for separate test pages first. v0.3 does **not** automatically replace `[tac_user_profile]`, `[tac_contacts]`, or the live `[tac_reg_form]` registration page.
 
 The Better Messages action is intentionally labeled as a test action. AtomChat remains the current production transport until Better Messages passes live testing and a controlled transport cutover is approved.
 
-It also does not change Feed, registration, login, billing, WooCommerce subscriptions/prices, AtomChat configuration, or Tun SSO / miniOrange.
+It does not change the live registration page, Feed, login, WooCommerce subscription prices/payment records, AtomChat configuration, or Tun SSO / miniOrange. The paid signup choice continues into the existing WooCommerce upgrade flow.
 
 ## Data ownership
 
@@ -48,13 +49,13 @@ composer test
 Build the manual WordPress package with PowerShell:
 
 ```powershell
-pwsh -File scripts/build-release.ps1 -Version 0.2.9
+pwsh -File scripts/build-release.ps1 -Version 0.3.0
 ```
 
 The verified output is:
 
 ```
-build/asn-core-v0.2.9.zip
+build/asn-core-v0.3.0.zip
 ```
 
 The archive contains one top-level `asn-core/` folder and runtime files only.
