@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 final class PluginBootstrapTest extends TestCase {
     public function test_plugin_constants_are_defined(): void {
         $this->assertTrue( defined( 'ASN_CORE_VERSION' ) );
-        $this->assertSame( '0.3.2', ASN_CORE_VERSION );
+        $this->assertSame( '0.3.3', ASN_CORE_VERSION );
         $this->assertTrue( defined( 'ASN_CORE_FILE' ) );
         $this->assertTrue( defined( 'ASN_CORE_PATH' ) );
         $this->assertTrue( defined( 'ASN_CORE_URL' ) );
