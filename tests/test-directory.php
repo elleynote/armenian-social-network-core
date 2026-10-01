@@ -58,6 +58,15 @@ final class ASN_Directory_Test_WPDB extends ASN_Test_WPDB {
             }
         }
 
+        if ( preg_match( "/p\.country LIKE '((?:''|[^'])*)'/i", $sql, $match ) ) {
+            $needle = str_replace( array( '\\%', '\\_', "''" ), array( '%', '_', "'" ), $match[1] );
+            $needle = trim( $needle, '%' );
+            $rows = array_values( array_filter( $rows, static function ( $row ) use ( $needle ) {
+                return false !== stripos( (string) ( $row['country'] ?? '' ), $needle )
+                    || in_array( (string) ( $row['country'] ?? '' ), array( 'USA', 'US' ), true );
+            } ) );
+        }
+
         if ( preg_match( "/display_name LIKE '((?:''|[^'])*)'/i", $sql, $match ) ) {
             $needle = str_replace( array( '\\%', '\\_', "''" ), array( '%', '_', "'" ), $match[1] );
             $needle = trim( $needle, '%' );
@@ -158,6 +167,45 @@ final class DirectoryTest extends TestCase {
         $this->assertSame( 25, $page1['items'][0]['user_id'] );
         $this->assertCount( 5, $page2['items'] );
         $this->assertSame( 2, Directory_Service::search( array( 'page' => 9999 ) )['page'] );
+    }
+
+    public function test_usa_country_alias_matches_united_states_members(): void {
+        $GLOBALS['asn_test_profile_rows'][27] = array(
+            'user_id' => 27,
+            'display_name' => 'US Member One',
+            'country' => 'United States of America',
+            'age' => 31,
+            'gender' => 'Female',
+            'job_title' => 'Designer',
+            'dialect' => 'eastern',
+            'proficiency' => 'fluent',
+            'registered_at' => '2025-02-01 00:00:00',
+        );
+        $GLOBALS['asn_test_profile_rows'][28] = array(
+            'user_id' => 28,
+            'display_name' => 'US Member Two',
+            'country' => 'United States',
+            'age' => 29,
+            'gender' => 'Male',
+            'job_title' => 'Engineer',
+            'dialect' => 'western',
+            'proficiency' => 'advanced',
+            'registered_at' => '2025-02-02 00:00:00',
+        );
+        $GLOBALS['asn_test_pmpro_levels'][27] = 1;
+        $GLOBALS['asn_test_pmpro_levels'][28] = 2;
+
+        $this->assertTrue( Directory_Query::is_united_states_country( 'usa' ) );
+        $this->assertTrue( Directory_Query::is_united_states_country( 'U.S.A.' ) );
+        $this->assertTrue( Directory_Query::is_united_states_country( 'United States' ) );
+        $this->assertFalse( Directory_Query::is_united_states_country( 'Australia' ) );
+
+        $result = Directory_Service::search( array( 'country' => 'usa' ) );
+
+        $this->assertSame( 2, $result['total'] );
+        $this->assertSame( array( 28, 27 ), array_map( static function ( $item ) {
+            return (int) $item['user_id'];
+        }, $result['items'] ) );
     }
 
     public function test_search_excludes_profiles_without_level_one_or_level_two(): void {
