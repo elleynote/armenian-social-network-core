@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.2 - Registration cache guard
+
+- Prevents the dynamic ASN registration/onboarding shortcode from being page-cached.
+- Sends no-cache headers and marks registration pages with the standard WordPress `DONOTCACHEPAGE` flag.
+- This prevents logged-out visitors from being served an older cached registration screen after UI updates.
+- No registration fields, membership, payment, profile, or messaging logic changed.
+
 ## 0.5.1 - Elly V2 registration and Explore polish
 
 - Restyled the guest account-entry screen so it uses the same two-column Elly V2 onboarding layout, soft-gray panels, pill inputs, blue Next action, 0% profile-completion sidebar, and help card as the supplied design.
