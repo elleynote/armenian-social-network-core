@@ -122,7 +122,7 @@ final class RegistrationTest extends TestCase {
             $html = ( new Registration_Shortcode() )->render();
 
             $this->assertStringContainsString( 'asn-registration-v2', $html );
-            $this->assertStringContainsString( 'Let&#8217;s get started.', $html );
+            $this->assertStringContainsString( 'Let’s get started.', $html );
             $this->assertStringContainsString( 'asn-registration-v2__panel--two', $html );
             $this->assertStringContainsString( 'Profile completion', $html );
             $this->assertStringContainsString( 'Help people get to know you.', $html );
