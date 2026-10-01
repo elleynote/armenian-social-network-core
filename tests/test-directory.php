@@ -49,7 +49,13 @@ final class ASN_Directory_Test_WPDB extends ASN_Test_WPDB {
             } ) );
         }
 
+        $is_us_alias_sql = false !== stripos( $sql, "p.country LIKE '%United States%'" );
+
         foreach ( array( 'dialect', 'proficiency', 'country' ) as $key ) {
+            if ( 'country' === $key && $is_us_alias_sql ) {
+                continue;
+            }
+
             if ( preg_match( "/" . $key . " = '([^']*)'/i", $sql, $match ) ) {
                 $expected = str_replace( "''", "'", $match[1] );
                 $rows = array_values( array_filter( $rows, static function ( $row ) use ( $key, $expected ) {
@@ -58,7 +64,7 @@ final class ASN_Directory_Test_WPDB extends ASN_Test_WPDB {
             }
         }
 
-        if ( false !== stripos( $sql, "p.country LIKE '%United States%'" ) ) {
+        if ( $is_us_alias_sql ) {
             $rows = array_values( array_filter( $rows, static function ( $row ) {
                 $country = (string) ( $row['country'] ?? '' );
                 return false !== stripos( $country, 'United States' )
