@@ -301,7 +301,7 @@ final class Registration_Shortcode {
 
     private static function render_account_form( string $register_url ): void {
         self::screen_open(
-            'Let&#8217;s get started.',
+            'Let’s get started.',
             'Create your account and start building your profile.',
             0,
             'Start your profile.',
