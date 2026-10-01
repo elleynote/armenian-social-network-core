@@ -104,6 +104,7 @@ final class DirectoryShortcodeTest extends TestCase {
 
         $this->assertStringContainsString( 'asn-member-card__view-profile', $html );
         $this->assertStringContainsString( 'asn-member-card__chat', $html );
+        $this->assertStringContainsString( '>Message</a>', $html );
         $this->assertStringContainsString( 'https://example.test/messages/#conversation/1007', $html );
         $this->assertStringNotContainsString( 'Test Better Messages', $html );
     }
@@ -167,6 +168,8 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'border-radius:50%', $css );
         $this->assertStringContainsString( '.asn-pagination__link--current', $css );
         $this->assertStringContainsString( 'background:#f85d3f', $css );
+        $this->assertStringContainsString( 'grid-template-columns:repeat(4,minmax(0,1fr))', $css );
+        $this->assertStringContainsString( 'grid-template-columns:repeat(2,minmax(0,1fr))', $css );
     }
 
     public function test_profile_url_attribute_targets_parallel_asn_profile_page(): void {

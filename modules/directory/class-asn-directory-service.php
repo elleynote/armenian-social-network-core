@@ -29,10 +29,20 @@ final class Directory_Service {
             array_push( $values, $like, $like, $like );
         }
 
-        foreach ( array( 'dialect', 'proficiency', 'country' ) as $key ) {
+        foreach ( array( 'dialect', 'proficiency' ) as $key ) {
             if ( '' !== $filters[ $key ] ) {
                 $where[] = 'p.' . $key . ' = %s';
                 $values[] = $filters[ $key ];
+            }
+        }
+
+        if ( '' !== $filters['country'] ) {
+            if ( Directory_Query::is_united_states_country( $filters['country'] ) ) {
+                $where[] = '(p.country LIKE %s OR p.country = %s OR p.country = %s)';
+                array_push( $values, '%United States%', 'USA', 'US' );
+            } else {
+                $where[] = 'p.country = %s';
+                $values[] = $filters['country'];
             }
         }
 
