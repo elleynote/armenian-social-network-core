@@ -300,23 +300,32 @@ final class Registration_Shortcode {
     }
 
     private static function render_account_form( string $register_url ): void {
-        echo '<div class="asn-registration__card">';
-        echo '<h2>Let&#8217;s get started</h2>';
-        echo '<form class="asn-registration__form" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+        self::screen_open(
+            'Let’s get started.',
+            'Create your account and start building your profile.',
+            0,
+            'Start your profile.',
+            0
+        );
+
+        echo '<form class="asn-registration-v2__form asn-registration-v2__form--account" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
         echo '<input type="hidden" name="action" value="asn_register_account">';
         echo '<input type="hidden" name="return_url" value="' . esc_attr( $register_url ) . '">';
         wp_nonce_field( 'asn_register_account', 'asn_registration_nonce' );
 
+        echo '<div class="asn-registration-v2__panel asn-registration-v2__panel--two">';
         self::field( 'email', 'Email address', 'email', true );
         self::field( 'first_name', 'First name', 'text', true );
         self::field( 'username', 'Username', 'text', true );
         self::field( 'password', 'Choose a password', 'password', true );
-
-        echo '<label class="asn-registration__check"><input type="checkbox" name="terms" value="1" required> <span>I agree to the Terms of Service and Privacy Policy.</span></label>';
-        echo '<button class="asn-button asn-registration__submit" type="submit">Next Step</button>';
-        echo '</form>';
-        echo '<p class="asn-registration__login">Already have an account? <a href="' . esc_url( site_url( '/login/' ) ) . '">Log in</a></p>';
         echo '</div>';
+
+        echo '<label class="asn-registration__check asn-registration-v2__terms"><input type="checkbox" name="terms" value="1" required> <span>I agree to the Terms of Service and Privacy Policy.</span></label>';
+        echo '<div class="asn-registration-v2__next-row"><button class="asn-button asn-registration-v2__next" type="submit">Next &#8594;</button></div>';
+        echo '</form>';
+        echo '<p class="asn-registration__login asn-registration-v2__login">Already have an account? <a href="' . esc_url( site_url( '/login/' ) ) . '">Log in</a></p>';
+
+        self::screen_close( 0, 'Start your profile.', 0 );
     }
 
     private static function render_profile_form( string $register_url, int $user_id ): void {
@@ -542,6 +551,9 @@ final class Registration_Shortcode {
         if ( '' !== $age ) {
             $name_line .= ', ' . $age;
         }
+        if ( $user_id <= 0 && '' === $name_line ) {
+            $name_line = 'Your profile';
+        }
 
         echo '<aside class="asn-registration-v2__sidebar">';
         echo '<section class="asn-registration-v2__sidebar-card asn-registration-v2__progress">';
@@ -567,8 +579,13 @@ final class Registration_Shortcode {
         }
 
         echo '<div class="asn-registration-v2__profile-actions">';
-        echo '<a class="asn-registration-v2__profile-button" href="' . esc_url( add_query_arg( 'member', $user_id, site_url( '/asn-profile-test/' ) ) ) . '">View Profile</a>';
-        echo '<a class="asn-registration-v2__profile-chat" href="' . esc_url( site_url( '/messages/' ) ) . '" aria-label="Open messages">&#128172;</a>';
+        if ( $user_id > 0 ) {
+            echo '<a class="asn-registration-v2__profile-button" href="' . esc_url( add_query_arg( 'member', $user_id, site_url( '/asn-profile-test/' ) ) ) . '">View Profile</a>';
+            echo '<a class="asn-registration-v2__profile-chat" href="' . esc_url( site_url( '/messages/' ) ) . '" aria-label="Open messages">&#128172;</a>';
+        } else {
+            echo '<span class="asn-registration-v2__profile-button asn-registration-v2__profile-button--disabled">View Profile</span>';
+            echo '<span class="asn-registration-v2__profile-chat asn-registration-v2__profile-button--disabled" aria-hidden="true">&#128172;</span>';
+        }
         echo '</div>';
         echo '</div>';
         echo '</section>';

@@ -159,3 +159,239 @@
   .asn-registration-v2__heading h1{font-size:2.25rem}
   .asn-directory__grid{grid-template-columns:1fr}
 }
+
+
+/* Elly V2 visual polish: account entry + Explore controls/cards */
+.asn-registration-v2__form--account .asn-registration-v2__panel{
+  margin-bottom:22px;
+}
+.asn-registration-v2__terms{
+  margin:2px 0 18px;
+  color:#48566e;
+  font-size:.88rem;
+}
+.asn-registration-v2__terms input{
+  margin-top:2px;
+  accent-color:#2b83d5;
+}
+.asn-registration-v2__login{
+  margin:20px 0 0;
+  color:#526078;
+  text-align:left;
+  font-size:.9rem;
+}
+.asn-registration-v2__login a{
+  color:#2b83d5;
+}
+.asn-registration-v2__profile-button--disabled{
+  opacity:.55;
+  cursor:default;
+  pointer-events:none;
+}
+
+/* Explore should use the same Elly navy / soft-gray / coral system. */
+.asn-directory{
+  max-width:1180px;
+  padding:44px 28px 76px;
+}
+.asn-directory__title{
+  margin:0 0 28px;
+  color:#10294a;
+  font-size:clamp(2.35rem,4vw,3.5rem);
+  line-height:1.06;
+  font-weight:700;
+  letter-spacing:-.035em;
+}
+.asn-directory__filters{
+  grid-template-columns:2fr 1fr 1fr 1fr auto;
+  gap:14px;
+  align-items:end;
+  margin:0 0 38px;
+  padding:20px 22px;
+  border-radius:18px;
+  background:#f3f3f3;
+}
+.asn-directory__filters .asn-field{
+  gap:7px;
+}
+.asn-directory__filters .asn-field__label{
+  padding-left:10px;
+  color:#526078;
+  font-size:.8rem;
+  font-weight:600;
+}
+.asn-directory__filters .asn-field__input{
+  min-height:46px;
+  padding:10px 16px;
+  border:1px solid transparent;
+  border-radius:999px;
+  background:#fff;
+  color:#24344e;
+  box-shadow:none;
+}
+.asn-directory__filters .asn-field__input:focus{
+  border-color:#2b83d5;
+  outline:2px solid rgba(43,131,213,.14);
+  outline-offset:0;
+}
+.asn-directory__submit{
+  min-height:46px;
+  margin:0!important;
+  padding:10px 22px;
+  border:0;
+  border-radius:999px;
+  background:#f85d3f!important;
+  color:#fff!important;
+  font-weight:600;
+  box-shadow:none;
+}
+.asn-directory__submit:hover,
+.asn-directory__submit:focus{
+  background:#e95034!important;
+  color:#fff!important;
+}
+
+/* Card proportions follow Elly page 9: soft-gray card, circular portrait, coral actions. */
+.asn-directory__grid{
+  grid-template-columns:repeat(4,minmax(0,225px));
+  justify-content:center;
+  gap:26px 24px;
+}
+.asn-member-card--v2{
+  display:flex;
+  min-height:355px;
+  flex-direction:column;
+  align-items:center;
+  padding:20px 16px 15px;
+  border:0;
+  border-radius:16px;
+  background:#f3f3f3;
+  text-align:center;
+}
+.asn-member-card--v2 .asn-member-card__profile{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  width:100%;
+  color:#10294a;
+}
+.asn-member-card--v2 .asn-member-card__photo{
+  width:124px;
+  height:124px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#e1e1e1;
+}
+.asn-member-card--v2 .asn-member-card__name{
+  margin:13px 0 2px;
+  color:#10294a;
+  font-size:.94rem;
+  font-weight:700;
+  line-height:1.3;
+}
+.asn-member-card__username{
+  margin:0 0 11px;
+  color:#344259;
+  font-size:.78rem;
+}
+.asn-member-card--v2 .asn-member-card__meta{
+  margin:3px 0;
+  color:#526078;
+  font-size:.78rem;
+  line-height:1.3;
+}
+.asn-member-card__actions--v2{
+  width:100%;
+  grid-template-columns:minmax(0,1fr) 38px;
+  gap:7px;
+  margin-top:auto;
+  padding-top:16px;
+}
+.asn-member-card__view-profile,
+.asn-member-card__chat{
+  min-height:38px;
+  border-radius:999px;
+  background:#f85d3f!important;
+  color:#fff!important;
+  font-size:.78rem;
+  font-weight:500;
+  box-shadow:none;
+}
+.asn-member-card__view-profile:hover,
+.asn-member-card__chat:hover{
+  background:#e95034!important;
+  color:#fff!important;
+}
+.asn-member-card__chat{
+  width:38px;
+}
+
+/* Pagination: remove the old blue look and keep Elly's coral as the accent. */
+.asn-pagination{
+  gap:7px;
+  margin-top:34px;
+}
+.asn-pagination__link{
+  display:flex;
+  min-width:34px;
+  min-height:34px;
+  align-items:center;
+  justify-content:center;
+  padding:6px 9px;
+  border:1px solid #d9dde4;
+  border-radius:999px;
+  background:#fff;
+  color:#526078!important;
+  font-size:.78rem;
+  text-decoration:none;
+}
+.asn-pagination__link:hover,
+.asn-pagination__link:focus{
+  border-color:#f85d3f;
+  background:#fff3ef;
+  color:#f85d3f!important;
+}
+.asn-pagination__link--current{
+  border-color:#f85d3f;
+  background:#f85d3f;
+  color:#fff!important;
+  font-weight:600;
+}
+
+@media(max-width:1120px){
+  .asn-directory__filters{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .asn-directory__submit{
+    width:max-content;
+  }
+  .asn-directory__grid{
+    grid-template-columns:repeat(3,minmax(0,225px));
+  }
+}
+@media(max-width:820px){
+  .asn-directory__filters{
+    grid-template-columns:1fr;
+    padding:18px;
+  }
+  .asn-directory__submit{
+    width:100%;
+  }
+  .asn-directory__grid{
+    grid-template-columns:repeat(2,minmax(0,225px));
+  }
+}
+@media(max-width:540px){
+  .asn-registration-v2__form--account .asn-registration-v2__panel--two{
+    grid-template-columns:1fr;
+  }
+  .asn-registration-v2__login{
+    text-align:center;
+  }
+  .asn-directory__grid{
+    grid-template-columns:minmax(0,280px);
+  }
+  .asn-member-card--v2{
+    min-height:0;
+  }
+}

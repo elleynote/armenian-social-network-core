@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1 - Elly V2 registration and Explore polish
+
+- Restyled the guest account-entry screen so it uses the same two-column Elly V2 onboarding layout, soft-gray panels, pill inputs, blue Next action, 0% profile-completion sidebar, and help card as the supplied design.
+- Updated Explore filters to the Elly V2 navy / soft-gray / coral palette with rounded pill controls and a coral Search button.
+- Reworked Explore member cards to match the supplied page 9 direction: soft-gray rounded cards, circular portraits, compact member details, and coral View Profile / chat actions.
+- Updated Explore pagination so current/hover states use the coral client accent instead of the old blue treatment.
+- No registration, membership, payment, profile-data, or messaging entitlement logic changed in this release.
+
 ## 0.5.0 - Elly V2 multi-step onboarding
 
 - Implements the supplied Illustrator onboarding sequence on the parallel ASN registration page with the exact client headings, prompt groups, progress values, photo step, completion screen, sidebar preview, and help card.

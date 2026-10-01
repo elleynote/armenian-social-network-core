@@ -158,6 +158,17 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'asn-pagination__link', $script );
     }
 
+    public function test_elly_explore_visual_system_styles_filters_cards_and_pagination(): void {
+        $css = file_get_contents( dirname( __DIR__ ) . '/public/css/asn-core.css' );
+
+        $this->assertStringContainsString( '.asn-directory__filters', $css );
+        $this->assertStringContainsString( 'background:#f3f3f3', $css );
+        $this->assertStringContainsString( '.asn-member-card--v2', $css );
+        $this->assertStringContainsString( 'border-radius:50%', $css );
+        $this->assertStringContainsString( '.asn-pagination__link--current', $css );
+        $this->assertStringContainsString( 'background:#f85d3f', $css );
+    }
+
     public function test_profile_url_attribute_targets_parallel_asn_profile_page(): void {
         $html = ( new Directory_Shortcode() )->render( array(
             'profile_url' => 'https://example.test/asn-profile-test/',
