@@ -171,36 +171,27 @@ final class RegistrationTest extends TestCase {
         }
     }
 
-    public function test_elly_onboarding_steps_use_the_supplied_copy_and_progress(): void {
+    public function test_elly_profile_cards_render_on_one_page_with_back_navigation(): void {
         $previous_user = $GLOBALS['asn_test_current_user_id'];
         $previous_level = $GLOBALS['asn_test_pmpro_levels'][8] ?? null;
 
         $GLOBALS['asn_test_current_user_id'] = 8;
         unset( $GLOBALS['asn_test_pmpro_levels'][8] );
+        $_GET = array( 'asn_step' => 'prompts' );
 
         try {
-            $_GET = array( 'asn_step' => 'personality' );
-            $personality = ( new Registration_Shortcode() )->render();
-            $this->assertStringContainsString( 'Love it. Now tell us what makes you, you.', $personality );
-            $this->assertStringContainsString( 'Give people a little glimpse into your world.', $personality );
-            $this->assertStringContainsString( '30%', $personality );
-            $this->assertStringContainsString( 'My favourite music is', $personality );
+            $html = ( new Registration_Shortcode() )->render();
 
-            $_GET = array( 'asn_step' => 'morning' );
-            $morning = ( new Registration_Shortcode() )->render();
-            $this->assertStringContainsString( 'Nice. Now what gets you out of bed in the morning?', $morning );
-            $this->assertStringContainsString( '60%', $morning );
-
-            $_GET = array( 'asn_step' => 'sharing' );
-            $sharing = ( new Registration_Shortcode() )->render();
-            $this->assertStringContainsString( 'You’ve got something to share, so does everyone here.', $sharing );
-            $this->assertStringContainsString( '90%', $sharing );
-
-            $_GET = array( 'asn_step' => 'photos' );
-            $photos = ( new Registration_Shortcode() )->render();
-            $this->assertStringContainsString( 'Nearly there! Show us a glimpse of your world.', $photos );
-            $this->assertStringContainsString( 'A photo of me doing what I love most.', $photos );
-            $this->assertStringContainsString( 'Save Profile', $photos );
+            $this->assertStringContainsString( 'Tell us what makes you, you.', $html );
+            $this->assertStringContainsString( 'Love it. Now tell us what makes you, you.', $html );
+            $this->assertStringContainsString( 'Nice. Now what gets you out of bed in the morning?', $html );
+            $this->assertStringContainsString( 'What are you planning next?', $html );
+            $this->assertStringContainsString( 'Now we want to know how you became you.', $html );
+            $this->assertStringContainsString( 'You’ve got something to share, so does everyone here.', $html );
+            $this->assertSame( 17, substr_count( $html, 'data-asn-completion-field' ) );
+            $this->assertStringContainsString( 'asn_step=profile', $html );
+            $this->assertStringContainsString( '&#8592; Back', $html );
+            $this->assertStringContainsString( 'Save &amp; Continue', $html );
         } finally {
             $GLOBALS['asn_test_current_user_id'] = $previous_user;
             if ( null === $previous_level ) {
@@ -212,23 +203,38 @@ final class RegistrationTest extends TestCase {
         }
     }
 
-    public function test_onboarding_step_field_groups_follow_elly_artboards(): void {
-        $this->assertSame(
-            array(
-                'my_favorite_music_is',
-                'i_get_way_too_excited_about',
-                'after_work_you_can_find_me',
-                'the_greatest_thing_about_where_i_live_is',
-            ),
-            Registration::onboarding_fields_for_step( 'personality' )
-        );
-        $this->assertSame(
-            array(
-                'i_m_currently_trying_to_learn',
-                'one_thing_i_could_help_teach_you_about_is',
-            ),
-            Registration::onboarding_fields_for_step( 'sharing' )
-        );
+    public function test_profile_completion_score_depends_on_filled_cards_not_page_navigation(): void {
+        $user_id = 8;
+        $previous_meta = $GLOBALS['asn_test_user_meta'][ $user_id ];
+
+        try {
+            foreach ( Registration_Shortcode::all_prompt_fields() as $key ) {
+                unset( $GLOBALS['asn_test_user_meta'][ $user_id ][ $key ] );
+            }
+
+            $this->assertSame( 0, Registration_Shortcode::profile_completion_score( $user_id ) );
+
+            $first_key = Registration_Shortcode::all_prompt_fields()[0];
+            $GLOBALS['asn_test_user_meta'][ $user_id ][ $first_key ] = 'One answer';
+            $this->assertLessThan( 100, Registration_Shortcode::profile_completion_score( $user_id ) );
+
+            foreach ( Registration_Shortcode::all_prompt_fields() as $key ) {
+                $GLOBALS['asn_test_user_meta'][ $user_id ][ $key ] = 'Completed';
+            }
+
+            $this->assertSame( 100, Registration_Shortcode::profile_completion_score( $user_id ) );
+        } finally {
+            $GLOBALS['asn_test_user_meta'][ $user_id ] = $previous_meta;
+        }
+    }
+
+    public function test_onboarding_submission_accepts_all_profile_cards_together(): void {
+        $fields = Registration_Shortcode::all_prompt_fields();
+
+        $this->assertCount( 17, $fields );
+        $this->assertSame( $fields, Registration::onboarding_fields_for_step( 'prompts' ) );
+        $this->assertSame( $fields, Registration::onboarding_fields_for_step( 'personality' ) );
+        $this->assertSame( $fields, Registration::onboarding_fields_for_step( 'sharing' ) );
         $this->assertSame( array(), Registration::onboarding_fields_for_step( 'unknown' ) );
     }
 

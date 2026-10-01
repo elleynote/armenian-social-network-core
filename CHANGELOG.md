@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.4 - Single-page profile cards and real completion score
+
+- Combines all of Elly's profile prompt cards onto one onboarding page instead of sending the member through five separate prompt pages.
+- Keeps the prompt sections and copy from the supplied UI, but saves all answers in one submission before the photo step.
+- Profile completion is now based on how many profile cards actually contain answers. Clicking Next alone no longer increases the score.
+- The profile reaches 100% only when all 17 profile cards are completed.
+- The completion bar updates live while the member types and keeps the real score on the photo, membership, and completion screens.
+- Adds Back navigation from the combined profile-card page, photo page, and membership page.
+- Existing PMPro, WooCommerce, Better Messages, photo upload, and membership logic remains unchanged.
+
 ## 0.5.3 - WP Fastest Cache registration exclusion
 
 - Explicitly calls WP Fastest Cache's current-page exclusion hook whenever the ASN registration/onboarding shortcode renders.

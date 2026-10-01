@@ -81,10 +81,46 @@
         }
     }
 
+    function updateCompletionScore() {
+        var fields = Array.prototype.slice.call(root.querySelectorAll('[data-asn-completion-field]'));
+        if (!fields.length) {
+            return;
+        }
+
+        var completed = fields.filter(function (field) {
+            return String(field.value || '').trim().length > 0;
+        }).length;
+
+        var score = Math.floor((completed / fields.length) * 100);
+        var valueNode = root.querySelector('[data-asn-progress-value]');
+        var barNode = root.querySelector('[data-asn-progress-bar]');
+        var statusNode = root.querySelector('[data-asn-progress-status]');
+
+        if (valueNode) {
+            valueNode.textContent = score + '%';
+        }
+        if (barNode) {
+            barNode.style.width = score + '%';
+        }
+        if (statusNode) {
+            statusNode.textContent = score >= 100
+                ? 'Profile completed.'
+                : 'Complete all profile cards to reach 100%.';
+        }
+    }
+
     root.querySelectorAll('input, select, textarea').forEach(function (field) {
-        field.addEventListener('input', updatePreview);
-        field.addEventListener('change', updatePreview);
+        field.addEventListener('input', function () {
+            updatePreview();
+            updateCompletionScore();
+        });
+        field.addEventListener('change', function () {
+            updatePreview();
+            updateCompletionScore();
+        });
     });
+
+    updateCompletionScore();
 
     root.querySelectorAll('.asn-registration-v2__photo-input').forEach(function (input) {
         input.addEventListener('change', function () {

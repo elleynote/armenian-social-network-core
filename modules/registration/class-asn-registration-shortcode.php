@@ -14,6 +14,7 @@ final class Registration_Shortcode {
 
     private const ONBOARDING_STEPS = array(
         'profile',
+        'prompts',
         'personality',
         'morning',
         'planning',
@@ -78,95 +79,12 @@ final class Registration_Shortcode {
 
             switch ( $step ) {
                 case 'personality':
-                    self::render_prompt_step(
-                        $user_id,
-                        $register_url,
-                        'personality',
-                        'Love it. Now tell us what makes you, you.',
-                        'Give people a little glimpse into your world.',
-                        30,
-                        'Complete your profile.',
-                        array(
-                            'my_favorite_music_is' => 'My favourite music is…',
-                            'i_get_way_too_excited_about' => 'I get way too excited about…',
-                            'after_work_you_can_find_me' => 'After work, you can find me…',
-                            'the_greatest_thing_about_where_i_live_is' => 'The greatest thing about where I live is…',
-                        ),
-                        'morning'
-                    );
-                    break;
-
                 case 'morning':
-                    self::render_prompt_step(
-                        $user_id,
-                        $register_url,
-                        'morning',
-                        'Nice. Now what gets you out of bed in the morning?',
-                        'The interesting stuff people won’t learn from your bio.',
-                        60,
-                        'Almost completed.',
-                        array(
-                            'something_i_m_really_really_good_at_is' => "Something I'm really, really good at…",
-                            'something_you_might_not_know_about_me_is' => 'Something you might not know about me is…',
-                            'i_value_people_who' => 'I value people who…',
-                        ),
-                        'planning'
-                    );
-                    break;
-
                 case 'planning':
-                    self::render_prompt_step(
-                        $user_id,
-                        $register_url,
-                        'planning',
-                        'What are you planning next?',
-                        'Big plans, little plans, we want to hear them all!',
-                        60,
-                        'Almost completed.',
-                        array(
-                            'my_dream_job_is' => 'My dream job is…',
-                            'this_year_i_really_want_to' => 'This year I really want to…',
-                            'a_lifelong_goal_of_mine_is_to' => 'A lifelong goal of mine is to…',
-                            'my_dream_holiday_destination_is' => 'My dream holiday destination is…',
-                            'one_way_i_d_like_to_change_the_world_is' => "One way I'd like to change the world is…",
-                        ),
-                        'story'
-                    );
-                    break;
-
                 case 'story':
-                    self::render_prompt_step(
-                        $user_id,
-                        $register_url,
-                        'story',
-                        'Now we want to know how you became you.',
-                        'Share a little of what’s shaped the person you are today',
-                        60,
-                        'Almost completed.',
-                        array(
-                            'my_greatest_childhood_memory_is' => 'My greatest childhood memory is…',
-                            'my_biggest_fear_is' => 'My biggest fear is…',
-                            'the_best_piece_of_advice_i_ve_ever_received_is' => "The best piece of advice I've received is…",
-                        ),
-                        'sharing'
-                    );
-                    break;
-
                 case 'sharing':
-                    self::render_prompt_step(
-                        $user_id,
-                        $register_url,
-                        'sharing',
-                        'You’ve got something to share, so does everyone here.',
-                        'What could you teach someone? And what could they teach you in return?',
-                        90,
-                        'A few final touches.',
-                        array(
-                            'i_m_currently_trying_to_learn' => "I'm currently trying to learn…",
-                            'one_thing_i_could_help_teach_you_about_is' => 'One thing I could help teach you about is…',
-                        ),
-                        'photos'
-                    );
+                case 'prompts':
+                    self::render_all_prompt_cards_step( $user_id, $register_url );
                     break;
 
                 case 'photos':
@@ -395,41 +313,51 @@ final class Registration_Shortcode {
         self::screen_close( 0, 'Complete your profile.', $user_id );
     }
 
-    private static function render_prompt_step(
-        int $user_id,
-        string $register_url,
-        string $step,
-        string $title,
-        string $subtitle,
-        int $progress,
-        string $status,
-        array $fields,
-        string $next_step
-    ): void {
+    private static function render_all_prompt_cards_step( int $user_id, string $register_url ): void {
         $profile = Profile_Service::find( $user_id, $user_id ) ?: array();
+        $progress = self::profile_completion_score( $user_id );
 
-        self::screen_open( $title, $subtitle, $progress, $status, $user_id );
+        self::screen_open(
+            'Tell us what makes you, you.',
+            'Complete the profile cards below. Your profile score only increases when you add answers.',
+            $progress,
+            self::completion_status( $progress ),
+            $user_id
+        );
 
-        echo '<form class="asn-registration-v2__form" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
+        echo '<form class="asn-registration-v2__form asn-registration-v2__form--all-prompts" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
         echo '<input type="hidden" name="action" value="asn_register_onboarding_step">';
         echo '<input type="hidden" name="return_url" value="' . esc_attr( $register_url ) . '">';
-        echo '<input type="hidden" name="step" value="' . esc_attr( $step ) . '">';
-        echo '<input type="hidden" name="next_step" value="' . esc_attr( $next_step ) . '">';
+        echo '<input type="hidden" name="step" value="prompts">';
+        echo '<input type="hidden" name="next_step" value="photos">';
         wp_nonce_field( 'asn_register_onboarding_step', 'asn_registration_nonce' );
 
-        echo '<div class="asn-registration-v2__panel asn-registration-v2__prompt-panel">';
-        foreach ( $fields as $key => $label ) {
-            echo '<label class="asn-field asn-registration-v2__prompt-field">';
-            echo '<span class="asn-field__label">' . esc_html( $label ) . '</span>';
-            echo '<textarea class="asn-field__input asn-registration-v2__textarea" name="asn_profile[' . esc_attr( $key ) . ']" maxlength="1000">' . esc_html( (string) ( $profile[ $key ] ?? '' ) ) . '</textarea>';
-            echo '</label>';
-        }
-        echo '</div>';
+        foreach ( self::prompt_groups() as $group ) {
+            echo '<section class="asn-registration-v2__prompt-section">';
+            echo '<header class="asn-registration-v2__prompt-section-heading">';
+            echo '<h2>' . esc_html( $group['title'] ) . '</h2>';
+            echo '<p>' . esc_html( $group['subtitle'] ) . '</p>';
+            echo '</header>';
+            echo '<div class="asn-registration-v2__panel asn-registration-v2__prompt-panel">';
 
-        echo '<div class="asn-registration-v2__next-row"><button class="asn-button asn-registration-v2__next" type="submit">Next &#8594;</button></div>';
+            foreach ( $group['fields'] as $key => $label ) {
+                echo '<label class="asn-field asn-registration-v2__prompt-field">';
+                echo '<span class="asn-field__label">' . esc_html( $label ) . '</span>';
+                echo '<textarea class="asn-field__input asn-registration-v2__textarea" name="asn_profile[' . esc_attr( $key ) . ']" maxlength="1000" data-asn-completion-field>' . esc_html( (string) ( $profile[ $key ] ?? '' ) ) . '</textarea>';
+                echo '</label>';
+            }
+
+            echo '</div>';
+            echo '</section>';
+        }
+
+        self::render_step_navigation(
+            add_query_arg( 'asn_step', 'profile', $register_url ),
+            'Save & Continue'
+        );
         echo '</form>';
 
-        self::screen_close( $progress, $status, $user_id );
+        self::screen_close( $progress, self::completion_status( $progress ), $user_id );
     }
 
     private static function render_photos_step( int $user_id, string $register_url ): void {
@@ -441,11 +369,13 @@ final class Registration_Shortcode {
             'a_photo_of_the_good_old_days' => 'A photo of the good old days.',
         );
 
+        $progress = self::profile_completion_score( $user_id );
+
         self::screen_open(
             'Nearly there! Show us a glimpse of your world.',
             'Add a few photos that say more about you than words',
-            90,
-            'A few final touches.',
+            $progress,
+            self::completion_status( $progress ),
             $user_id
         );
 
@@ -470,18 +400,23 @@ final class Registration_Shortcode {
         }
         echo '</div>';
 
-        echo '<div class="asn-registration-v2__next-row"><button class="asn-button asn-registration-v2__next" type="submit">Save Profile</button></div>';
+        self::render_step_navigation(
+            add_query_arg( 'asn_step', 'prompts', $register_url ),
+            'Save Profile'
+        );
         echo '</form>';
 
-        self::screen_close( 90, 'A few final touches.', $user_id );
+        self::screen_close( $progress, self::completion_status( $progress ), $user_id );
     }
 
     private static function render_plan_form( string $register_url, string $explore_url, string $paid_url, int $user_id ): void {
+        $progress = self::profile_completion_score( $user_id );
+
         self::screen_open(
             'Choose your membership.',
             'Pick the option that works for you.',
-            90,
-            'A few final touches.',
+            $progress,
+            self::completion_status( $progress ),
             $user_id
         );
 
@@ -506,8 +441,9 @@ final class Registration_Shortcode {
         echo '</div>';
 
         echo '</div>';
+        echo '<div class="asn-registration-v2__back-only"><a class="asn-registration-v2__back" href="' . esc_url( add_query_arg( 'asn_step', 'photos', $register_url ) ) . '">&#8592; Back</a></div>';
 
-        self::screen_close( 90, 'A few final touches.', $user_id );
+        self::screen_close( $progress, self::completion_status( $progress ), $user_id );
     }
 
     private static function render_complete( int $user_id, string $explore_url ): void {
@@ -515,17 +451,19 @@ final class Registration_Shortcode {
         delete_user_meta( $user_id, '_asn_free_onboarding_redirect_expires' );
         update_user_meta( $user_id, '_asn_onboarding_step', 'complete' );
 
+        $progress = self::profile_completion_score( $user_id );
+
         self::screen_open(
             'All done!',
             "Let's introduce you to the community.",
-            100,
-            'Profile completed.',
+            $progress,
+            self::completion_status( $progress ),
             $user_id
         );
         echo '<div class="asn-registration-v2__complete" data-asn-complete-redirect="' . esc_attr( $explore_url ) . '">';
         echo '<a class="asn-registration-v2__complete-fallback" href="' . esc_url( $explore_url ) . '">Continue to Explore</a>';
         echo '</div>';
-        self::screen_close( 100, 'Profile completed.', $user_id );
+        self::screen_close( $progress, self::completion_status( $progress ), $user_id );
     }
 
     private static function screen_open( string $title, string $subtitle, int $progress, string $status, int $user_id ): void {
@@ -573,8 +511,8 @@ final class Registration_Shortcode {
 
         echo '<aside class="asn-registration-v2__sidebar">';
         echo '<section class="asn-registration-v2__sidebar-card asn-registration-v2__progress">';
-        echo '<div class="asn-registration-v2__progress-title"><h2>Profile completion</h2><p>' . esc_html( $status ) . '</p></div>';
-        echo '<div class="asn-registration-v2__progress-row"><div class="asn-registration-v2__progress-track"><span style="width:' . esc_attr( (string) $progress ) . '%"></span></div><strong>' . esc_html( (string) $progress ) . '%</strong></div>';
+        echo '<div class="asn-registration-v2__progress-title"><h2>Profile completion</h2><p data-asn-progress-status>' . esc_html( $status ) . '</p></div>';
+        echo '<div class="asn-registration-v2__progress-row"><div class="asn-registration-v2__progress-track"><span data-asn-progress-bar style="width:' . esc_attr( (string) $progress ) . '%"></span></div><strong data-asn-progress-value>' . esc_html( (string) $progress ) . '%</strong></div>';
 
         echo '<div class="asn-registration-v2__profile-preview">';
         echo '<img class="asn-registration-v2__profile-photo" src="' . esc_url( Profile_Photo::url( $user_id ) ) . '" alt="">';
@@ -617,6 +555,102 @@ final class Registration_Shortcode {
         echo '<p>The more we know about each other, the easier it is to build friendships, professional connections and community across the diaspora.</p>';
         echo '</section>';
         echo '</aside>';
+    }
+
+    public static function all_prompt_fields(): array {
+        $fields = array();
+
+        foreach ( self::prompt_groups() as $group ) {
+            $fields = array_merge( $fields, array_keys( $group['fields'] ) );
+        }
+
+        return $fields;
+    }
+
+    public static function profile_completion_score( int $user_id ): int {
+        if ( $user_id <= 0 ) {
+            return 0;
+        }
+
+        $profile = Profile_Service::find( $user_id, $user_id ) ?: array();
+        $fields = self::all_prompt_fields();
+        $total = count( $fields );
+
+        if ( 0 === $total ) {
+            return 0;
+        }
+
+        $completed = 0;
+        foreach ( $fields as $key ) {
+            if ( '' !== trim( (string) ( $profile[ $key ] ?? '' ) ) ) {
+                ++$completed;
+            }
+        }
+
+        return (int) floor( ( $completed / $total ) * 100 );
+    }
+
+    private static function completion_status( int $progress ): string {
+        return $progress >= 100 ? 'Profile completed.' : 'Complete all profile cards to reach 100%.';
+    }
+
+    private static function prompt_groups(): array {
+        return array(
+            array(
+                'title'    => 'Love it. Now tell us what makes you, you.',
+                'subtitle' => 'Give people a little glimpse into your world.',
+                'fields'   => array(
+                    'my_favorite_music_is' => 'My favourite music is…',
+                    'i_get_way_too_excited_about' => 'I get way too excited about…',
+                    'after_work_you_can_find_me' => 'After work, you can find me…',
+                    'the_greatest_thing_about_where_i_live_is' => 'The greatest thing about where I live is…',
+                ),
+            ),
+            array(
+                'title'    => 'Nice. Now what gets you out of bed in the morning?',
+                'subtitle' => 'The interesting stuff people won’t learn from your bio.',
+                'fields'   => array(
+                    'something_i_m_really_really_good_at_is' => "Something I'm really, really good at…",
+                    'something_you_might_not_know_about_me_is' => 'Something you might not know about me is…',
+                    'i_value_people_who' => 'I value people who…',
+                ),
+            ),
+            array(
+                'title'    => 'What are you planning next?',
+                'subtitle' => 'Big plans, little plans, we want to hear them all!',
+                'fields'   => array(
+                    'my_dream_job_is' => 'My dream job is…',
+                    'this_year_i_really_want_to' => 'This year I really want to…',
+                    'a_lifelong_goal_of_mine_is_to' => 'A lifelong goal of mine is to…',
+                    'my_dream_holiday_destination_is' => 'My dream holiday destination is…',
+                    'one_way_i_d_like_to_change_the_world_is' => "One way I'd like to change the world is…",
+                ),
+            ),
+            array(
+                'title'    => 'Now we want to know how you became you.',
+                'subtitle' => 'Share a little of what’s shaped the person you are today.',
+                'fields'   => array(
+                    'my_greatest_childhood_memory_is' => 'My greatest childhood memory is…',
+                    'my_biggest_fear_is' => 'My biggest fear is…',
+                    'the_best_piece_of_advice_i_ve_ever_received_is' => "The best piece of advice I've received is…",
+                ),
+            ),
+            array(
+                'title'    => 'You’ve got something to share, so does everyone here.',
+                'subtitle' => 'What could you teach someone? And what could they teach you in return?',
+                'fields'   => array(
+                    'i_m_currently_trying_to_learn' => "I'm currently trying to learn…",
+                    'one_thing_i_could_help_teach_you_about_is' => 'One thing I could help teach you about is…',
+                ),
+            ),
+        );
+    }
+
+    private static function render_step_navigation( string $back_url, string $next_label ): void {
+        echo '<div class="asn-registration-v2__navigation">';
+        echo '<a class="asn-registration-v2__back" href="' . esc_url( $back_url ) . '">&#8592; Back</a>';
+        echo '<button class="asn-button asn-registration-v2__next" type="submit">' . esc_html( $next_label ) . ' &#8594;</button>';
+        echo '</div>';
     }
 
     private static function country_field( string $selected_country = '' ): void {

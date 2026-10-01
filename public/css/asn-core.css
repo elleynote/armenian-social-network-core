@@ -395,3 +395,79 @@
     min-height:0;
   }
 }
+
+
+/* Single-page profile cards + data-driven completion */
+.asn-registration-v2__form--all-prompts{
+  display:grid!important;
+  gap:34px;
+}
+.asn-registration-v2__prompt-section{
+  display:grid;
+  gap:16px;
+}
+.asn-registration-v2__prompt-section-heading h2{
+  margin:0;
+  color:#10294a;
+  font-size:1.45rem;
+  line-height:1.25;
+  font-weight:700;
+}
+.asn-registration-v2__prompt-section-heading p{
+  margin:7px 0 0;
+  color:#526078;
+  font-size:.9rem;
+  line-height:1.45;
+}
+.asn-registration-v2__form--all-prompts .asn-registration-v2__prompt-panel{
+  margin:0;
+}
+.asn-registration-v2__navigation{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  margin-top:4px;
+}
+.asn-registration-v2__back,
+.asn-registration-v2__back-only .asn-registration-v2__back{
+  display:inline-flex;
+  min-height:40px;
+  align-items:center;
+  justify-content:center;
+  padding:9px 18px;
+  border:1px solid #d9dde4;
+  border-radius:999px;
+  background:#fff;
+  color:#526078!important;
+  text-decoration:none;
+  font-size:.8rem;
+  font-weight:600;
+}
+.asn-registration-v2__back:hover,
+.asn-registration-v2__back:focus{
+  border-color:#2b83d5;
+  color:#2b83d5!important;
+}
+.asn-registration-v2__back-only{
+  margin-top:18px;
+}
+.asn-registration-v2__sidebar{
+  align-self:start;
+}
+@media(min-width:851px){
+  .asn-registration-v2__sidebar{
+    position:sticky;
+    top:28px;
+  }
+}
+@media(max-width:600px){
+  .asn-registration-v2__navigation{
+    align-items:stretch;
+    flex-direction:column-reverse;
+  }
+  .asn-registration-v2__navigation .asn-registration-v2__back,
+  .asn-registration-v2__navigation .asn-registration-v2__next{
+    width:100%!important;
+  }
+}
