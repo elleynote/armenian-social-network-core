@@ -25,6 +25,17 @@ final class Directory_Query {
         );
     }
 
+    public static function is_united_states_country( string $country ): bool {
+        $normalized = strtolower( trim( $country ) );
+        $normalized = preg_replace( '/[^a-z]/', '', $normalized );
+
+        return in_array(
+            $normalized,
+            array( 'us', 'usa', 'unitedstates', 'unitedstatesofamerica' ),
+            true
+        );
+    }
+
     private static function text( $value ): string {
         if ( ! is_scalar( $value ) ) {
             return '';
