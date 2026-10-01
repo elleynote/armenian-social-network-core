@@ -511,7 +511,7 @@ final class Registration_Shortcode {
 
         echo '<aside class="asn-registration-v2__sidebar">';
         echo '<section class="asn-registration-v2__sidebar-card asn-registration-v2__progress">';
-        echo '<div class="asn-registration-v2__progress-title"><h2>Profile completion</h2><p>' . esc_html( $status ) . '</p></div>';
+        echo '<div class="asn-registration-v2__progress-title"><h2>Profile completion</h2><p data-asn-progress-status>' . esc_html( $status ) . '</p></div>';
         echo '<div class="asn-registration-v2__progress-row"><div class="asn-registration-v2__progress-track"><span data-asn-progress-bar style="width:' . esc_attr( (string) $progress ) . '%"></span></div><strong data-asn-progress-value>' . esc_html( (string) $progress ) . '%</strong></div>';
 
         echo '<div class="asn-registration-v2__profile-preview">';
