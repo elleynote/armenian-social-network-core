@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.3 - WP Fastest Cache registration exclusion
+
+- Explicitly calls WP Fastest Cache's current-page exclusion hook whenever the ASN registration/onboarding shortcode renders.
+- Keeps the existing WordPress no-cache guard as a fallback.
+- Prevents the clean `/asn-register-test/` URL from being cached again after the stale cache entry is cleared once.
+- No registration fields, membership, payment, profile, or messaging behavior changed.
+
 ## 0.5.2 - Registration cache guard
 
 - Prevents the dynamic ASN registration/onboarding shortcode from being page-cached.
