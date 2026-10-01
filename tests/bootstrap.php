@@ -165,6 +165,11 @@ if ( ! function_exists( 'wp_die' ) ) {
 if ( ! function_exists( 'add_shortcode' ) ) {
     function add_shortcode( $tag, $callback ) { $GLOBALS['asn_test_shortcodes'][ $tag ] = $callback; }
 }
+if ( ! function_exists( 'shortcode_atts' ) ) {
+    function shortcode_atts( $pairs, $atts, $shortcode = '' ) {
+        return array_merge( (array) $pairs, array_intersect_key( (array) $atts, (array) $pairs ) );
+    }
+}
 if ( ! function_exists( 'get_current_user_id' ) ) {
     function get_current_user_id() { return (int) $GLOBALS['asn_test_current_user_id']; }
 }
