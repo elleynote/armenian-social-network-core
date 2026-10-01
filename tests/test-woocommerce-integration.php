@@ -51,7 +51,7 @@ final class WooCommerceIntegrationTest extends TestCase {
             );
 
             $this->assertSame(
-                'https://example.test/asn-explore-test/',
+                'https://example.test/asn-register-test/?asn_step=complete',
                 WooCommerce_Integration::filter_paid_return_url(
                     'https://example.test/checkout/order-received/1139/',
                     $order
