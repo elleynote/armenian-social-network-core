@@ -110,6 +110,30 @@ final class RegistrationTest extends TestCase {
         );
     }
 
+    public function test_guest_account_screen_uses_elly_v2_layout(): void {
+        $previous_user = $GLOBALS['asn_test_current_user_id'];
+        $previous_logged_in = $GLOBALS['asn_test_logged_in'];
+
+        $GLOBALS['asn_test_current_user_id'] = 0;
+        $GLOBALS['asn_test_logged_in'] = false;
+        $_GET = array();
+
+        try {
+            $html = ( new Registration_Shortcode() )->render();
+
+            $this->assertStringContainsString( 'asn-registration-v2', $html );
+            $this->assertStringContainsString( 'Let&#8217;s get started.', $html );
+            $this->assertStringContainsString( 'asn-registration-v2__panel--two', $html );
+            $this->assertStringContainsString( 'Profile completion', $html );
+            $this->assertStringContainsString( 'Help people get to know you.', $html );
+            $this->assertStringNotContainsString( 'asn-registration__card', $html );
+        } finally {
+            $GLOBALS['asn_test_current_user_id'] = $previous_user;
+            $GLOBALS['asn_test_logged_in'] = $previous_logged_in;
+            $_GET = array();
+        }
+    }
+
     public function test_registration_renders_client_ui_v2_foundation(): void {
         $previous_user = $GLOBALS['asn_test_current_user_id'];
         $previous_logged_in = $GLOBALS['asn_test_logged_in'];
