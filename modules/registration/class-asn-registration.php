@@ -195,6 +195,7 @@ final class Registration {
             return;
         }
 
+        Profile_Index::sync_user( $user_id );
         self::save_legacy_age_meta( $user_id, $age );
 
         $this->redirect( add_query_arg( 'asn_step', 'personality', $return_url ) );
