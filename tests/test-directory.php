@@ -58,12 +58,11 @@ final class ASN_Directory_Test_WPDB extends ASN_Test_WPDB {
             }
         }
 
-        if ( preg_match( "/p\.country LIKE '((?:''|[^'])*)'/i", $sql, $match ) ) {
-            $needle = str_replace( array( '\\%', '\\_', "''" ), array( '%', '_', "'" ), $match[1] );
-            $needle = trim( $needle, '%' );
-            $rows = array_values( array_filter( $rows, static function ( $row ) use ( $needle ) {
-                return false !== stripos( (string) ( $row['country'] ?? '' ), $needle )
-                    || in_array( (string) ( $row['country'] ?? '' ), array( 'USA', 'US' ), true );
+        if ( false !== stripos( $sql, "p.country LIKE '%United States%'" ) ) {
+            $rows = array_values( array_filter( $rows, static function ( $row ) {
+                $country = (string) ( $row['country'] ?? '' );
+                return false !== stripos( $country, 'United States' )
+                    || in_array( $country, array( 'USA', 'US' ), true );
             } ) );
         }
 
