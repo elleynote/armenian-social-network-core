@@ -197,6 +197,10 @@ final class Registration_Shortcode {
             define( 'DONOTCACHEPAGE', true );
         }
 
+        if ( function_exists( 'wpfc_exclude_current_page' ) ) {
+            wpfc_exclude_current_page();
+        }
+
         if ( function_exists( 'nocache_headers' ) ) {
             nocache_headers();
         }
