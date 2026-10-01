@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0 - Elly V2 multi-step onboarding
+
+- Implements the supplied Illustrator onboarding sequence on the parallel ASN registration page with the exact client headings, prompt groups, progress values, photo step, completion screen, sidebar preview, and help card.
+- The basic profile screen now follows the client field set: first name, last name, public display name, email, country, age, gender, job title, and spoken proficiency.
+- Profile answers are saved between steps using the existing ASN profile fields so they appear on member profiles later.
+- Adds the four photo slots shown in the supplied design and stores successful WordPress media uploads against the matching profile prompts.
+- Free and paid membership logic is preserved. After membership activation, members now see the 100% "All done!" client screen before continuing automatically to ASN Explore.
+- The Better Messages floating interface is suppressed while the onboarding UI is open so it does not cover the client design.
+- Explore cards remain on the compact client V2 treatment introduced in 0.4.0.
+
 ## 0.4.0 - Client UI V2 foundation
 
 - Added the first client-design visual pass for the parallel registration experience using the new two-column onboarding layout, profile-completion sidebar, progress treatment, and updated form styling.

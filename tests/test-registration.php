@@ -80,6 +80,8 @@ final class RegistrationTest extends TestCase {
         $this->assertCount( 1, $GLOBALS['asn_test_shortcodes'] );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_nopriv_asn_register_account'] ?? array() );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_register_profile'] ?? array() );
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_register_onboarding_step'] ?? array() );
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_register_photos'] ?? array() );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_choose_free_plan'] ?? array() );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['asn_send_new_user_notification'] ?? array() );
         $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['template_redirect'] ?? array() );
@@ -135,6 +137,67 @@ final class RegistrationTest extends TestCase {
             }
             $_GET = array();
         }
+    }
+
+    public function test_elly_onboarding_steps_use_the_supplied_copy_and_progress(): void {
+        $previous_user = $GLOBALS['asn_test_current_user_id'];
+        $previous_level = $GLOBALS['asn_test_pmpro_levels'][8] ?? null;
+
+        $GLOBALS['asn_test_current_user_id'] = 8;
+        unset( $GLOBALS['asn_test_pmpro_levels'][8] );
+
+        try {
+            $_GET = array( 'asn_step' => 'personality' );
+            $personality = ( new Registration_Shortcode() )->render();
+            $this->assertStringContainsString( 'Love it. Now tell us what makes you, you.', $personality );
+            $this->assertStringContainsString( 'Give people a little glimpse into your world.', $personality );
+            $this->assertStringContainsString( '30%', $personality );
+            $this->assertStringContainsString( 'My favourite music is', $personality );
+
+            $_GET = array( 'asn_step' => 'morning' );
+            $morning = ( new Registration_Shortcode() )->render();
+            $this->assertStringContainsString( 'Nice. Now what gets you out of bed in the morning?', $morning );
+            $this->assertStringContainsString( '60%', $morning );
+
+            $_GET = array( 'asn_step' => 'sharing' );
+            $sharing = ( new Registration_Shortcode() )->render();
+            $this->assertStringContainsString( 'You’ve got something to share, so does everyone here.', $sharing );
+            $this->assertStringContainsString( '90%', $sharing );
+
+            $_GET = array( 'asn_step' => 'photos' );
+            $photos = ( new Registration_Shortcode() )->render();
+            $this->assertStringContainsString( 'Nearly there! Show us a glimpse of your world.', $photos );
+            $this->assertStringContainsString( 'A photo of me doing what I love most.', $photos );
+            $this->assertStringContainsString( 'Save Profile', $photos );
+        } finally {
+            $GLOBALS['asn_test_current_user_id'] = $previous_user;
+            if ( null === $previous_level ) {
+                unset( $GLOBALS['asn_test_pmpro_levels'][8] );
+            } else {
+                $GLOBALS['asn_test_pmpro_levels'][8] = $previous_level;
+            }
+            $_GET = array();
+        }
+    }
+
+    public function test_onboarding_step_field_groups_follow_elly_artboards(): void {
+        $this->assertSame(
+            array(
+                'my_favorite_music_is',
+                'i_get_way_too_excited_about',
+                'after_work_you_can_find_me',
+                'the_greatest_thing_about_where_i_live_is',
+            ),
+            Registration::onboarding_fields_for_step( 'personality' )
+        );
+        $this->assertSame(
+            array(
+                'i_m_currently_trying_to_learn',
+                'one_thing_i_could_help_teach_you_about_is',
+            ),
+            Registration::onboarding_fields_for_step( 'sharing' )
+        );
+        $this->assertSame( array(), Registration::onboarding_fields_for_step( 'unknown' ) );
     }
 
     public function test_birth_date_validation_returns_age_or_null(): void {

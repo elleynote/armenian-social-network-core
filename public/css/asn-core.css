@@ -80,3 +80,82 @@
 @media(max-width:480px){
   .asn-directory__grid{grid-template-columns:1fr}
 }
+
+
+/* Elly V2 onboarding screens */
+.asn-registration-v2{grid-template-columns:minmax(0,760px) 360px;justify-content:center;gap:74px}
+.asn-registration-v2__main{padding-top:12px}
+.asn-registration-v2__heading{margin-bottom:44px}
+.asn-registration-v2__heading h1{font-size:clamp(2.4rem,3.8vw,4rem);color:#10294a;letter-spacing:-.035em}
+.asn-registration-v2__heading p{margin-top:12px;color:#10294a;font-size:1rem}
+.asn-registration-v2__form{display:block!important}
+.asn-registration-v2__panel{display:grid;gap:16px;padding:28px 30px;margin-bottom:34px;border-radius:18px;background:#f3f3f3}
+.asn-registration-v2__panel--two{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 20px}
+.asn-registration-v2 .asn-field{display:grid;gap:8px}
+.asn-registration-v2 .asn-field__label{padding-left:12px;color:#526078;font-size:.82rem;font-weight:500}
+.asn-registration-v2 .asn-field__input{min-height:48px;padding:12px 18px;border:0;border-radius:999px;background:#fff;color:#24344e;font-size:.95rem}
+.asn-registration-v2 select.asn-field__input{appearance:auto}
+.asn-registration-v2__prompt-panel{gap:18px}
+.asn-registration-v2__prompt-field{gap:8px!important}
+.asn-registration-v2__textarea{min-height:84px!important;border-radius:12px!important;resize:vertical}
+.asn-registration-v2__next-row{display:flex;justify-content:flex-end;margin-top:8px}
+.asn-registration-v2__next{width:auto!important;min-width:82px;min-height:40px;padding:9px 19px!important;margin:0!important;border:0;border-radius:999px!important;background:#2b83d5!important;color:#fff!important;font-size:.8rem}
+.asn-registration-v2__next:hover{background:#216fb8!important}
+.asn-registration-v2__sidebar{display:grid;gap:22px;padding:0;border:0}
+.asn-registration-v2__sidebar-card{border:1px solid #d9dde4;border-radius:18px;background:#fff}
+.asn-registration-v2__progress{padding:28px 28px 30px;border:1px solid #d9dde4}
+.asn-registration-v2__progress-title h2{margin:0;color:#10294a;font-size:1.75rem;line-height:1.1}
+.asn-registration-v2__progress-title p{margin:9px 0 0;color:#10294a;font-size:.9rem}
+.asn-registration-v2__progress-row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;margin-top:26px}
+.asn-registration-v2__progress-row strong{color:#10294a;font-size:.9rem}
+.asn-registration-v2__progress-track{height:16px;margin:0;border-radius:999px;background:#f1f1f1}
+.asn-registration-v2__progress-track span{background:#2b83d5}
+.asn-registration-v2__profile-preview{display:flex;flex-direction:column;align-items:center;text-align:center;margin-top:32px;padding:32px 18px 8px;border-radius:17px;background:#f3f3f3;color:#526078}
+.asn-registration-v2__profile-photo{width:150px;height:150px;border-radius:50%;object-fit:cover;background:#e3e3e3}
+.asn-registration-v2__profile-name{margin-top:18px;color:#111d31;font-size:1.08rem}
+.asn-registration-v2__profile-username{margin-top:5px;color:#111d31}
+.asn-registration-v2__profile-preview>span{margin-top:7px;font-size:.95rem}
+.asn-registration-v2__profile-actions{display:grid;grid-template-columns:1fr 48px;gap:8px;width:100%;margin-top:22px}
+.asn-registration-v2__profile-button,.asn-registration-v2__profile-chat{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:999px;background:#f85d3f;color:#fff!important;text-decoration:none;font-weight:500}
+.asn-registration-v2__profile-chat{width:48px;padding:0}
+.asn-registration-v2__help{padding:31px 31px 27px}
+.asn-registration-v2__help h2{margin:0 0 23px;color:#344259;font-size:1.45rem;font-weight:500}
+.asn-registration-v2__help ul{list-style:none;padding:0;margin:0;display:grid;gap:16px}
+.asn-registration-v2__help li{position:relative;padding-left:27px;color:#48566e;font-size:.82rem;line-height:1.35}
+.asn-registration-v2__help li:before{content:"✓";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:#2b83d5;color:#fff;text-align:center;line-height:18px;font-size:.72rem;font-weight:700}
+.asn-registration-v2__help p{margin:26px 0 0;color:#48566e;font-size:.78rem;line-height:1.42}
+.asn-registration-v2__photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;padding:28px 30px;border-radius:18px;background:#f3f3f3}
+.asn-registration-v2__photo-card{position:relative;display:flex;min-height:220px;flex-direction:column;align-items:center;justify-content:center;padding:34px 20px;border:1px solid transparent;border-radius:12px;background:#fff;text-align:center;cursor:pointer;overflow:hidden}
+.asn-registration-v2__photo-title{position:absolute;left:14px;right:14px;top:15px;color:#526078;font-size:.72rem}
+.asn-registration-v2__photo-plus{font-size:2rem;color:#9ba4b2;font-weight:300}
+.asn-registration-v2__photo-add{margin-top:9px;color:#59677d;font-size:.75rem}
+.asn-registration-v2__photo-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.asn-registration-v2__photo-preview{position:absolute;inset:42px 16px 26px;width:calc(100% - 32px);height:calc(100% - 68px);object-fit:cover;border-radius:8px}
+.asn-registration-v2__complete{min-height:260px}
+.asn-registration-v2__complete-fallback{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.asn-registration-v2 .asn-registration__plans{margin-top:10px}
+.asn-registration-v2 .asn-registration__plan{border-radius:12px}
+
+/* Keep the client Explore grid compact like the supplied V2 artboard. */
+.asn-directory__grid{grid-template-columns:repeat(4,minmax(0,230px));justify-content:center;gap:44px 42px}
+.asn-member-card--v2 .asn-member-card__photo{width:230px;height:230px;aspect-ratio:auto}
+.asn-member-card--v2 .asn-member-card__name{font-size:1rem}
+.asn-member-card__actions--v2{grid-template-columns:minmax(0,1fr) 42px}
+.asn-member-card__view-profile,.asn-member-card__chat{min-height:40px;border-radius:999px}
+.asn-member-card__chat{width:42px}
+
+@media(max-width:1120px){
+  .asn-registration-v2{grid-template-columns:minmax(0,1fr) 330px;gap:36px}
+  .asn-directory__grid{grid-template-columns:repeat(3,minmax(0,230px))}
+}
+@media(max-width:850px){
+  .asn-registration-v2{grid-template-columns:1fr}
+  .asn-registration-v2__sidebar{max-width:520px;margin:0 auto;width:100%}
+  .asn-directory__grid{grid-template-columns:repeat(2,minmax(0,230px))}
+}
+@media(max-width:600px){
+  .asn-registration-v2__panel--two,.asn-registration-v2__photo-grid{grid-template-columns:1fr}
+  .asn-registration-v2__panel,.asn-registration-v2__photo-grid{padding:20px}
+  .asn-registration-v2__heading h1{font-size:2.25rem}
+  .asn-directory__grid{grid-template-columns:1fr}
+}
