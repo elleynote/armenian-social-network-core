@@ -367,7 +367,7 @@ final class Registration_Shortcode {
         echo '<div class="asn-registration-v2__next-row"><button class="asn-button asn-registration-v2__next" type="submit">Next &#8594;</button></div>';
         echo '</form>';
 
-        self::screen_close();
+        self::screen_close( 0, 'Complete your profile.', $user_id );
     }
 
     private static function render_prompt_step(
@@ -404,7 +404,7 @@ final class Registration_Shortcode {
         echo '<div class="asn-registration-v2__next-row"><button class="asn-button asn-registration-v2__next" type="submit">Next &#8594;</button></div>';
         echo '</form>';
 
-        self::screen_close();
+        self::screen_close( $progress, $status, $user_id );
     }
 
     private static function render_photos_step( int $user_id, string $register_url ): void {
@@ -448,7 +448,7 @@ final class Registration_Shortcode {
         echo '<div class="asn-registration-v2__next-row"><button class="asn-button asn-registration-v2__next" type="submit">Save Profile</button></div>';
         echo '</form>';
 
-        self::screen_close();
+        self::screen_close( 90, 'A few final touches.', $user_id );
     }
 
     private static function render_plan_form( string $register_url, string $explore_url, string $paid_url, int $user_id ): void {
@@ -482,7 +482,7 @@ final class Registration_Shortcode {
 
         echo '</div>';
 
-        self::screen_close();
+        self::screen_close( 90, 'A few final touches.', $user_id );
     }
 
     private static function render_complete( int $user_id, string $explore_url ): void {
@@ -496,7 +496,7 @@ final class Registration_Shortcode {
         echo '<div class="asn-registration-v2__complete" data-asn-complete-redirect="' . esc_attr( $explore_url ) . '">';
         echo '<a class="asn-registration-v2__complete-fallback" href="' . esc_url( $explore_url ) . '">Continue to Explore</a>';
         echo '</div>';
-        self::screen_close();
+        self::screen_close( 100, 'Profile completed.', $user_id );
     }
 
     private static function screen_open( string $title, string $subtitle, int $progress, string $status, int $user_id ): void {
@@ -508,8 +508,9 @@ final class Registration_Shortcode {
         echo '</header>';
     }
 
-    private static function screen_close(): void {
+    private static function screen_close( int $progress, string $status, int $user_id ): void {
         echo '</main>';
+        self::render_sidebar( $progress, $status, $user_id );
         echo '</div>';
     }
 
