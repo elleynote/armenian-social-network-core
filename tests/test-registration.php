@@ -108,6 +108,35 @@ final class RegistrationTest extends TestCase {
         );
     }
 
+    public function test_registration_renders_client_ui_v2_foundation(): void {
+        $previous_user = $GLOBALS['asn_test_current_user_id'];
+        $previous_logged_in = $GLOBALS['asn_test_logged_in'];
+        $previous_level = $GLOBALS['asn_test_pmpro_levels'][8] ?? null;
+
+        $GLOBALS['asn_test_current_user_id'] = 8;
+        $GLOBALS['asn_test_logged_in'] = true;
+        unset( $GLOBALS['asn_test_pmpro_levels'][8] );
+        $_GET = array();
+
+        try {
+            $html = ( new Registration_Shortcode() )->render();
+
+            $this->assertStringContainsString( 'asn-registration-v2', $html );
+            $this->assertStringContainsString( 'Introduce yourself.', $html );
+            $this->assertStringContainsString( 'Profile completion', $html );
+            $this->assertStringContainsString( 'Help people get to know you.', $html );
+        } finally {
+            $GLOBALS['asn_test_current_user_id'] = $previous_user;
+            $GLOBALS['asn_test_logged_in'] = $previous_logged_in;
+            if ( null === $previous_level ) {
+                unset( $GLOBALS['asn_test_pmpro_levels'][8] );
+            } else {
+                $GLOBALS['asn_test_pmpro_levels'][8] = $previous_level;
+            }
+            $_GET = array();
+        }
+    }
+
     public function test_birth_date_validation_returns_age_or_null(): void {
         $age = Registration::age_from_birth_date( '2010-01-01' );
         $this->assertNotNull( $age );
