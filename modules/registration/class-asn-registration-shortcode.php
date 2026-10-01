@@ -36,6 +36,8 @@ final class Registration_Shortcode {
     }
 
     public function render( array $atts = array() ): string {
+        self::disable_page_cache();
+
         $atts = shortcode_atts(
             array(
                 'register_url' => site_url( '/asn-register-test/' ),
@@ -188,6 +190,16 @@ final class Registration_Shortcode {
 
         echo '</div>';
         return (string) ob_get_clean();
+    }
+
+    public static function disable_page_cache(): void {
+        if ( ! defined( 'DONOTCACHEPAGE' ) ) {
+            define( 'DONOTCACHEPAGE', true );
+        }
+
+        if ( function_exists( 'nocache_headers' ) ) {
+            nocache_headers();
+        }
     }
 
     public static function default_paid_checkout_url(): string {
