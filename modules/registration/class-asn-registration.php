@@ -198,7 +198,7 @@ final class Registration {
         Profile_Index::sync_user( $user_id );
         self::save_legacy_age_meta( $user_id, $age );
 
-        $this->redirect( add_query_arg( 'asn_step', 'personality', $return_url ) );
+        $this->redirect( add_query_arg( 'asn_step', 'prompts', $return_url ) );
     }
 
     public function handle_onboarding_step(): void {
@@ -219,10 +219,11 @@ final class Registration {
         $step = isset( $_POST['step'] ) ? sanitize_key( wp_unslash( $_POST['step'] ) ) : '';
         $next_step = isset( $_POST['next_step'] ) ? sanitize_key( wp_unslash( $_POST['next_step'] ) ) : '';
         $allowed_transitions = array(
-            'personality' => 'morning',
-            'morning'     => 'planning',
-            'planning'    => 'story',
-            'story'       => 'sharing',
+            'prompts'     => 'photos',
+            'personality' => 'photos',
+            'morning'     => 'photos',
+            'planning'    => 'photos',
+            'story'       => 'photos',
             'sharing'     => 'photos',
         );
 
@@ -296,37 +297,13 @@ final class Registration {
     }
 
     public static function onboarding_fields_for_step( string $step ): array {
-        $map = array(
-            'personality' => array(
-                'my_favorite_music_is',
-                'i_get_way_too_excited_about',
-                'after_work_you_can_find_me',
-                'the_greatest_thing_about_where_i_live_is',
-            ),
-            'morning' => array(
-                'something_i_m_really_really_good_at_is',
-                'something_you_might_not_know_about_me_is',
-                'i_value_people_who',
-            ),
-            'planning' => array(
-                'my_dream_job_is',
-                'this_year_i_really_want_to',
-                'a_lifelong_goal_of_mine_is_to',
-                'my_dream_holiday_destination_is',
-                'one_way_i_d_like_to_change_the_world_is',
-            ),
-            'story' => array(
-                'my_greatest_childhood_memory_is',
-                'my_biggest_fear_is',
-                'the_best_piece_of_advice_i_ve_ever_received_is',
-            ),
-            'sharing' => array(
-                'i_m_currently_trying_to_learn',
-                'one_thing_i_could_help_teach_you_about_is',
-            ),
-        );
+        $fields = Registration_Shortcode::all_prompt_fields();
 
-        return $map[ $step ] ?? array();
+        if ( in_array( $step, array( 'prompts', 'personality', 'morning', 'planning', 'story', 'sharing' ), true ) ) {
+            return $fields;
+        }
+
+        return array();
     }
 
     private static function nested_upload( array $files, string $key ): array {
