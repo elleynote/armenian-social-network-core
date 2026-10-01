@@ -37,17 +37,11 @@ if ( '' !== $spoken ) {
         <a class="asn-button asn-member-card__view-profile" href="<?php echo esc_url( $profile_url ); ?>">View Profile</a>
 
         <?php if ( ! empty( $better_messages['available'] ) && ! empty( $better_messages['url'] ) ) : ?>
-            <a class="asn-button asn-member-card__chat" href="<?php echo esc_url( $better_messages['url'] ); ?>" aria-label="<?php echo esc_attr( 'Message ' . $member['display_name'] ); ?>">
-                <span aria-hidden="true">&#9993;</span>
-            </a>
+            <a class="asn-button asn-member-card__chat" href="<?php echo esc_url( $better_messages['url'] ); ?>" aria-label="<?php echo esc_attr( 'Message ' . $member['display_name'] ); ?>">Message</a>
         <?php elseif ( ! empty( $message['available'] ) ) : ?>
-            <button class="asn-button asn-member-card__chat" type="button" data-asn-message-user="<?php echo esc_attr( (string) $message['target_user_id'] ); ?>" aria-label="<?php echo esc_attr( 'Message ' . $member['display_name'] ); ?>">
-                <span aria-hidden="true">&#9993;</span>
-            </button>
+            <button class="asn-button asn-member-card__chat" type="button" data-asn-message-user="<?php echo esc_attr( (string) $message['target_user_id'] ); ?>" aria-label="<?php echo esc_attr( 'Message ' . $member['display_name'] ); ?>">Message</button>
         <?php else : ?>
-            <button class="asn-button asn-member-card__chat" type="button" disabled aria-label="Messaging unavailable">
-                <span aria-hidden="true">&#9993;</span>
-            </button>
+            <button class="asn-button asn-member-card__chat" type="button" disabled aria-label="Messaging unavailable">Message</button>
         <?php endif; ?>
     </div>
 </article>
