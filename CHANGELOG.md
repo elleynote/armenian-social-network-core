@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 - Client UI V2 foundation
+
+- Added the first client-design visual pass for the parallel registration experience using the new two-column onboarding layout, profile-completion sidebar, progress treatment, and updated form styling.
+- Updated the parallel Explore member cards to the new client direction with image-first cards, name and age, public username, job title, country, speaker level, View Profile action, and compact chat action.
+- Better Messages is now the primary chat action on the parallel ASN Explore cards when available; the legacy message action remains as fallback while live AtomChat stays untouched.
+- No membership, payment, subscription, or live registration logic was replaced in this release.
+- This release is the UI foundation only; the remaining client onboarding screens and richer profile-completion steps will be layered onto this structure next.
+
 ## 0.3.9 - Faster signup step transition
 
 - Moved WordPress new-user notification email sending out of the synchronous registration request and into a short-lived WP-Cron event.

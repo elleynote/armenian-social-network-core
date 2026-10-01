@@ -172,8 +172,9 @@ final class Registration_Shortcode {
     }
 
     private static function render_account_form( string $register_url ): void {
-        echo '<div class="asn-registration__card">';
-        echo '<h2>Let&#8217;s get started</h2>';
+        echo '<div class="asn-registration-v2">';
+        echo '<main class="asn-registration-v2__main">';
+        echo '<header class="asn-registration-v2__heading"><h1>Create your account.</h1><p>First, let\'s set up your login.</p></header>';
         echo '<form class="asn-registration__form" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
         echo '<input type="hidden" name="action" value="asn_register_account">';
         echo '<input type="hidden" name="return_url" value="' . esc_attr( $register_url ) . '">';
@@ -188,12 +189,15 @@ final class Registration_Shortcode {
         echo '<button class="asn-button asn-registration__submit" type="submit">Next Step</button>';
         echo '</form>';
         echo '<p class="asn-registration__login">Already have an account? <a href="' . esc_url( site_url( '/login/' ) ) . '">Log in</a></p>';
+        echo '</main>';
+        self::render_sidebar( 0, 'Start your profile.' );
         echo '</div>';
     }
 
     private static function render_profile_form( string $register_url ): void {
-        echo '<div class="asn-registration__card">';
-        echo '<h2>Great! Now, introduce yourself</h2>';
+        echo '<div class="asn-registration-v2">';
+        echo '<main class="asn-registration-v2__main">';
+        echo '<header class="asn-registration-v2__heading"><h1>Introduce yourself.</h1><p>Let\'s start with the basics.</p></header>';
         echo '<form class="asn-registration__form" method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '">';
         echo '<input type="hidden" name="action" value="asn_register_profile">';
         echo '<input type="hidden" name="return_url" value="' . esc_attr( $register_url ) . '">';
@@ -219,14 +223,17 @@ final class Registration_Shortcode {
         echo '</select></label>';
 
         echo '<p class="asn-registration__hint">You can add or change your profile picture after registration from My Profile.</p>';
-        echo '<button class="asn-button asn-registration__submit" type="submit">Create Profile</button>';
+        echo '<button class="asn-button asn-registration__submit asn-registration-v2__primary" type="submit">Next</button>';
         echo '</form>';
+        echo '</main>';
+        self::render_sidebar( 0, 'Complete your profile.' );
         echo '</div>';
     }
 
     private static function render_plan_form( string $register_url, string $explore_url, string $paid_url ): void {
-        echo '<div class="asn-registration__card asn-registration__card--wide">';
-        echo '<h2>Choose a plan</h2>';
+        echo '<div class="asn-registration-v2">';
+        echo '<main class="asn-registration-v2__main">';
+        echo '<header class="asn-registration-v2__heading"><h1>Choose your membership.</h1><p>Pick the option that works for you.</p></header>';
         echo '<div class="asn-registration__plans">';
 
         echo '<div class="asn-registration__plan">';
@@ -248,7 +255,25 @@ final class Registration_Shortcode {
         echo '</div>';
 
         echo '</div>';
+        echo '</main>';
+        self::render_sidebar( 90, 'A few final touches.' );
         echo '</div>';
+    }
+
+    private static function render_sidebar( int $progress, string $status ): void {
+        $progress = max( 0, min( 100, $progress ) );
+        echo '<aside class="asn-registration-v2__sidebar">';
+        echo '<section class="asn-registration-v2__progress">';
+        echo '<div class="asn-registration-v2__progress-top"><div><strong>Profile completion</strong><span>' . esc_html( $status ) . '</span></div><b>' . esc_html( (string) $progress ) . '%</b></div>';
+        echo '<div class="asn-registration-v2__progress-track"><span style="width:' . esc_attr( (string) $progress ) . '%"></span></div>';
+        echo '</section>';
+        echo '<section class="asn-registration-v2__preview"><div class="asn-registration-v2__avatar" aria-hidden="true"></div><strong>Your profile</strong><span>Preview updates as we build the new onboarding flow.</span></section>';
+        echo '<section class="asn-registration-v2__help">';
+        echo '<h2>Help people get to know you.</h2>';
+        echo '<ul><li>Share who you are, where you\'re from and what connects you to the Armenian community.</li><li>Find Armenians you have something in common with.</li><li>Make better connections.</li><li>Connect through shared interests, locations, backgrounds and experiences.</li></ul>';
+        echo '<p>The more we know about each other, the easier it is to build friendships, professional connections and community across the diaspora.</p>';
+        echo '</section>';
+        echo '</aside>';
     }
 
     private static function country_field(): void {

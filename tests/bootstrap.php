@@ -165,6 +165,11 @@ if ( ! function_exists( 'wp_die' ) ) {
 if ( ! function_exists( 'add_shortcode' ) ) {
     function add_shortcode( $tag, $callback ) { $GLOBALS['asn_test_shortcodes'][ $tag ] = $callback; }
 }
+if ( ! function_exists( 'shortcode_atts' ) ) {
+    function shortcode_atts( $pairs, $atts, $shortcode = '' ) {
+        return array_merge( (array) $pairs, array_intersect_key( (array) $atts, (array) $pairs ) );
+    }
+}
 if ( ! function_exists( 'get_current_user_id' ) ) {
     function get_current_user_id() { return (int) $GLOBALS['asn_test_current_user_id']; }
 }
@@ -272,6 +277,7 @@ require_once dirname( __DIR__ ) . '/asn-core.php';
 $GLOBALS['asn_test_users'] = array(
     7 => (object) array(
         'ID'           => 7,
+        'user_login'   => 'testmember',
         'display_name' => 'Test Member',
         'user_email'   => 'private@example.test',
         'user_pass'    => 'secret-hash',
@@ -279,6 +285,7 @@ $GLOBALS['asn_test_users'] = array(
     ),
     8 => (object) array(
         'ID'           => 8,
+        'user_login'   => 'freemember',
         'display_name' => 'Free Member',
         'user_email'   => 'private2@example.test',
         'user_pass'    => 'secret-hash-2',
@@ -377,6 +384,12 @@ if ( ! function_exists( 'sanitize_key' ) ) {
 }
 if ( ! function_exists( 'sanitize_email' ) ) {
     function sanitize_email( $value ) { return filter_var( (string) $value, FILTER_SANITIZE_EMAIL ); }
+}
+if ( ! function_exists( 'sanitize_user' ) ) {
+    function sanitize_user( $value, $strict = false ) {
+        $value = strtolower( (string) $value );
+        return preg_replace( $strict ? '/[^a-z0-9_.-]/' : '/[^a-z0-9_.@-]/', '', $value );
+    }
 }
 if ( ! function_exists( 'wp_json_encode' ) ) {
     function wp_json_encode( $value ) { return json_encode( $value ); }

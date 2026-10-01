@@ -12,15 +12,16 @@ final class Profile_Service {
             return null;
         }
 
+        $user = get_userdata( $user_id );
         $profile = array(
             'id'           => (int) $member['id'],
             'display_name' => (string) $member['display_name'],
+            'username'     => $user && isset( $user->user_login ) ? sanitize_user( (string) $user->user_login, true ) : '',
             'photo_url'    => Profile_Photo::url( $user_id ),
             'is_owner'     => $viewer_id > 0 && $viewer_id === $user_id,
         );
 
         if ( $viewer_id > 0 ) {
-            $user = get_userdata( $user_id );
             if ( $user && isset( $user->user_email ) ) {
                 $profile['email'] = sanitize_email( (string) $user->user_email );
             }
