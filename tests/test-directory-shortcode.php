@@ -176,7 +176,7 @@ final class DirectoryShortcodeTest extends TestCase {
         $wpdb->total = 1;
         $GLOBALS['asn_test_options']['active_plugins'] = array();
         $html = ( new Directory_Shortcode() )->render();
-        $this->assertStringContainsString( 'Messaging unavailable', $html );
+        $this->assertStringContainsString( 'aria-label="Messaging unavailable"', $html );
         $this->assertStringNotContainsString( 'data-asn-message-user', $html );
     }
 }
