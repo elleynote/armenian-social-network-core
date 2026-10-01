@@ -185,6 +185,15 @@ if ( ! function_exists( 'esc_attr' ) ) {
 if ( ! function_exists( 'esc_url' ) ) {
     function esc_url( $value ) { return htmlspecialchars( (string) $value, ENT_QUOTES, 'UTF-8' ); }
 }
+if ( ! function_exists( 'selected' ) ) {
+    function selected( $selected, $current = true, $echo = true ) {
+        $result = (string) $selected === (string) $current ? ' selected="selected"' : '';
+        if ( $echo ) {
+            echo $result;
+        }
+        return $result;
+    }
+}
 
 if ( ! class_exists( 'ASN_Test_Better_Messages_Functions' ) ) {
     final class ASN_Test_Better_Messages_Functions {
