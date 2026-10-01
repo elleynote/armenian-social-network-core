@@ -5,6 +5,7 @@ use ASN\Core\Integrations\PMPro_Integration;
 use ASN\Core\Memberships;
 use ASN\Core\Profiles\Legacy_Profile_Contract;
 use ASN\Core\Profiles\Profile_Index;
+use ASN\Core\Profiles\Profile_Fields;
 use ASN\Core\Profiles\Profile_Service;
 
 defined( 'ABSPATH' ) || exit;
@@ -16,6 +17,8 @@ final class Registration {
     public function register(): void {
         add_action( 'admin_post_nopriv_asn_register_account', array( $this, 'handle_account' ) );
         add_action( 'admin_post_asn_register_profile', array( $this, 'handle_profile' ) );
+        add_action( 'admin_post_asn_register_onboarding_step', array( $this, 'handle_onboarding_step' ) );
+        add_action( 'admin_post_asn_register_photos', array( $this, 'handle_photos' ) );
         add_action( 'admin_post_asn_choose_free_plan', array( $this, 'handle_free_plan' ) );
         add_action( 'asn_send_new_user_notification', array( $this, 'send_new_user_notification' ), 10, 1 );
         add_action( 'template_redirect', array( $this, 'maybe_redirect_completed_free_signup' ), 1 );
@@ -126,16 +129,25 @@ final class Registration {
             return;
         }
 
+        $first_name = isset( $_POST['first_name'] ) ? sanitize_text_field( wp_unslash( $_POST['first_name'] ) ) : '';
+        $last_name = isset( $_POST['last_name'] ) ? sanitize_text_field( wp_unslash( $_POST['last_name'] ) ) : '';
+        $display_name = isset( $_POST['display_name'] ) ? sanitize_text_field( wp_unslash( $_POST['display_name'] ) ) : '';
+        $email = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
         $country = isset( $_POST['country'] ) ? sanitize_text_field( wp_unslash( $_POST['country'] ) ) : '';
-        $birth_date = isset( $_POST['birth_date'] ) ? sanitize_text_field( wp_unslash( $_POST['birth_date'] ) ) : '';
+        $age = isset( $_POST['age'] ) ? absint( wp_unslash( $_POST['age'] ) ) : 0;
         $gender = isset( $_POST['gender'] ) ? sanitize_text_field( wp_unslash( $_POST['gender'] ) ) : '';
         $job_title = isset( $_POST['job_title'] ) ? sanitize_text_field( wp_unslash( $_POST['job_title'] ) ) : '';
         $spoken = isset( $_POST['spoken_proficiency'] ) ? sanitize_text_field( wp_unslash( $_POST['spoken_proficiency'] ) ) : '';
 
-        $age = self::age_from_birth_date( $birth_date );
         if (
-            '' === $country
-            || null === $age
+            '' === $first_name
+            || '' === $last_name
+            || '' === $display_name
+            || '' === $email
+            || ! is_email( $email )
+            || '' === $country
+            || $age < 1
+            || $age > 120
             || ! in_array( $gender, Legacy_Profile_Contract::gender_options(), true )
             || ! in_array( $spoken, Legacy_Profile_Contract::spoken_proficiency_options(), true )
         ) {
@@ -143,10 +155,18 @@ final class Registration {
             return;
         }
 
+        $email_owner = email_exists( $email );
+        if ( $email_owner && (int) $email_owner !== $user_id ) {
+            $this->redirect_with_error( add_query_arg( 'asn_step', 'profile', $return_url ), 'email' );
+            return;
+        }
+
         $result = Profile_Service::update_own_profile(
             $user_id,
             $user_id,
             array(
+                'first_name'         => $first_name,
+                'last_name'          => $last_name,
                 'country'            => $country,
                 'age'                => $age,
                 'gender'             => $gender,
@@ -160,10 +180,209 @@ final class Registration {
             return;
         }
 
-        update_user_meta( $user_id, 'birth_date', $birth_date );
-        self::save_legacy_birth_meta( $user_id, $birth_date, $age );
+        $updated_user = wp_update_user(
+            array(
+                'ID'           => $user_id,
+                'first_name'   => $first_name,
+                'last_name'    => $last_name,
+                'display_name' => $display_name,
+                'user_email'   => $email,
+            )
+        );
 
+        if ( is_wp_error( $updated_user ) ) {
+            $this->redirect_with_error( add_query_arg( 'asn_step', 'profile', $return_url ), 'profile' );
+            return;
+        }
+
+        self::save_legacy_age_meta( $user_id, $age );
+
+        $this->redirect( add_query_arg( 'asn_step', 'personality', $return_url ) );
+    }
+
+    public function handle_onboarding_step(): void {
+        $return_url = $this->posted_url( 'return_url', site_url( self::DEFAULT_REGISTER_URL ) );
+        $user_id = (int) get_current_user_id();
+
+        if ( ! is_user_logged_in() || $user_id <= 0 ) {
+            $this->redirect_with_error( $return_url, 'login' );
+            return;
+        }
+
+        $nonce = isset( $_POST['asn_registration_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['asn_registration_nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'asn_register_onboarding_step' ) ) {
+            $this->redirect_with_error( $return_url, 'security' );
+            return;
+        }
+
+        $step = isset( $_POST['step'] ) ? sanitize_key( wp_unslash( $_POST['step'] ) ) : '';
+        $next_step = isset( $_POST['next_step'] ) ? sanitize_key( wp_unslash( $_POST['next_step'] ) ) : '';
+        $allowed_transitions = array(
+            'personality' => 'morning',
+            'morning'     => 'planning',
+            'planning'    => 'story',
+            'story'       => 'sharing',
+            'sharing'     => 'photos',
+        );
+
+        if ( ! isset( $allowed_transitions[ $step ] ) || $allowed_transitions[ $step ] !== $next_step ) {
+            $this->redirect_with_error( add_query_arg( 'asn_step', 'profile', $return_url ), 'profile' );
+            return;
+        }
+
+        $input = isset( $_POST['asn_profile'] ) && is_array( $_POST['asn_profile'] )
+            ? wp_unslash( $_POST['asn_profile'] )
+            : array();
+
+        $allowed_keys = self::onboarding_fields_for_step( $step );
+        $clean_input = array();
+
+        foreach ( $allowed_keys as $key ) {
+            $clean_input[ $key ] = isset( $input[ $key ] ) ? $input[ $key ] : '';
+        }
+
+        $result = Profile_Service::update_own_profile( $user_id, $user_id, $clean_input );
+        if ( ! $result['success'] ) {
+            $this->redirect_with_error( add_query_arg( 'asn_step', $step, $return_url ), 'profile' );
+            return;
+        }
+
+        update_user_meta( $user_id, '_asn_onboarding_step', $next_step );
+        $this->redirect( add_query_arg( 'asn_step', $next_step, $return_url ) );
+    }
+
+    public function handle_photos(): void {
+        $return_url = $this->posted_url( 'return_url', site_url( self::DEFAULT_REGISTER_URL ) );
+        $user_id = (int) get_current_user_id();
+
+        if ( ! is_user_logged_in() || $user_id <= 0 ) {
+            $this->redirect_with_error( $return_url, 'login' );
+            return;
+        }
+
+        $nonce = isset( $_POST['asn_registration_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['asn_registration_nonce'] ) ) : '';
+        if ( ! wp_verify_nonce( $nonce, 'asn_register_photos' ) ) {
+            $this->redirect_with_error( add_query_arg( 'asn_step', 'photos', $return_url ), 'security' );
+            return;
+        }
+
+        $allowed = array(
+            'a_photo_of_me_doing_what_i_love_most',
+            'a_photo_of_me_being_me',
+            'a_photo_of_something_i_ve_done_recently',
+            'a_photo_of_the_good_old_days',
+        );
+
+        $files = isset( $_FILES['asn_photos'] ) && is_array( $_FILES['asn_photos'] ) ? $_FILES['asn_photos'] : array();
+
+        foreach ( $allowed as $key ) {
+            $file = self::nested_upload( $files, $key );
+            if ( empty( $file ) || empty( $file['name'] ) ) {
+                continue;
+            }
+
+            $url = self::upload_profile_photo( $file, $user_id, $key );
+            if ( '' === $url ) {
+                $this->redirect_with_error( add_query_arg( 'asn_step', 'photos', $return_url ), 'upload' );
+                return;
+            }
+
+            update_user_meta( $user_id, $key . '_image', $url );
+        }
+
+        update_user_meta( $user_id, '_asn_onboarding_step', 'plan' );
         $this->redirect( add_query_arg( 'asn_step', 'plan', $return_url ) );
+    }
+
+    public static function onboarding_fields_for_step( string $step ): array {
+        $map = array(
+            'personality' => array(
+                'my_favorite_music_is',
+                'i_get_way_too_excited_about',
+                'after_work_you_can_find_me',
+                'the_greatest_thing_about_where_i_live_is',
+            ),
+            'morning' => array(
+                'something_i_m_really_really_good_at_is',
+                'something_you_might_not_know_about_me_is',
+                'i_value_people_who',
+            ),
+            'planning' => array(
+                'my_dream_job_is',
+                'this_year_i_really_want_to',
+                'a_lifelong_goal_of_mine_is_to',
+                'my_dream_holiday_destination_is',
+                'one_way_i_d_like_to_change_the_world_is',
+            ),
+            'story' => array(
+                'my_greatest_childhood_memory_is',
+                'my_biggest_fear_is',
+                'the_best_piece_of_advice_i_ve_ever_received_is',
+            ),
+            'sharing' => array(
+                'i_m_currently_trying_to_learn',
+                'one_thing_i_could_help_teach_you_about_is',
+            ),
+        );
+
+        return $map[ $step ] ?? array();
+    }
+
+    private static function nested_upload( array $files, string $key ): array {
+        if ( ! isset( $files['name'][ $key ] ) ) {
+            return array();
+        }
+
+        return array(
+            'name'     => $files['name'][ $key ] ?? '',
+            'type'     => $files['type'][ $key ] ?? '',
+            'tmp_name' => $files['tmp_name'][ $key ] ?? '',
+            'error'    => $files['error'][ $key ] ?? UPLOAD_ERR_NO_FILE,
+            'size'     => $files['size'][ $key ] ?? 0,
+        );
+    }
+
+    public static function upload_profile_photo( array $file, int $user_id, string $key ): string {
+        if ( $user_id <= 0 || empty( $file['name'] ) || UPLOAD_ERR_OK !== (int) ( $file['error'] ?? UPLOAD_ERR_NO_FILE ) ) {
+            return '';
+        }
+
+        $allowed_keys = Profile_Fields::photo_prompt_keys();
+        if ( ! in_array( $key, $allowed_keys, true ) ) {
+            return '';
+        }
+
+        $GLOBALS['asn_registration_upload_file'] = $file;
+        $_FILES['asn_registration_upload_file'] = $file;
+
+        if ( ! function_exists( 'media_handle_upload' ) ) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+            require_once ABSPATH . 'wp-admin/includes/image.php';
+            require_once ABSPATH . 'wp-admin/includes/media.php';
+        }
+
+        $attachment_id = media_handle_upload( 'asn_registration_upload_file', 0, array(), array( 'test_form' => false ) );
+        unset( $_FILES['asn_registration_upload_file'], $GLOBALS['asn_registration_upload_file'] );
+
+        if ( is_wp_error( $attachment_id ) || (int) $attachment_id <= 0 ) {
+            return '';
+        }
+
+        $url = wp_get_attachment_url( (int) $attachment_id );
+        return is_string( $url ) ? esc_url_raw( $url ) : '';
+    }
+
+    public static function save_legacy_age_meta( int $user_id, int $age ): void {
+        if ( $user_id <= 0 || $age < 1 || $age > 120 ) {
+            return;
+        }
+
+        update_user_meta( $user_id, 'dob', $age );
+
+        $existing = (string) get_user_meta( $user_id, 'dob_date', true );
+        if ( '' === $existing ) {
+            update_user_meta( $user_id, 'dob_date', 'age-only' );
+        }
     }
 
     public function handle_free_plan(): void {
@@ -182,11 +401,12 @@ final class Registration {
             return;
         }
 
-        update_user_meta( $user_id, '_asn_free_onboarding_redirect_url', $explore_url );
+        $complete_url = add_query_arg( 'asn_step', 'complete', $return_url );
+        update_user_meta( $user_id, '_asn_free_onboarding_redirect_url', $complete_url );
         update_user_meta( $user_id, '_asn_free_onboarding_redirect_expires', time() + 900 );
 
-        $redirect_filter = static function ( $location, $status ) use ( $explore_url ) {
-            return self::rewrite_legacy_free_plan_redirect( (string) $location, $explore_url );
+        $redirect_filter = static function ( $location, $status ) use ( $complete_url ) {
+            return self::rewrite_legacy_free_plan_redirect( (string) $location, $complete_url );
         };
         add_filter( 'wp_redirect', $redirect_filter, 999, 2 );
 
@@ -202,7 +422,8 @@ final class Registration {
         }
 
         Profile_Index::sync_user( $user_id );
-        $this->redirect( $explore_url );
+        update_user_meta( $user_id, '_asn_onboarding_step', 'complete' );
+        $this->redirect( $complete_url );
     }
 
     public function maybe_redirect_completed_free_signup(): void {
