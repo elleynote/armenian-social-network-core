@@ -94,12 +94,18 @@
         var score = Math.floor((completed / fields.length) * 100);
         var valueNode = root.querySelector('[data-asn-progress-value]');
         var barNode = root.querySelector('[data-asn-progress-bar]');
+        var statusNode = root.querySelector('[data-asn-progress-status]');
 
         if (valueNode) {
             valueNode.textContent = score + '%';
         }
         if (barNode) {
             barNode.style.width = score + '%';
+        }
+        if (statusNode) {
+            statusNode.textContent = score >= 100
+                ? 'Profile completed.'
+                : 'Complete all profile cards to reach 100%.';
         }
     }
 
