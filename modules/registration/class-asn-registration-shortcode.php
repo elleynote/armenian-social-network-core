@@ -547,19 +547,19 @@ final class Registration_Shortcode {
         echo '<div class="asn-registration-v2__profile-preview">';
         echo '<img class="asn-registration-v2__profile-photo" src="' . esc_url( Profile_Photo::url( $user_id ) ) . '" alt="">';
         if ( '' !== $name_line ) {
-            echo '<strong class="asn-registration-v2__profile-name">' . esc_html( $name_line ) . '</strong>';
+            echo '<strong class="asn-registration-v2__profile-name" data-asn-preview-name>' . esc_html( $name_line ) . '</strong>';
         }
         if ( '' !== $username ) {
-            echo '<span class="asn-registration-v2__profile-username">@' . esc_html( $username ) . '</span>';
+            echo '<span class="asn-registration-v2__profile-username" data-asn-preview-username>@' . esc_html( $username ) . '</span>';
         }
         if ( '' !== $job ) {
-            echo '<span>' . esc_html( $job ) . '</span>';
+            echo '<span data-asn-preview-job>' . esc_html( $job ) . '</span>';
         }
         if ( '' !== $country ) {
-            echo '<span>' . esc_html( $country ) . '</span>';
+            echo '<span data-asn-preview-country>' . esc_html( $country ) . '</span>';
         }
         if ( '' !== $speaker ) {
-            echo '<span>' . esc_html( $speaker ) . '</span>';
+            echo '<span data-asn-preview-speaker>' . esc_html( $speaker ) . '</span>';
         }
 
         echo '<div class="asn-registration-v2__profile-actions">';
