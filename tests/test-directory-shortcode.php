@@ -88,21 +88,24 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'member=7', $html );
         $this->assertStringContainsString( 'tac_user=7', $html );
         $this->assertStringContainsString( 'data-asn-message-user="7"', $html );
+        $this->assertStringContainsString( '@testmember', $html );
+        $this->assertStringContainsString( 'Fluent Speaker', $html );
+        $this->assertStringContainsString( 'View Profile', $html );
         $this->assertStringContainsString( 'q=Test', $html );
         $this->assertStringContainsString( 'dialect=western', $html );
         $this->assertStringNotContainsString( 'private@example.test', $html );
         $this->assertStringNotContainsString( 'secret-hash', $html );
     }
 
-    public function test_parallel_better_messages_action_renders_without_replacing_atomchat(): void {
+    public function test_parallel_better_messages_action_uses_client_chat_button_on_test_explore(): void {
         $GLOBALS['asn_test_better_messages_enabled'] = true;
 
         $html = ( new Directory_Shortcode() )->render();
 
-        $this->assertStringContainsString( 'data-asn-message-user="7"', $html );
-        $this->assertStringContainsString( '>Message</button>', $html );
-        $this->assertStringContainsString( 'Test Better Messages', $html );
+        $this->assertStringContainsString( 'asn-member-card__view-profile', $html );
+        $this->assertStringContainsString( 'asn-member-card__chat', $html );
         $this->assertStringContainsString( 'https://example.test/messages/#conversation/1007', $html );
+        $this->assertStringNotContainsString( 'Test Better Messages', $html );
     }
 
     public function test_filter_form_posts_get_parameters_to_current_page_explicitly(): void {
