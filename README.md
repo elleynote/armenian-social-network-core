@@ -2,7 +2,7 @@
 
 ASN Core is the custom WordPress social-network application layer for ArmenianSocialNetwork.com.
 
-## v0.5.4 candidate
+## v0.5.5 candidate
 
 Version 0.3 adds a parallel registration/onboarding path while keeping the current live registration and billing flows intact.
 
@@ -49,13 +49,13 @@ composer test
 Build the manual WordPress package with PowerShell:
 
 ```powershell
-pwsh -File scripts/build-release.ps1 -Version 0.5.4
+pwsh -File scripts/build-release.ps1 -Version 0.5.5
 ```
 
 The verified output is:
 
 ```
-build/asn-core-v0.5.4.zip
+build/asn-core-v0.5.5.zip
 ```
 
 The archive contains one top-level `asn-core/` folder and runtime files only.
