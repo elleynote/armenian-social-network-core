@@ -65,6 +65,7 @@ final class RegistrationTest extends TestCase {
         $GLOBALS['asn_test_wc_products'] = array();
         $GLOBALS['asn_test_scheduled_events'] = array();
         $GLOBALS['asn_test_new_user_notifications'] = array();
+        $GLOBALS['asn_test_wpfc_excluded'] = 0;
     }
     public function test_registration_shortcode_and_handlers_are_registered(): void {
         $GLOBALS['asn_test_shortcodes'] = array();
@@ -108,6 +109,13 @@ final class RegistrationTest extends TestCase {
             ),
             $GLOBALS['asn_test_new_user_notifications']
         );
+    }
+
+    public function test_registration_explicitly_excludes_wp_fastest_cache(): void {
+        Registration_Shortcode::disable_page_cache();
+
+        $this->assertGreaterThanOrEqual( 1, $GLOBALS['asn_test_wpfc_excluded'] );
+        $this->assertTrue( defined( 'DONOTCACHEPAGE' ) );
     }
 
     public function test_guest_account_screen_uses_elly_v2_layout(): void {

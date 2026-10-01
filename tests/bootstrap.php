@@ -27,6 +27,7 @@ $GLOBALS['asn_test_better_messages_enabled'] = false;
 $GLOBALS['asn_test_wc_products'] = array();
 $GLOBALS['asn_test_scheduled_events'] = array();
 $GLOBALS['asn_test_new_user_notifications'] = array();
+$GLOBALS['asn_test_wpfc_excluded'] = 0;
 
 class ASN_Test_WPDB {
     public $prefix = 'wp_';
@@ -278,6 +279,12 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) {
             'user_id' => (int) $user_id,
             'notify'  => (string) $notify,
         );
+    }
+}
+
+if ( ! function_exists( 'wpfc_exclude_current_page' ) ) {
+    function wpfc_exclude_current_page() {
+        $GLOBALS['asn_test_wpfc_excluded']++;
     }
 }
 
