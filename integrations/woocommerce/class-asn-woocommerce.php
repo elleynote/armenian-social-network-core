@@ -5,7 +5,7 @@ defined( 'ABSPATH' ) || exit;
 
 final class WooCommerce_Integration {
     private const PREMIUM_PRODUCT_ID = 152;
-    private const PAID_SUCCESS_PATH = '/asn-explore-test/';
+    private const PAID_SUCCESS_PATH = '/asn-register-test/?asn_step=complete';
 
     public static function is_available(): bool {
         return class_exists( 'WooCommerce' ) || function_exists( 'WC' );
