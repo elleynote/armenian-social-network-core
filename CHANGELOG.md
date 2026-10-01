@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.5 - Client Explore review adjustments
+
+- The Explore country filter now recognizes common United States aliases such as `usa`, `US`, `U.S.A.`, and `United States` and returns members whose saved country is United States / United States of America.
+- Explore member cards now span the full results width so the four-card row lines up with the filter panel above it.
+- View Profile and Message actions now use equal-width, equal-height buttons on every member card instead of a large profile button with a tiny message icon.
+- Responsive three-column, two-column, and one-column card layouts keep the same aligned proportions on smaller screens.
+- No membership, registration, payment, profile-data, or messaging permission logic changed.
+
 ## 0.5.4 - Single-page profile cards and real completion score
 
 - Combines all of Elly's profile prompt cards onto one onboarding page instead of sending the member through five separate prompt pages.
