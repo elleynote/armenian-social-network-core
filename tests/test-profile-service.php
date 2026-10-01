@@ -26,6 +26,7 @@ final class ProfileServiceTest extends TestCase {
 
         $this->assertSame( 7, $profile['id'] );
         $this->assertSame( 'Test Member', $profile['display_name'] );
+        $this->assertSame( 'testmember', $profile['username'] );
         $this->assertSame( 'Australia', $profile['country'] );
         $this->assertSame( 'Jazz', $profile['my_favorite_music_is'] );
         $this->assertTrue( $profile['is_owner'] );
