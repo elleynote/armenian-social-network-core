@@ -486,6 +486,10 @@ final class Registration_Shortcode {
     }
 
     private static function render_complete( int $user_id, string $explore_url ): void {
+        delete_user_meta( $user_id, '_asn_free_onboarding_redirect_url' );
+        delete_user_meta( $user_id, '_asn_free_onboarding_redirect_expires' );
+        update_user_meta( $user_id, '_asn_onboarding_step', 'complete' );
+
         self::screen_open(
             'All done!',
             "Let's introduce you to the community.",
