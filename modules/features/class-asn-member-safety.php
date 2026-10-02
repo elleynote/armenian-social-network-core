@@ -98,6 +98,28 @@ final class Member_Safety {
         return false !== $result;
     }
 
+    public static function open_report_count(): int {
+        global $wpdb;
+        $table = Database::table( 'reports' );
+        return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$table} WHERE status = 'open'" );
+    }
+
+    public static function latest_open_reports( int $limit = 20 ): array {
+        global $wpdb;
+        $table = Database::table( 'reports' );
+        $limit = max( 1, min( 100, $limit ) );
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT id, reporter_id, target_user_id, reason, created_at FROM {$table} WHERE status = %s ORDER BY created_at DESC LIMIT %d",
+                'open',
+                $limit
+            ),
+            defined( 'ARRAY_A' ) ? ARRAY_A : 'ARRAY_A'
+        );
+
+        return is_array( $rows ) ? $rows : array();
+    }
+
     public static function report( int $reporter_id, int $target_user_id, string $reason ): bool {
         $reason_key = sanitize_key( $reason );
         $reasons = self::report_reasons();
