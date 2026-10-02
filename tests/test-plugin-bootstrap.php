@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 final class PluginBootstrapTest extends TestCase {
     public function test_plugin_constants_are_defined(): void {
         $this->assertTrue( defined( 'ASN_CORE_VERSION' ) );
-        $this->assertSame( '0.7.0', ASN_CORE_VERSION );
+        $this->assertSame( '0.8.0', ASN_CORE_VERSION );
         $this->assertTrue( defined( 'ASN_CORE_FILE' ) );
         $this->assertTrue( defined( 'ASN_CORE_PATH' ) );
         $this->assertTrue( defined( 'ASN_CORE_URL' ) );
@@ -28,6 +28,13 @@ final class PluginBootstrapTest extends TestCase {
         $this->assertSame( 3, $video[0]['accepted_args'] ?? 0 );
         $this->assertSame( 4, $create[0]['accepted_args'] ?? 0 );
         $this->assertSame( 4, $join[0]['accepted_args'] ?? 0 );
+    }
+
+    public function test_member_discovery_hooks_are_registered(): void {
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_toggle_favorite'] ?? array() );
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_save_search'] ?? array() );
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_delete_saved_search'] ?? array() );
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['template_redirect'] ?? array() );
     }
 
     public function test_paid_checkout_return_filter_is_registered(): void {

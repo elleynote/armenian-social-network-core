@@ -22,14 +22,17 @@ final class DatabaseTest extends TestCase {
             $this->assertArrayHasKey( 'custom_asn_' . $name, $GLOBALS['asn_test_tables'] );
         }
 
-        $this->assertSame( '1.1.0', get_option( Database::VERSION_OPTION ) );
+        $this->assertSame( '1.2.0', get_option( Database::VERSION_OPTION ) );
 
         $schema = implode( "\n", $GLOBALS['asn_test_dbdelta_sql'] );
         $this->assertStringContainsString( 'age smallint unsigned NULL', $schema );
         $this->assertStringContainsString( "job_title varchar(191) NOT NULL DEFAULT ''", $schema );
         $this->assertStringContainsString( 'registered_at datetime NULL DEFAULT NULL', $schema );
+        $this->assertStringContainsString( "here_for varchar(191) NOT NULL DEFAULT ''", $schema );
+        $this->assertStringContainsString( 'last_active_at datetime NULL DEFAULT NULL', $schema );
         $this->assertStringContainsString( 'KEY job_title (job_title)', $schema );
         $this->assertStringContainsString( 'KEY registered_at (registered_at)', $schema );
+        $this->assertStringContainsString( 'KEY last_active_at (last_active_at)', $schema );
     }
 
     public function test_install_is_idempotent(): void {

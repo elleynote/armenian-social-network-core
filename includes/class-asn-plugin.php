@@ -10,6 +10,7 @@ use ASN\Core\Registration\Registration;
 use ASN\Core\Registration\Registration_Shortcode;
 use ASN\Core\Integrations\WooCommerce_Integration;
 use ASN\Core\Features\Member_Safety;
+use ASN\Core\Features\Member_Discovery;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -49,6 +50,9 @@ final class Plugin {
 
         $member_safety = new Member_Safety();
         $member_safety->register_hooks();
+
+        $member_discovery = new Member_Discovery();
+        $member_discovery->register_hooks();
 
         $profile_shortcode = new Profile_Shortcode();
         $profile_shortcode->register();

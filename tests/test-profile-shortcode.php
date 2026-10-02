@@ -9,6 +9,7 @@ final class ProfileShortcodeTest extends TestCase {
         $GLOBALS['asn_test_shortcodes'] = array();
         $GLOBALS['asn_test_better_messages_enabled'] = false;
         $GLOBALS['asn_test_blocks'] = array();
+        $GLOBALS['asn_test_profile_views'] = array();
     }
 
     public function test_shortcode_registers_once(): void {
@@ -67,6 +68,48 @@ final class ProfileShortcodeTest extends TestCase {
             $this->assertStringContainsString( 'Message about this', $html );
         } finally {
             $GLOBALS['asn_test_user_meta'][8] = $previous;
+        }
+    }
+
+    public function test_other_member_profile_records_view_and_shows_save_profile_action(): void {
+        $_GET['member'] = '8';
+
+        $html = ( new Profile_Shortcode() )->render();
+
+        $this->assertStringContainsString( 'Save Profile', $html );
+        $this->assertCount( 1, $GLOBALS['asn_test_profile_views'] );
+        $this->assertSame( 7, (int) $GLOBALS['asn_test_profile_views'][0]['viewer_id'] );
+        $this->assertSame( 8, (int) $GLOBALS['asn_test_profile_views'][0]['profile_user_id'] );
+    }
+
+    public function test_owner_profile_shows_recent_profile_viewers(): void {
+        $GLOBALS['asn_test_profile_views'][] = array(
+            'viewer_id' => 8,
+            'profile_user_id' => 7,
+            'viewed_at' => '2026-09-28 00:00:00',
+        );
+        $_GET['member'] = '7';
+
+        $html = ( new Profile_Shortcode() )->render();
+
+        $this->assertStringContainsString( 'Who viewed my profile', $html );
+        $this->assertStringContainsString( 'Free Member', $html );
+    }
+
+    public function test_recent_activity_badge_renders_on_member_profile(): void {
+        $previous = $GLOBALS['asn_test_user_meta'][8]['_asn_last_active_at'] ?? null;
+        $GLOBALS['asn_test_user_meta'][8]['_asn_last_active_at'] = '2026-09-27 00:00:00';
+        $_GET['member'] = '8';
+
+        try {
+            $html = ( new Profile_Shortcode() )->render();
+            $this->assertStringContainsString( 'Recently active', $html );
+        } finally {
+            if ( null === $previous ) {
+                unset( $GLOBALS['asn_test_user_meta'][8]['_asn_last_active_at'] );
+            } else {
+                $GLOBALS['asn_test_user_meta'][8]['_asn_last_active_at'] = $previous;
+            }
         }
     }
 

@@ -30,6 +30,8 @@ final class ASN_Directory_Shortcode_Test_WPDB extends ASN_Test_WPDB {
                 'job_title' => 'Teacher',
                 'dialect' => 'western',
                 'proficiency' => 'fluent',
+                'here_for' => 'friendship,networking',
+                'last_active_at' => '2026-09-27 00:00:00',
                 'registered_at' => '2025-01-02 03:04:05',
             ),
         );
@@ -108,6 +110,30 @@ final class DirectoryShortcodeTest extends TestCase {
         } finally {
             $GLOBALS['asn_test_users'][7]->user_registered = $previous;
         }
+    }
+
+    public function test_shared_discovery_controls_render_on_explore(): void {
+        $_GET = array(
+            'age_min' => '25',
+            'age_max' => '45',
+            'gender' => 'Female',
+            'job_title' => 'Teacher',
+            'here_for' => 'friendship',
+            'recent' => '1',
+        );
+
+        $html = ( new Directory_Shortcode() )->render();
+
+        $this->assertStringContainsString( 'Advanced filters', $html );
+        $this->assertStringContainsString( 'name="age_min"', $html );
+        $this->assertStringContainsString( 'name="age_max"', $html );
+        $this->assertStringContainsString( 'name="gender"', $html );
+        $this->assertStringContainsString( 'name="job_title"', $html );
+        $this->assertStringContainsString( 'name="here_for"', $html );
+        $this->assertStringContainsString( 'Recently active', $html );
+        $this->assertStringContainsString( 'Saved profiles only', $html );
+        $this->assertStringContainsString( 'Save this search', $html );
+        $this->assertStringContainsString( 'asn-member-card__favorite', $html );
     }
 
     public function test_parallel_better_messages_action_uses_client_chat_button_on_test_explore(): void {

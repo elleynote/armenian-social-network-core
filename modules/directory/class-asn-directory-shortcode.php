@@ -1,9 +1,10 @@
 <?php
 namespace ASN\Core\Directory;
 
+use ASN\Core\Features\Member_Discovery;
+use ASN\Core\Features\Member_Features;
 use ASN\Core\Messaging;
 use ASN\Core\Profiles\Profile_Service;
-use ASN\Core\Features\Member_Features;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -34,9 +35,9 @@ final class Directory_Shortcode {
 
         $profile_base_url = isset( $atts['profile_url'] ) && is_scalar( $atts['profile_url'] )
             ? esc_url_raw( (string) $atts['profile_url'] )
-            : site_url( '/profile/' );
+            : site_url( '/asn-profile-test/' );
         if ( '' === $profile_base_url ) {
-            $profile_base_url = site_url( '/profile/' );
+            $profile_base_url = site_url( '/asn-profile-test/' );
         }
 
         $result = Directory_Service::search( $filters );
@@ -44,34 +45,83 @@ final class Directory_Shortcode {
         $members = array();
 
         foreach ( $result['items'] as $item ) {
-            $user_id = isset( $item['user_id'] ) ? (int) $item['user_id'] : 0;
-            $profile = Profile_Service::find( $user_id, $viewer_id );
-            if ( ! $profile ) {
-                continue;
+            $profile = self::hydrate_member( $item, $viewer_id );
+            if ( $profile ) {
+                $members[] = $profile;
             }
-            $profile['message_action'] = Messaging::action( $user_id );
-            $profile['better_messages_action'] = Messaging::better_messages_action( $user_id );
-            $profile['is_new_member'] = Member_Features::is_new_member( $user_id );
-            $members[] = $profile;
         }
+
+        $suggested_members = array();
+        if ( $viewer_id > 0 && ! Directory_Query::has_active_filters( $filters ) ) {
+            foreach ( Directory_Service::suggested( $viewer_id, 4 ) as $item ) {
+                $profile = self::hydrate_member( $item, $viewer_id );
+                if ( $profile ) {
+                    $suggested_members[] = $profile;
+                }
+            }
+        }
+
+        $saved_searches = $viewer_id > 0 ? Member_Discovery::saved_searches( $viewer_id ) : array();
+        $feature_notice = isset( $_GET['asn_feature_notice'] ) ? sanitize_key( wp_unslash( $_GET['asn_feature_notice'] ) ) : '';
+        $notice_messages = array(
+            'favorite_saved' => 'Profile saved to your favorites.',
+            'favorite_removed' => 'Profile removed from your favorites.',
+            'favorite_failed' => 'We could not update that favorite.',
+            'search_saved' => 'Search saved.',
+            'search_empty' => 'Choose at least one filter before saving a search.',
+            'search_deleted' => 'Saved search deleted.',
+            'search_delete_failed' => 'We could not delete that saved search.',
+            'security' => 'Please refresh the page and try again.',
+            'not_allowed' => 'That action is not available.',
+        );
 
         $pagination_urls = array();
         for ( $page = 1; $page <= (int) $result['pages']; ++$page ) {
-            $params = array(
-                'q'           => $filters['q'],
-                'dialect'     => $filters['dialect'],
-                'proficiency' => $filters['proficiency'],
-                'country'     => $filters['country'],
-                'page'        => $page,
-            );
-            $params = array_filter( $params, static function ( $value ) {
-                return '' !== $value;
-            } );
+            $params = self::pagination_params( $filters, $page );
             $pagination_urls[ $page ] = '?' . http_build_query( $params, '', '&', PHP_QUERY_RFC3986 );
         }
 
         ob_start();
         require __DIR__ . '/views/directory.php';
         return (string) ob_get_clean();
+    }
+
+    private static function hydrate_member( array $item, int $viewer_id ): ?array {
+        $user_id = isset( $item['user_id'] ) ? (int) $item['user_id'] : 0;
+        $profile = Profile_Service::find( $user_id, $viewer_id );
+        if ( ! $profile ) {
+            return null;
+        }
+
+        $profile['message_action'] = Messaging::action( $user_id );
+        $profile['better_messages_action'] = Messaging::better_messages_action( $user_id );
+        $profile['is_new_member'] = Member_Features::is_new_member( $user_id );
+        $profile['is_recently_active'] = Member_Discovery::is_recently_active( $user_id );
+        $profile['is_favorite'] = $viewer_id > 0 ? Member_Discovery::is_favorite( $viewer_id, $user_id ) : false;
+        return $profile;
+    }
+
+    private static function pagination_params( array $filters, int $page ): array {
+        $params = array(
+            'q'           => $filters['q'],
+            'dialect'     => $filters['dialect'],
+            'proficiency' => $filters['proficiency'],
+            'country'     => $filters['country'],
+            'gender'      => $filters['gender'],
+            'job_title'   => $filters['job_title'],
+            'here_for'    => $filters['here_for'],
+            'age_min'     => $filters['age_min'],
+            'age_max'     => $filters['age_max'],
+            'recent'      => $filters['recent'] ? '1' : '',
+            'favorites'   => $filters['favorites'] ? '1' : '',
+            'page'        => $page,
+        );
+
+        return array_filter(
+            $params,
+            static function ( $value ) {
+                return '' !== $value && 0 !== $value;
+            }
+        );
     }
 }
