@@ -138,6 +138,9 @@ final class Registration {
         $gender = isset( $_POST['gender'] ) ? sanitize_text_field( wp_unslash( $_POST['gender'] ) ) : '';
         $job_title = isset( $_POST['job_title'] ) ? sanitize_text_field( wp_unslash( $_POST['job_title'] ) ) : '';
         $spoken = isset( $_POST['spoken_proficiency'] ) ? sanitize_text_field( wp_unslash( $_POST['spoken_proficiency'] ) ) : '';
+        $im_here_for = isset( $_POST['im_here_for'] ) && is_array( $_POST['im_here_for'] )
+            ? wp_unslash( $_POST['im_here_for'] )
+            : array();
 
         if (
             '' === $first_name
@@ -172,6 +175,7 @@ final class Registration {
                 'gender'             => $gender,
                 'job_title'          => $job_title,
                 'spoken_proficiency' => $spoken,
+                'im_here_for'         => $im_here_for,
             )
         );
 
