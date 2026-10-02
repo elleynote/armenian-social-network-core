@@ -23,6 +23,36 @@ $status = static function ( $available ): string {
         </tbody>
     </table>
 
+    <h2><?php echo esc_html( 'Open profile reports' ); ?></h2>
+    <p><?php echo esc_html( (string) $data['open_profile_reports'] ); ?> <?php echo esc_html( 'report(s) waiting for review.' ); ?></p>
+
+    <?php if ( ! empty( $data['latest_profile_reports'] ) ) : ?>
+        <table class="widefat striped" style="max-width: 900px; margin-bottom: 24px;">
+            <thead>
+                <tr>
+                    <th><?php echo esc_html( 'Reported member' ); ?></th>
+                    <th><?php echo esc_html( 'Reporter' ); ?></th>
+                    <th><?php echo esc_html( 'Reason' ); ?></th>
+                    <th><?php echo esc_html( 'Date' ); ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ( $data['latest_profile_reports'] as $report ) : ?>
+                    <?php
+                    $target = get_userdata( (int) $report['target_user_id'] );
+                    $reporter = get_userdata( (int) $report['reporter_id'] );
+                    ?>
+                    <tr>
+                        <td><?php echo esc_html( $target ? $target->display_name . ' (#' . (int) $report['target_user_id'] . ')' : '#' . (int) $report['target_user_id'] ); ?></td>
+                        <td><?php echo esc_html( $reporter ? $reporter->display_name . ' (#' . (int) $report['reporter_id'] . ')' : '#' . (int) $report['reporter_id'] ); ?></td>
+                        <td><?php echo esc_html( (string) $report['reason'] ); ?></td>
+                        <td><?php echo esc_html( (string) $report['created_at'] ); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+
     <h2><?php echo esc_html( 'Profile index sync' ); ?></h2>
     <p>
         <?php
