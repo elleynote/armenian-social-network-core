@@ -296,13 +296,9 @@ final class Registration {
             update_user_meta( $user_id, $key . '_image', $url );
         }
 
-        if ( ! Memberships::can_text_chat( $user_id ) ) {
-            $assigned = PMPro_Integration::assign_level( Memberships::FREE_LEVEL_ID, $user_id );
-            if ( ! $assigned ) {
-                $this->redirect_with_error( add_query_arg( 'asn_step', 'photos', $return_url ), 'membership' );
-                return;
-            }
-            Profile_Index::sync_user( $user_id );
+        if ( ! self::ensure_default_free_membership( $user_id ) ) {
+            $this->redirect_with_error( add_query_arg( 'asn_step', 'photos', $return_url ), 'membership' );
+            return;
         }
 
         update_user_meta( $user_id, '_asn_onboarding_step', 'plan' );
@@ -374,6 +370,23 @@ final class Registration {
         if ( '' === $existing ) {
             update_user_meta( $user_id, 'dob_date', 'age-only' );
         }
+    }
+
+    public static function ensure_default_free_membership( int $user_id ): bool {
+        if ( $user_id <= 0 || false === get_userdata( $user_id ) ) {
+            return false;
+        }
+
+        if ( Memberships::can_text_chat( $user_id ) ) {
+            return true;
+        }
+
+        if ( ! PMPro_Integration::assign_level( Memberships::FREE_LEVEL_ID, $user_id ) ) {
+            return false;
+        }
+
+        Profile_Index::sync_user( $user_id );
+        return Memberships::can_text_chat( $user_id );
     }
 
     public function handle_free_plan(): void {
