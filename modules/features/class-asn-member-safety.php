@@ -23,6 +23,39 @@ final class Member_Safety {
         );
     }
 
+    public static function blocked_user_ids( int $user_id ): array {
+        if ( $user_id <= 0 ) {
+            return array();
+        }
+
+        global $wpdb;
+        $table = Database::table( 'blocks' );
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT blocker_id, blocked_id FROM {$table} WHERE blocker_id = %d OR blocked_id = %d",
+                $user_id,
+                $user_id
+            ),
+            defined( 'ARRAY_A' ) ? ARRAY_A : 'ARRAY_A'
+        );
+
+        if ( ! is_array( $rows ) ) {
+            return array();
+        }
+
+        $ids = array();
+        foreach ( $rows as $row ) {
+            $blocker_id = (int) ( $row['blocker_id'] ?? 0 );
+            $blocked_id = (int) ( $row['blocked_id'] ?? 0 );
+            $other_id = $blocker_id === $user_id ? $blocked_id : $blocker_id;
+            if ( $other_id > 0 && $other_id !== $user_id ) {
+                $ids[ $other_id ] = $other_id;
+            }
+        }
+
+        return array_values( $ids );
+    }
+
     public static function is_blocked_between( int $first_user_id, int $second_user_id ): bool {
         if ( $first_user_id <= 0 || $second_user_id <= 0 || $first_user_id === $second_user_id ) {
             return false;
