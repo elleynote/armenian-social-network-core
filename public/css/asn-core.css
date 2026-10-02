@@ -918,6 +918,63 @@
 }
 
 
+/* Explore discovery visibility */
+.asn-directory__tools{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin:0 0 22px;
+}
+.asn-directory__tool{
+  display:inline-flex;
+  min-height:38px;
+  align-items:center;
+  justify-content:center;
+  padding:8px 14px;
+  border:1px solid #d9dde4;
+  border-radius:999px;
+  background:#fff;
+  color:#344259!important;
+  font-size:.78rem;
+  font-weight:700;
+  text-decoration:none!important;
+}
+.asn-directory__tool:hover,
+.asn-directory__tool:focus,
+.asn-directory__tool--active{
+  border-color:#f85d3f;
+  background:#fff3ef;
+  color:#f85d3f!important;
+}
+.asn-directory__feature-empty{
+  padding:18px 20px;
+  border:1px dashed #d9dde4;
+  border-radius:16px;
+  background:#fafafa;
+  color:#68758a;
+  font-size:.84rem;
+}
+.asn-directory__feature-empty p{margin:0;}
+.asn-member-card__here-for{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:5px;
+  min-height:24px;
+  margin:8px 0 2px;
+}
+.asn-member-card__here-for span{
+  display:inline-flex;
+  align-items:center;
+  min-height:22px;
+  padding:3px 8px;
+  border-radius:999px;
+  background:#eef4fb;
+  color:#2b5f93;
+  font-size:.66rem;
+  font-weight:700;
+}
+
 /* Elly shared discovery feature pack */
 .asn-directory__notice,
 .asn-profile-v2__notice{
