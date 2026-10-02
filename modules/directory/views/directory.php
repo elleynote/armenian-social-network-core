@@ -23,28 +23,41 @@ $has_filters = \ASN\Core\Directory\Directory_Query::has_active_filters( $filters
         <div class="asn-directory__notice"><?php echo esc_html( $notice_messages[ $feature_notice ] ); ?></div>
     <?php endif; ?>
 
-    <?php if ( ! empty( $saved_searches ) ) : ?>
+    <?php if ( get_current_user_id() > 0 ) : ?>
+        <nav class="asn-directory__tools" aria-label="Explore member tools">
+            <a class="asn-directory__tool<?php echo ! $has_filters ? ' asn-directory__tool--active' : ''; ?>" href="<?php echo esc_url( $quick_links['all'] ); ?>">All members</a>
+            <a class="asn-directory__tool<?php echo ! empty( $filters['recent'] ) ? ' asn-directory__tool--active' : ''; ?>" href="<?php echo esc_url( $quick_links['recent'] ); ?>">Recently active</a>
+            <a class="asn-directory__tool<?php echo ! empty( $filters['favorites'] ) ? ' asn-directory__tool--active' : ''; ?>" href="<?php echo esc_url( $quick_links['favorites'] ); ?>">Saved profiles</a>
+            <a class="asn-directory__tool" href="#asn-saved-searches-title">Saved searches</a>
+            <a class="asn-directory__tool" href="<?php echo esc_url( $quick_links['viewers'] ); ?>">Who viewed me</a>
+        </nav>
+
         <section class="asn-directory__saved-searches" aria-labelledby="asn-saved-searches-title">
             <div class="asn-directory__section-heading">
                 <h2 id="asn-saved-searches-title">Saved searches</h2>
+                <?php if ( empty( $saved_searches ) ) : ?>
+                    <p>Choose filters below, run the search, then use <strong>Save this search</strong> to keep it here.</p>
+                <?php endif; ?>
             </div>
-            <div class="asn-directory__saved-search-list">
-                <?php foreach ( $saved_searches as $saved_search ) : ?>
-                    <?php
-                    $saved_url = $form_action . '?' . http_build_query( $saved_search['filters'], '', '&', PHP_QUERY_RFC3986 );
-                    ?>
-                    <div class="asn-directory__saved-search">
-                        <a href="<?php echo esc_url( $saved_url ); ?>"><?php echo esc_html( $saved_search['label'] ); ?></a>
-                        <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-                            <input type="hidden" name="action" value="asn_delete_saved_search">
-                            <input type="hidden" name="search_id" value="<?php echo esc_attr( $saved_search['id'] ); ?>">
-                            <input type="hidden" name="return_url" value="<?php echo esc_url( $form_action ); ?>">
-                            <?php wp_nonce_field( 'asn_delete_search_' . $saved_search['id'], 'asn_discovery_nonce' ); ?>
-                            <button type="submit" aria-label="Delete saved search">&times;</button>
-                        </form>
-                    </div>
-                <?php endforeach; ?>
-            </div>
+            <?php if ( ! empty( $saved_searches ) ) : ?>
+                <div class="asn-directory__saved-search-list">
+                    <?php foreach ( $saved_searches as $saved_search ) : ?>
+                        <?php
+                        $saved_url = $form_action . '?' . http_build_query( $saved_search['filters'], '', '&', PHP_QUERY_RFC3986 );
+                        ?>
+                        <div class="asn-directory__saved-search">
+                            <a href="<?php echo esc_url( $saved_url ); ?>"><?php echo esc_html( $saved_search['label'] ); ?></a>
+                            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                                <input type="hidden" name="action" value="asn_delete_saved_search">
+                                <input type="hidden" name="search_id" value="<?php echo esc_attr( $saved_search['id'] ); ?>">
+                                <input type="hidden" name="return_url" value="<?php echo esc_url( $form_action ); ?>">
+                                <?php wp_nonce_field( 'asn_delete_search_' . $saved_search['id'], 'asn_discovery_nonce' ); ?>
+                                <button type="submit" aria-label="Delete saved search">&times;</button>
+                            </form>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </section>
     <?php endif; ?>
 
@@ -76,7 +89,7 @@ $has_filters = \ASN\Core\Directory\Directory_Query::has_active_filters( $filters
         </label>
         <button class="asn-button asn-directory__submit" type="submit" data-asn-directory-submit>Search</button>
 
-        <details class="asn-directory__advanced"<?php echo $has_filters && ( $filters['gender'] || $filters['job_title'] || $filters['here_for'] || $filters['age_min'] || $filters['age_max'] || $filters['recent'] || $filters['favorites'] ) ? ' open' : ''; ?>>
+        <details class="asn-directory__advanced" open>
             <summary>Advanced filters</summary>
             <div class="asn-directory__advanced-grid">
                 <label class="asn-field">
@@ -135,17 +148,23 @@ $has_filters = \ASN\Core\Directory\Directory_Query::has_active_filters( $filters
         </form>
     <?php endif; ?>
 
-    <?php if ( ! empty( $suggested_members ) ) : ?>
+    <?php if ( $show_suggested_section ) : ?>
         <section class="asn-directory__suggested" aria-labelledby="asn-suggested-title">
             <div class="asn-directory__section-heading">
                 <h2 id="asn-suggested-title">Suggested members</h2>
                 <p>Members with profile details in common with you.</p>
             </div>
-            <div class="asn-directory__grid asn-directory__grid--suggested">
-                <?php foreach ( $suggested_members as $member ) : ?>
-                    <?php require __DIR__ . '/member-card.php'; ?>
-                <?php endforeach; ?>
-            </div>
+            <?php if ( empty( $suggested_members ) ) : ?>
+                <div class="asn-directory__feature-empty">
+                    <p>No suggestions are available yet. Complete more profile answers and your “I’m Here For” choices to improve matching.</p>
+                </div>
+            <?php else : ?>
+                <div class="asn-directory__grid asn-directory__grid--suggested">
+                    <?php foreach ( $suggested_members as $member ) : ?>
+                        <?php require __DIR__ . '/member-card.php'; ?>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </section>
     <?php endif; ?>
 
