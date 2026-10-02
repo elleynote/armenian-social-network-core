@@ -14,7 +14,7 @@ $saveable_filters = array(
     'recent' => $filters['recent'] ? '1' : '',
     'favorites' => $filters['favorites'] ? '1' : '',
 );
-$has_filters = ASNCoreDirectoryDirectory_Query::has_active_filters( $filters );
+$has_filters = \ASN\Core\Directory\Directory_Query::has_active_filters( $filters );
 ?>
 <section class="asn-directory" aria-labelledby="asn-directory-title">
     <h1 id="asn-directory-title" class="asn-directory__title">Explore members</h1>
@@ -91,7 +91,7 @@ $has_filters = ASNCoreDirectoryDirectory_Query::has_active_filters( $filters );
                     <span class="asn-field__label">Gender</span>
                     <select class="asn-field__input" name="gender">
                         <option value="">All</option>
-                        <?php foreach ( ASNCoreProfilesLegacy_Profile_Contract::gender_options() as $gender ) : ?>
+                        <?php foreach ( \ASN\Core\Profiles\Legacy_Profile_Contract::gender_options() as $gender ) : ?>
                             <option value="<?php echo esc_attr( $gender ); ?>"<?php echo $gender === $filters['gender'] ? ' selected' : ''; ?>><?php echo esc_html( $gender ); ?></option>
                         <?php endforeach; ?>
                     </select>
@@ -104,7 +104,7 @@ $has_filters = ASNCoreDirectoryDirectory_Query::has_active_filters( $filters );
                     <span class="asn-field__label">I&#8217;m here for</span>
                     <select class="asn-field__input" name="here_for">
                         <option value="">All</option>
-                        <?php foreach ( ASNCoreFeaturesMember_Features::here_for_options() as $key => $label ) : ?>
+                        <?php foreach ( \ASN\Core\Features\Member_Features::here_for_options() as $key => $label ) : ?>
                             <option value="<?php echo esc_attr( $key ); ?>"<?php echo $key === $filters['here_for'] ? ' selected' : ''; ?>><?php echo esc_html( $label ); ?></option>
                         <?php endforeach; ?>
                     </select>
