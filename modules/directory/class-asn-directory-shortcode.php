@@ -44,10 +44,11 @@ final class Directory_Shortcode {
         $result = Directory_Service::search( $filters );
         $viewer_id = (int) get_current_user_id();
         $blocked_ids = $viewer_id > 0 ? Member_Safety::blocked_user_ids( $viewer_id ) : array();
+        $favorite_ids = $viewer_id > 0 ? Member_Discovery::favorite_ids( $viewer_id ) : array();
         $members = array();
 
         foreach ( $result['items'] as $item ) {
-            $profile = self::hydrate_member( $item, $viewer_id, $blocked_ids, $request_uri );
+            $profile = self::hydrate_member( $item, $viewer_id, $blocked_ids, $favorite_ids, $request_uri );
             if ( $profile ) {
                 $members[] = $profile;
             }
@@ -56,7 +57,7 @@ final class Directory_Shortcode {
         $suggested_members = array();
         if ( $viewer_id > 0 && ! Directory_Query::has_active_filters( $filters ) ) {
             foreach ( Directory_Service::suggested( $viewer_id, 4, $blocked_ids ) as $item ) {
-                $profile = self::hydrate_member( $item, $viewer_id, $blocked_ids, $request_uri );
+                $profile = self::hydrate_member( $item, $viewer_id, $blocked_ids, $favorite_ids, $request_uri );
                 if ( $profile ) {
                     $suggested_members[] = $profile;
                 }
@@ -95,7 +96,7 @@ final class Directory_Shortcode {
         return (string) ob_get_clean();
     }
 
-    private static function hydrate_member( array $item, int $viewer_id, array $blocked_ids = array(), string $return_url = '' ): ?array {
+    private static function hydrate_member( array $item, int $viewer_id, array $blocked_ids = array(), array $favorite_ids = array(), string $return_url = '' ): ?array {
         $user_id = isset( $item['user_id'] ) ? (int) $item['user_id'] : 0;
         $user = $user_id > 0 ? get_userdata( $user_id ) : false;
         if ( ! $user ) {
@@ -115,6 +116,13 @@ final class Directory_Shortcode {
 
         $is_blocked = in_array( $user_id, $blocked_ids, true );
         $better_messages = Messaging::better_messages_action( $user_id, $return_url, true, $is_blocked );
+        $registered = isset( $user->user_registered ) ? strtotime( (string) $user->user_registered ) : false;
+        $is_new_member = false !== $registered
+            && $registered <= time()
+            && ( time() - $registered ) <= ( Member_Features::NEW_MEMBER_DAYS * DAY_IN_SECONDS );
+        $last_active = strtotime( (string) ( $item['last_active_at'] ?? '' ) );
+        $recent_cutoff = strtotime( Member_Discovery::recent_cutoff() );
+        $is_recently_active = false !== $last_active && false !== $recent_cutoff && $last_active >= $recent_cutoff;
 
         $profile = array(
             'id'                     => $user_id,
@@ -128,9 +136,9 @@ final class Directory_Shortcode {
             'im_here_for'            => (string) ( $item['here_for'] ?? '' ),
             'message_action'         => ! empty( $better_messages['available'] ) ? array( 'available' => false ) : Messaging::action( $user_id ),
             'better_messages_action' => $better_messages,
-            'is_new_member'          => Member_Features::is_new_member( $user_id ),
-            'is_recently_active'     => Member_Discovery::is_recently_active( $user_id ),
-            'is_favorite'            => $viewer_id > 0 ? Member_Discovery::is_favorite( $viewer_id, $user_id ) : false,
+            'is_new_member'          => $is_new_member,
+            'is_recently_active'     => $is_recently_active,
+            'is_favorite'            => $viewer_id > 0 && in_array( $user_id, $favorite_ids, true ),
             'here_for_labels'        => Member_Features::here_for_labels( $item['here_for'] ?? '' ),
         );
 
