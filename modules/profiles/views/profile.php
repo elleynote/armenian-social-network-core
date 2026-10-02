@@ -78,10 +78,35 @@ $photos = array(
     'a_photo_of_something_i_ve_done_recently' => "A photo of something I've done recently.",
     'a_photo_of_the_good_old_days' => 'A photo of the good old days.',
 );
+
+$profile_url = add_query_arg( 'member', (int) $profile['id'], site_url( '/asn-profile-test/' ) );
+$completion_score = (int) ( $profile['completion_score'] ?? 0 );
+$resume_profile_url = (string) ( $profile['resume_profile_url'] ?? '' );
+$here_for_labels = (array) ( $profile['here_for_labels'] ?? array() );
+$viewer_blocked_target = ! empty( $profile['viewer_blocked_target'] );
+$blocked_between = ! empty( $profile['blocked_between'] );
+$notice_key = isset( $_GET['asn_profile_notice'] ) ? sanitize_key( wp_unslash( $_GET['asn_profile_notice'] ) ) : '';
+$notice_messages = array(
+    'reported' => 'Thanks. This profile has been reported for review.',
+    'blocked' => 'This member is now blocked.',
+    'unblocked' => 'This member has been unblocked.',
+    'report_failed' => 'We could not submit the report. Please try again.',
+    'block_failed' => 'We could not update the block. Please try again.',
+    'security' => 'Please refresh the page and try again.',
+    'not_allowed' => 'That action is not available.',
+);
 ?>
+<?php if ( '' !== $notice_key && isset( $notice_messages[ $notice_key ] ) ) : ?>
+    <div class="asn-profile-v2__notice"><?php echo esc_html( $notice_messages[ $notice_key ] ); ?></div>
+<?php endif; ?>
+
 <section class="asn-profile asn-profile--v2" aria-labelledby="asn-profile-name">
     <aside class="asn-profile-v2__sidebar">
         <div class="asn-profile-v2__identity-card">
+            <?php if ( ! empty( $profile['is_new_member'] ) ) : ?>
+                <span class="asn-profile-v2__new-badge">New member</span>
+            <?php endif; ?>
+
             <h1 id="asn-profile-name" class="asn-profile-v2__name"><?php echo esc_html( $name_line ); ?></h1>
 
             <img class="asn-profile-v2__photo" src="<?php echo esc_url( $profile['photo_url'] ); ?>" alt="<?php echo esc_attr( $profile['display_name'] ); ?>" loading="lazy" width="220" height="220">
@@ -96,12 +121,62 @@ $photos = array(
                 <?php if ( '' !== $speaker ) : ?><p><?php echo esc_html( $speaker ); ?></p><?php endif; ?>
             </div>
 
+            <?php if ( ! empty( $here_for_labels ) ) : ?>
+                <div class="asn-profile-v2__here-for" aria-label="I'm here for">
+                    <?php foreach ( $here_for_labels as $label ) : ?>
+                        <span><?php echo esc_html( $label ); ?></span>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
             <?php if ( ! empty( $profile['is_owner'] ) ) : ?>
+                <div class="asn-profile-v2__completion">
+                    <div class="asn-profile-v2__completion-copy">
+                        <span>Profile completion</span>
+                        <strong><?php echo esc_html( (string) $completion_score ); ?>%</strong>
+                    </div>
+                    <div class="asn-profile-v2__completion-track"><span style="width:<?php echo esc_attr( (string) $completion_score ); ?>%"></span></div>
+                    <?php if ( '' !== $resume_profile_url ) : ?>
+                        <a class="asn-profile-v2__resume" href="<?php echo esc_url( $resume_profile_url ); ?>">Resume Profile Setup</a>
+                    <?php endif; ?>
+                </div>
                 <a class="asn-profile-v2__primary-action" href="?member=<?php echo esc_attr( (string) $profile['id'] ); ?>&amp;asn_edit_profile=1">Edit Profile</a>
             <?php elseif ( ! empty( $better_messages['available'] ) && ! empty( $better_messages['url'] ) ) : ?>
                 <a class="asn-profile-v2__primary-action" href="<?php echo esc_url( $better_messages['url'] ); ?>">Message</a>
             <?php else : ?>
-                <span class="asn-profile-v2__primary-action asn-profile-v2__primary-action--disabled">Message</span>
+                <span class="asn-profile-v2__primary-action asn-profile-v2__primary-action--disabled"><?php echo $blocked_between ? 'Messaging unavailable' : 'Message'; ?></span>
+            <?php endif; ?>
+
+            <?php if ( empty( $profile['is_owner'] ) && get_current_user_id() > 0 ) : ?>
+                <div class="asn-profile-v2__safety-actions">
+                    <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                        <input type="hidden" name="action" value="<?php echo $viewer_blocked_target ? 'asn_unblock_profile' : 'asn_block_profile'; ?>">
+                        <input type="hidden" name="target_user_id" value="<?php echo esc_attr( (string) $profile['id'] ); ?>">
+                        <input type="hidden" name="return_url" value="<?php echo esc_url( $profile_url ); ?>">
+                        <?php wp_nonce_field( 'asn_profile_safety_' . (int) $profile['id'], 'asn_safety_nonce' ); ?>
+                        <button class="asn-profile-v2__safety-button" type="submit"><?php echo $viewer_blocked_target ? 'Unblock Profile' : 'Block Profile'; ?></button>
+                    </form>
+
+                    <details class="asn-profile-v2__report">
+                        <summary>Report Profile</summary>
+                        <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                            <input type="hidden" name="action" value="asn_report_profile">
+                            <input type="hidden" name="target_user_id" value="<?php echo esc_attr( (string) $profile['id'] ); ?>">
+                            <input type="hidden" name="return_url" value="<?php echo esc_url( $profile_url ); ?>">
+                            <?php wp_nonce_field( 'asn_profile_safety_' . (int) $profile['id'], 'asn_safety_nonce' ); ?>
+                            <label>
+                                <span>Reason</span>
+                                <select name="reason" required>
+                                    <option value="">Choose a reason</option>
+                                    <?php foreach ( \ASN\Core\Features\Member_Safety::report_reasons() as $reason_key => $reason_label ) : ?>
+                                        <option value="<?php echo esc_attr( $reason_key ); ?>"><?php echo esc_html( $reason_label ); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </label>
+                            <button type="submit">Submit Report</button>
+                        </form>
+                    </details>
+                </div>
             <?php endif; ?>
         </div>
     </aside>
@@ -132,6 +207,9 @@ $photos = array(
                                 <div class="asn-profile-v2__answer">
                                     <span class="asn-profile-v2__answer-label"><?php echo esc_html( $answer['label'] ); ?></span>
                                     <p><?php echo esc_html( $answer['value'] ); ?></p>
+                                    <?php if ( empty( $profile['is_owner'] ) && ! empty( $better_messages['available'] ) && ! empty( $better_messages['url'] ) ) : ?>
+                                        <a class="asn-profile-v2__conversation-starter" href="<?php echo esc_url( $better_messages['url'] ); ?>">Message about this</a>
+                                    <?php endif; ?>
                                 </div>
                             <?php endforeach; ?>
                         </div>
