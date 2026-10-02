@@ -3,9 +3,19 @@ use ASN\Core\Features\Member_Safety;
 use PHPUnit\Framework\TestCase;
 
 final class MemberSafetyTest extends TestCase {
+    private $wpdb;
+
     protected function setUp(): void {
+        global $wpdb;
+        $this->wpdb = $wpdb;
+        $wpdb = new ASN_Test_WPDB();
         $GLOBALS['asn_test_blocks'] = array();
         $GLOBALS['asn_test_reports'] = array();
+    }
+
+    protected function tearDown(): void {
+        global $wpdb;
+        $wpdb = $this->wpdb;
     }
 
     public function test_member_can_block_and_unblock_another_profile(): void {
