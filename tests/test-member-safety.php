@@ -28,6 +28,21 @@ final class MemberSafetyTest extends TestCase {
         $this->assertFalse( Member_Safety::is_blocked_between( 7, 8 ) );
     }
 
+    public function test_blocked_user_ids_are_loaded_in_one_batch(): void {
+        $GLOBALS['asn_test_blocks'][] = array(
+            'blocker_id' => 7,
+            'blocked_id' => 8,
+            'created_at' => '2026-10-03 00:00:00',
+        );
+        $GLOBALS['asn_test_blocks'][] = array(
+            'blocker_id' => 9,
+            'blocked_id' => 7,
+            'created_at' => '2026-10-03 00:00:00',
+        );
+
+        $this->assertSame( array( 8, 9 ), Member_Safety::blocked_user_ids( 7 ) );
+    }
+
     public function test_member_can_report_profile_with_allowed_reason(): void {
         $this->assertTrue( Member_Safety::report( 7, 8, 'suspicious' ) );
         $this->assertCount( 1, $GLOBALS['asn_test_reports'] );
