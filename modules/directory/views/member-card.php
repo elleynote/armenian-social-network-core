@@ -10,6 +10,7 @@ $username = trim( (string) ( $member['username'] ?? '' ) );
 $spoken = trim( (string) ( $member['spoken_proficiency'] ?? '' ) );
 $is_favorite = ! empty( $member['is_favorite'] );
 $is_recently_active = ! empty( $member['is_recently_active'] );
+$here_for_labels = (array) ( $member['here_for_labels'] ?? array() );
 $speaker_label = '';
 if ( '' !== $spoken ) {
     $parts = array_map( 'trim', explode( '-', $spoken, 2 ) );
@@ -56,6 +57,14 @@ $return_to_explore = isset( $request_uri ) && is_scalar( $request_uri ) ? (strin
     <?php if ( '' !== (string) ( $member['job_title'] ?? '' ) ) : ?><p class="asn-member-card__meta"><?php echo esc_html( $member['job_title'] ); ?></p><?php endif; ?>
     <?php if ( '' !== (string) ( $member['country'] ?? '' ) ) : ?><p class="asn-member-card__meta"><?php echo esc_html( $member['country'] ); ?></p><?php endif; ?>
     <?php if ( '' !== $speaker_label ) : ?><p class="asn-member-card__meta"><?php echo esc_html( $speaker_label ); ?></p><?php endif; ?>
+
+    <?php if ( ! empty( $here_for_labels ) ) : ?>
+        <div class="asn-member-card__here-for" aria-label="I'm here for">
+            <?php foreach ( array_slice( $here_for_labels, 0, 3 ) as $label ) : ?>
+                <span><?php echo esc_html( $label ); ?></span>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
     <div class="asn-member-card__actions asn-member-card__actions--v2">
         <a class="asn-button asn-member-card__view-profile" href="<?php echo esc_url( $profile_url ); ?>">View Profile</a>

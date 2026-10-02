@@ -124,6 +124,7 @@ final class DirectoryShortcodeTest extends TestCase {
 
         $html = ( new Directory_Shortcode() )->render();
 
+        $this->assertStringContainsString( '<details class="asn-directory__advanced" open>', $html );
         $this->assertStringContainsString( 'Advanced filters', $html );
         $this->assertStringContainsString( 'name="age_min"', $html );
         $this->assertStringContainsString( 'name="age_max"', $html );
@@ -134,6 +135,24 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'Saved profiles only', $html );
         $this->assertStringContainsString( 'Save this search', $html );
         $this->assertStringContainsString( 'asn-member-card__favorite', $html );
+        $this->assertStringContainsString( 'Saved searches', $html );
+        $this->assertStringContainsString( 'Who viewed me', $html );
+    }
+
+    public function test_explore_discovery_tools_and_interests_are_visible_without_existing_saved_searches(): void {
+        $GLOBALS['asn_test_user_meta'][8]['_asn_saved_searches'] = array();
+
+        $html = ( new Directory_Shortcode() )->render();
+
+        $this->assertStringContainsString( 'All members', $html );
+        $this->assertStringContainsString( 'Recently active', $html );
+        $this->assertStringContainsString( 'Saved profiles', $html );
+        $this->assertStringContainsString( 'Saved searches', $html );
+        $this->assertStringContainsString( 'Who viewed me', $html );
+        $this->assertStringContainsString( 'Choose filters below', $html );
+        $this->assertStringContainsString( 'Suggested members', $html );
+        $this->assertStringContainsString( 'Friendship', $html );
+        $this->assertStringContainsString( 'Networking', $html );
     }
 
     public function test_parallel_better_messages_action_uses_client_chat_button_on_test_explore(): void {
