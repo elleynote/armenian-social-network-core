@@ -52,19 +52,19 @@ class ASN_Test_WPDB {
     }
 
     public function get_var( $sql ) {
-        if ( false !== strpos( $sql, 'wp_asn_blocks' ) ) {
-            preg_match_all( '/(?:blocker_id|blocked_id) = (\d+)/', $sql, $matches );
+        if ( false !== strpos( $sql, 'asn_blocks' ) ) {
+            preg_match_all( '/(?:blocker_id|blocked_id) = (\\d+)/', $sql, $matches );
             $ids = array_map( 'intval', $matches[1] ?? array() );
             if ( count( $ids ) >= 2 ) {
-                foreach ( $GLOBALS['asn_test_blocks'] as $row ) {
+                foreach ( $GLOBALS['asn_test_blocks'] as $index => $row ) {
                     if (
                         ( (int) $row['blocker_id'] === $ids[0] && (int) $row['blocked_id'] === $ids[1] )
                         || ( count( $ids ) >= 4 && (int) $row['blocker_id'] === $ids[2] && (int) $row['blocked_id'] === $ids[3] )
                     ) {
-                        return 1;
+                        return $index + 1;
                     }
                 }
-                return 0;
+                return null;
             }
         }
 
