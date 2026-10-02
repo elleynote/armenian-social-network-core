@@ -62,6 +62,13 @@ final class Directory_Shortcode {
         }
 
         $saved_searches = $viewer_id > 0 ? Member_Discovery::saved_searches( $viewer_id ) : array();
+        $show_suggested_section = $viewer_id > 0 && ! Directory_Query::has_active_filters( $filters );
+        $quick_links = array(
+            'all'       => $form_action,
+            'recent'    => add_query_arg( 'recent', '1', $form_action ),
+            'favorites' => add_query_arg( 'favorites', '1', $form_action ),
+            'viewers'   => add_query_arg( 'member', $viewer_id, site_url( '/asn-profile-test/' ) ) . '#asn-profile-viewers-title',
+        );
         $feature_notice = isset( $_GET['asn_feature_notice'] ) ? sanitize_key( wp_unslash( $_GET['asn_feature_notice'] ) ) : '';
         $notice_messages = array(
             'favorite_saved' => 'Profile saved to your favorites.',
@@ -98,6 +105,7 @@ final class Directory_Shortcode {
         $profile['is_new_member'] = Member_Features::is_new_member( $user_id );
         $profile['is_recently_active'] = Member_Discovery::is_recently_active( $user_id );
         $profile['is_favorite'] = $viewer_id > 0 ? Member_Discovery::is_favorite( $viewer_id, $user_id ) : false;
+        $profile['here_for_labels'] = Member_Features::here_for_labels( $profile['im_here_for'] ?? '' );
         return $profile;
     }
 
