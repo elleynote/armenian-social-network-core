@@ -19,14 +19,16 @@ final class Messaging {
         );
     }
 
-    public static function better_messages_action( int $target_user_id, string $return_url = '' ): array {
+    public static function better_messages_action( int $target_user_id, string $return_url = '', ?bool $target_entitled = null, ?bool $blocked = null ): array {
         $viewer_id = (int) get_current_user_id();
         $valid = $target_user_id > 0 && false !== get_userdata( $target_user_id );
+        $target_can_chat = null === $target_entitled ? Memberships::can_text_chat( $target_user_id ) : $target_entitled;
+        $is_blocked = null === $blocked ? Member_Safety::is_blocked_between( $viewer_id, $target_user_id ) : $blocked;
         $entitled = $valid
             && $viewer_id > 0
             && Memberships::can_text_chat( $viewer_id )
-            && Memberships::can_text_chat( $target_user_id )
-            && ! Member_Safety::is_blocked_between( $viewer_id, $target_user_id );
+            && $target_can_chat
+            && ! $is_blocked;
         $available = $entitled && Better_Messages_Integration::is_available();
         $url = $available ? self::better_messages_launch_url( $target_user_id, $return_url ) : '';
 
