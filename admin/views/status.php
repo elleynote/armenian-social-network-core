@@ -45,7 +45,8 @@ $status = static function ( $available ): string {
                     <tr>
                         <td><?php echo esc_html( $target ? $target->display_name . ' (#' . (int) $report['target_user_id'] . ')' : '#' . (int) $report['target_user_id'] ); ?></td>
                         <td><?php echo esc_html( $reporter ? $reporter->display_name . ' (#' . (int) $report['reporter_id'] . ')' : '#' . (int) $report['reporter_id'] ); ?></td>
-                        <td><?php echo esc_html( (string) $report['reason'] ); ?></td>
+                        <?php $reason_labels = \ASN\Core\Features\Member_Safety::report_reasons(); ?>
+                        <td><?php echo esc_html( $reason_labels[ (string) $report['reason'] ] ?? (string) $report['reason'] ); ?></td>
                         <td><?php echo esc_html( (string) $report['created_at'] ); ?></td>
                     </tr>
                 <?php endforeach; ?>
