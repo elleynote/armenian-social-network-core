@@ -123,6 +123,18 @@ class ASN_Test_WPDB {
         }
         return null;
     }
+
+    public function get_results( $sql, $output = null ) {
+        if ( false !== strpos( $sql, 'wp_asn_reports' ) ) {
+            return array_values( array_filter(
+                $GLOBALS['asn_test_reports'],
+                static function ( $row ) {
+                    return 'open' === (string) ( $row['status'] ?? '' );
+                }
+            ) );
+        }
+        return array();
+    }
 }
 
 $GLOBALS['wpdb'] = new ASN_Test_WPDB();
