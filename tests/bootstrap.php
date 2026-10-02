@@ -6,6 +6,9 @@ if ( ! defined( 'ASN_CORE_TESTING' ) ) {
 if ( ! defined( 'ABSPATH' ) ) {
     define( 'ABSPATH', dirname( __DIR__ ) . '/tests/wordpress/' );
 }
+if ( ! defined( 'DAY_IN_SECONDS' ) ) {
+    define( 'DAY_IN_SECONDS', 86400 );
+}
 
 $GLOBALS['asn_test_hooks'] = array();
 $GLOBALS['asn_test_options'] = array();
@@ -28,6 +31,8 @@ $GLOBALS['asn_test_wc_products'] = array();
 $GLOBALS['asn_test_scheduled_events'] = array();
 $GLOBALS['asn_test_new_user_notifications'] = array();
 $GLOBALS['asn_test_wpfc_excluded'] = 0;
+$GLOBALS['asn_test_blocks'] = array();
+$GLOBALS['asn_test_reports'] = array();
 
 class ASN_Test_WPDB {
     public $prefix = 'wp_';
@@ -47,6 +52,22 @@ class ASN_Test_WPDB {
     }
 
     public function get_var( $sql ) {
+        if ( false !== strpos( $sql, 'wp_asn_blocks' ) ) {
+            preg_match_all( '/(?:blocker_id|blocked_id) = (\d+)/', $sql, $matches );
+            $ids = array_map( 'intval', $matches[1] ?? array() );
+            if ( count( $ids ) >= 2 ) {
+                foreach ( $GLOBALS['asn_test_blocks'] as $row ) {
+                    if (
+                        ( (int) $row['blocker_id'] === $ids[0] && (int) $row['blocked_id'] === $ids[1] )
+                        || ( count( $ids ) >= 4 && (int) $row['blocker_id'] === $ids[2] && (int) $row['blocked_id'] === $ids[3] )
+                    ) {
+                        return 1;
+                    }
+                }
+                return 0;
+            }
+        }
+
         if ( preg_match( "/LIKE '([^']+)'/", $sql, $matches ) ) {
             $table = $matches[1];
             if ( $table === $GLOBALS['asn_test_fail_table'] ) {
@@ -55,6 +76,37 @@ class ASN_Test_WPDB {
             return isset( $GLOBALS['asn_test_tables'][ $table ] ) ? $table : null;
         }
         return null;
+    }
+
+    public function insert( $table, $data, $formats = null ) {
+        if ( 'wp_asn_blocks' === $table ) {
+            $GLOBALS['asn_test_blocks'][] = $data;
+            return 1;
+        }
+        if ( 'wp_asn_reports' === $table ) {
+            $GLOBALS['asn_test_reports'][] = $data;
+            return 1;
+        }
+        return 1;
+    }
+
+    public function delete( $table, $where, $formats = null ) {
+        if ( 'wp_asn_blocks' !== $table ) {
+            return 1;
+        }
+
+        $before = count( $GLOBALS['asn_test_blocks'] );
+        $GLOBALS['asn_test_blocks'] = array_values( array_filter(
+            $GLOBALS['asn_test_blocks'],
+            static function ( $row ) use ( $where ) {
+                return ! (
+                    (int) $row['blocker_id'] === (int) $where['blocker_id']
+                    && (int) $row['blocked_id'] === (int) $where['blocked_id']
+                );
+            }
+        ) );
+
+        return $before - count( $GLOBALS['asn_test_blocks'] );
     }
 
     public function replace( $table, $data, $formats = null ) {
@@ -453,7 +505,13 @@ if ( ! function_exists( 'is_user_logged_in' ) ) {
     function is_user_logged_in() { return (bool) $GLOBALS['asn_test_logged_in']; }
 }
 if ( ! function_exists( 'wp_verify_nonce' ) ) {
-    function wp_verify_nonce( $nonce, $action ) { return in_array( $action, array( 'asn_update_profile', 'asn_sync_profiles' ), true ) && $nonce === $GLOBALS['asn_test_valid_nonce']; }
+    function wp_verify_nonce( $nonce, $action ) {
+        $valid_action = in_array( $action, array( 'asn_update_profile', 'asn_sync_profiles' ), true )
+            || 0 === strpos( (string) $action, 'asn_profile_safety_' )
+            || 0 === strpos( (string) $action, 'asn_register_' )
+            || 'asn_choose_free_plan' === $action;
+        return $valid_action && $nonce === $GLOBALS['asn_test_valid_nonce'];
+    }
 }
 if ( ! function_exists( 'wp_unslash' ) ) {
     function wp_unslash( $value ) {
