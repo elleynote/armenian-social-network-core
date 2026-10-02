@@ -55,7 +55,7 @@ final class Directory_Shortcode {
         }
 
         $suggested_members = array();
-        if ( $viewer_id > 0 && ! Directory_Query::has_active_filters( $filters ) ) {
+        if ( $viewer_id > 0 && 1 === (int) $filters['page'] && ! Directory_Query::has_active_filters( $filters ) ) {
             foreach ( Directory_Service::suggested( $viewer_id, 4, $blocked_ids ) as $item ) {
                 $profile = self::hydrate_member( $item, $viewer_id, $blocked_ids, $favorite_ids, $request_uri );
                 if ( $profile ) {
@@ -65,7 +65,7 @@ final class Directory_Shortcode {
         }
 
         $saved_searches = $viewer_id > 0 ? Member_Discovery::saved_searches( $viewer_id ) : array();
-        $show_suggested_section = $viewer_id > 0 && ! Directory_Query::has_active_filters( $filters );
+        $show_suggested_section = $viewer_id > 0 && 1 === (int) $filters['page'] && ! Directory_Query::has_active_filters( $filters );
         $quick_links = array(
             'all'       => $form_action,
             'recent'    => add_query_arg( 'recent', '1', $form_action ),
