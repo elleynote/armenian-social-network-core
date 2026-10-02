@@ -9,6 +9,7 @@ use ASN\Core\Directory\Directory_Shortcode;
 use ASN\Core\Registration\Registration;
 use ASN\Core\Registration\Registration_Shortcode;
 use ASN\Core\Integrations\WooCommerce_Integration;
+use ASN\Core\Features\Member_Safety;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -45,6 +46,9 @@ final class Plugin {
 
         $profile_index_admin = new Profile_Index_Admin();
         $profile_index_admin->register_hooks();
+
+        $member_safety = new Member_Safety();
+        $member_safety->register_hooks();
 
         $profile_shortcode = new Profile_Shortcode();
         $profile_shortcode->register();

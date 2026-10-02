@@ -24,6 +24,9 @@ if ( '' !== $spoken ) {
             <?php echo esc_html( $member['display_name'] ); ?>
             <?php if ( '' !== $age ) : ?><span class="asn-member-card__age">, <?php echo esc_html( $age ); ?></span><?php endif; ?>
         </h2>
+        <?php if ( ! empty( $member['is_new_member'] ) ) : ?>
+            <span class="asn-member-card__new-badge">New</span>
+        <?php endif; ?>
     </a>
 
     <?php if ( '' !== $username ) : ?>

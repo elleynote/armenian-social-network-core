@@ -8,6 +8,7 @@ final class ProfileShortcodeTest extends TestCase {
         $GLOBALS['asn_test_current_user_id'] = 7;
         $GLOBALS['asn_test_shortcodes'] = array();
         $GLOBALS['asn_test_better_messages_enabled'] = false;
+        $GLOBALS['asn_test_blocks'] = array();
     }
 
     public function test_shortcode_registers_once(): void {
@@ -39,6 +40,34 @@ final class ProfileShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'Test Member, 35', $html );
         $this->assertStringContainsString( '>Edit Profile</a>', $html );
         $this->assertStringNotContainsString( '>Message</a>', $html );
+    }
+
+    public function test_owner_profile_shows_completion_and_resume_setup(): void {
+        $html = ( new Profile_Shortcode() )->render();
+
+        $this->assertStringContainsString( 'Profile completion', $html );
+        $this->assertStringContainsString( 'Resume Profile Setup', $html );
+        $this->assertStringContainsString( 'asn_step=prompts', $html );
+    }
+
+    public function test_profile_shows_here_for_safety_and_conversation_starters(): void {
+        $previous = $GLOBALS['asn_test_user_meta'][8];
+        $GLOBALS['asn_test_user_meta'][8]['im_here_for'] = 'friendship,armenian-practice';
+        $GLOBALS['asn_test_user_meta'][8]['my_favorite_music_is'] = 'Jazz';
+        $GLOBALS['asn_test_better_messages_enabled'] = true;
+        $_GET['member'] = '8';
+
+        try {
+            $html = ( new Profile_Shortcode() )->render();
+
+            $this->assertStringContainsString( 'Friendship', $html );
+            $this->assertStringContainsString( 'Armenian practice', $html );
+            $this->assertStringContainsString( 'Block Profile', $html );
+            $this->assertStringContainsString( 'Report Profile', $html );
+            $this->assertStringContainsString( 'Message about this', $html );
+        } finally {
+            $GLOBALS['asn_test_user_meta'][8] = $previous;
+        }
     }
 
     public function test_profile_groups_onboarding_answers_into_elly_sections(): void {

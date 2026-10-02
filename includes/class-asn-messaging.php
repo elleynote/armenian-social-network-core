@@ -3,6 +3,7 @@ namespace ASN\Core;
 
 use ASN\Core\Integrations\AtomChat_Integration;
 use ASN\Core\Integrations\Better_Messages_Integration;
+use ASN\Core\Features\Member_Safety;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -24,7 +25,8 @@ final class Messaging {
         $entitled = $valid
             && $viewer_id > 0
             && Memberships::can_text_chat( $viewer_id )
-            && Memberships::can_text_chat( $target_user_id );
+            && Memberships::can_text_chat( $target_user_id )
+            && ! Member_Safety::is_blocked_between( $viewer_id, $target_user_id );
         $url = $entitled ? Better_Messages_Integration::conversation_url( $target_user_id ) : '';
         $available = '' !== $url;
 
@@ -42,7 +44,7 @@ final class Messaging {
             return false;
         }
 
-        if ( Memberships::can_text_chat( (int) $user_id ) ) {
+        if ( Memberships::can_text_chat( (int) $user_id ) && ! self::thread_has_blocked_pair( (int) $user_id, (int) $thread_id ) ) {
             return true;
         }
 
@@ -51,7 +53,11 @@ final class Messaging {
             $bp_better_messages_restrict_send_message = array();
         }
 
-        $bp_better_messages_restrict_send_message['asn_membership'] = 'Messaging is available to active ASN members.';
+        if ( self::thread_has_blocked_pair( (int) $user_id, (int) $thread_id ) ) {
+            $bp_better_messages_restrict_send_message['asn_blocked'] = 'Messaging is unavailable because one of you has blocked the other.';
+        } else {
+            $bp_better_messages_restrict_send_message['asn_membership'] = 'Messaging is available to active ASN members.';
+        }
 
         return false;
     }
@@ -88,6 +94,36 @@ final class Messaging {
         return self::call_permission_error( (int) $user_id, (int) $thread_id, (string) $type );
     }
 
+    private static function thread_has_blocked_pair( int $user_id, int $thread_id ): bool {
+        if ( $user_id <= 0 || $thread_id <= 0 || ! function_exists( 'Better_Messages' ) ) {
+            return false;
+        }
+
+        $better_messages = Better_Messages();
+        if ( ! is_object( $better_messages ) || ! isset( $better_messages->functions ) ) {
+            return false;
+        }
+
+        $functions = $better_messages->functions;
+        if ( ! is_object( $functions ) || ! is_callable( array( $functions, 'get_recipients_ids' ) ) ) {
+            return false;
+        }
+
+        $participants = $functions->get_recipients_ids( $thread_id );
+        if ( ! is_array( $participants ) ) {
+            return false;
+        }
+
+        foreach ( $participants as $participant_id ) {
+            $participant_id = (int) $participant_id;
+            if ( $participant_id > 0 && $participant_id !== $user_id && Member_Safety::is_blocked_between( $user_id, $participant_id ) ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static function call_permission_error( int $user_id, int $thread_id, string $type ): string {
         if ( 'audio' === $type ) {
             return self::can_use_call_type( $user_id, $thread_id, 'audio' )
@@ -113,7 +149,7 @@ final class Messaging {
             ? Memberships::can_video_chat( $user_id )
             : Memberships::can_voice_chat( $user_id );
 
-        if ( ! $user_entitled ) {
+        if ( ! $user_entitled || self::thread_has_blocked_pair( $user_id, $thread_id ) ) {
             return false;
         }
 

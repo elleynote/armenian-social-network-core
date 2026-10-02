@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ProfileFieldsTest extends TestCase {
     public function test_only_approved_fields_are_public_and_editable(): void {
-        $this->assertCount( 30, Profile_Fields::public_keys() );
+        $this->assertCount( 31, Profile_Fields::public_keys() );
         $this->assertSame( Profile_Fields::public_keys(), Profile_Fields::editable_keys() );
         $this->assertNotContains( 'user_email', Profile_Fields::editable_keys(), true );
         $this->assertNotContains( 'wp_capabilities', Profile_Fields::editable_keys(), true );

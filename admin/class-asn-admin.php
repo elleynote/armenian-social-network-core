@@ -4,6 +4,7 @@ namespace ASN\Core\Admin;
 use ASN\Core\Database;
 use ASN\Core\Integrations\WooCommerce_Integration;
 use ASN\Core\Memberships;
+use ASN\Core\Features\Member_Safety;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -45,6 +46,8 @@ final class Admin {
             'miniorange_active'            => $this->plugin_is_active( 'miniorange' ),
             'profile_sync_offset'           => (int) get_option( Profile_Index_Admin::OFFSET_OPTION, 0 ),
             'profile_sync_complete'         => (bool) get_option( Profile_Index_Admin::COMPLETE_OPTION, false ),
+            'open_profile_reports'           => Member_Safety::open_report_count(),
+            'latest_profile_reports'         => Member_Safety::latest_open_reports( 20 ),
         );
 
         require __DIR__ . '/views/status.php';

@@ -12,6 +12,7 @@ final class Profile_Fields {
         'gender',
         'job_title',
         'spoken_proficiency',
+        'im_here_for',
     );
 
     private const PROMPT_KEYS = array(
@@ -91,6 +92,10 @@ final class Profile_Fields {
         return self::PHOTO_PROMPT_KEYS;
     }
 
+    public static function completion_prompt_keys(): array {
+        return array_values( array_diff( self::PROMPT_KEYS, self::PHOTO_PROMPT_KEYS ) );
+    }
+
     public static function prompt_label( string $key ): string {
         return self::PROMPT_LABELS[ $key ] ?? ucwords( str_replace( '_', ' ', $key ) );
     }
@@ -98,6 +103,10 @@ final class Profile_Fields {
     public static function sanitize( string $key, $value ) {
         if ( ! in_array( $key, self::editable_keys(), true ) ) {
             return null;
+        }
+
+        if ( 'im_here_for' === $key ) {
+            return \ASN\Core\Features\Member_Features::normalize_here_for( $value );
         }
 
         if ( 'age' === $key ) {

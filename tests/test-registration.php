@@ -159,6 +159,9 @@ final class RegistrationTest extends TestCase {
             $this->assertStringContainsString( 'Introduce yourself.', $html );
             $this->assertStringContainsString( 'Profile completion', $html );
             $this->assertStringContainsString( 'Help people get to know you.', $html );
+            $this->assertStringContainsString( 'I&#8217;m here for', $html );
+            $this->assertStringContainsString( 'Friendship', $html );
+            $this->assertStringContainsString( 'Armenian practice', $html );
         } finally {
             $GLOBALS['asn_test_current_user_id'] = $previous_user;
             $GLOBALS['asn_test_logged_in'] = $previous_logged_in;

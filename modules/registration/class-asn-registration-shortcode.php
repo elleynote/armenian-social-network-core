@@ -2,6 +2,7 @@
 namespace ASN\Core\Registration;
 
 use ASN\Core\Memberships;
+use ASN\Core\Features\Member_Features;
 use ASN\Core\Profiles\Legacy_Profile_Contract;
 use ASN\Core\Profiles\Profile_Fields;
 use ASN\Core\Profiles\Profile_Photo;
@@ -305,6 +306,14 @@ final class Registration_Shortcode {
             echo '<option value="' . esc_attr( $option ) . '"' . selected( (string) ( $profile['spoken_proficiency'] ?? '' ), $option, false ) . '>' . esc_html( $option ) . '</option>';
         }
         echo '</select></label>';
+
+        $selected_here_for = explode( ',', Member_Features::normalize_here_for( $profile['im_here_for'] ?? '' ) );
+        echo '<fieldset class="asn-registration-v2__here-for"><legend>I&#8217;m here for</legend><p>Select anything that fits you.</p><div class="asn-registration-v2__choice-grid">';
+        foreach ( Member_Features::here_for_options() as $key => $label ) {
+            $checked = in_array( $key, $selected_here_for, true ) ? ' checked' : '';
+            echo '<label class="asn-registration-v2__choice"><input type="checkbox" name="im_here_for[]" value="' . esc_attr( $key ) . '"' . $checked . '> <span>' . esc_html( $label ) . '</span></label>';
+        }
+        echo '</div></fieldset>';
         echo '</div>';
 
         echo '<div class="asn-registration-v2__next-row"><button class="asn-button asn-registration-v2__next" type="submit">Next &#8594;</button></div>';
@@ -568,26 +577,7 @@ final class Registration_Shortcode {
     }
 
     public static function profile_completion_score( int $user_id ): int {
-        if ( $user_id <= 0 ) {
-            return 0;
-        }
-
-        $profile = Profile_Service::find( $user_id, $user_id ) ?: array();
-        $fields = self::all_prompt_fields();
-        $total = count( $fields );
-
-        if ( 0 === $total ) {
-            return 0;
-        }
-
-        $completed = 0;
-        foreach ( $fields as $key ) {
-            if ( '' !== trim( (string) ( $profile[ $key ] ?? '' ) ) ) {
-                ++$completed;
-            }
-        }
-
-        return (int) floor( ( $completed / $total ) * 100 );
+        return Member_Features::profile_completion_score( $user_id );
     }
 
     private static function completion_status( int $progress ): string {

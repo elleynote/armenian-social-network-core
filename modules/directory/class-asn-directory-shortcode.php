@@ -3,6 +3,7 @@ namespace ASN\Core\Directory;
 
 use ASN\Core\Messaging;
 use ASN\Core\Profiles\Profile_Service;
+use ASN\Core\Features\Member_Features;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -50,6 +51,7 @@ final class Directory_Shortcode {
             }
             $profile['message_action'] = Messaging::action( $user_id );
             $profile['better_messages_action'] = Messaging::better_messages_action( $user_id );
+            $profile['is_new_member'] = Member_Features::is_new_member( $user_id );
             $members[] = $profile;
         }
 
