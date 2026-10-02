@@ -20,6 +20,8 @@ final class ProfileIndexTest extends TestCase {
         $this->assertSame( 'Teacher', $row['job_title'] );
         $this->assertSame( 'western', $row['dialect'] );
         $this->assertSame( 'fluent', $row['proficiency'] );
+        $this->assertSame( '', $row['here_for'] );
+        $this->assertNull( $row['last_active_at'] );
         $this->assertSame( '2025-01-02 03:04:05', $row['registered_at'] );
         $this->assertArrayNotHasKey( 'user_email', $row );
         $this->assertArrayNotHasKey( 'user_pass', $row );
@@ -36,6 +38,31 @@ final class ProfileIndexTest extends TestCase {
             $this->assertStringNotContainsString( '@', $row['display_name'] );
         } finally {
             $GLOBALS['asn_test_users'][7]->display_name = $original_display_name;
+        }
+    }
+
+    public function test_sync_indexes_here_for_and_last_activity(): void {
+        $previous_here_for = $GLOBALS['asn_test_user_meta'][7]['im_here_for'] ?? null;
+        $previous_activity = $GLOBALS['asn_test_user_meta'][7]['_asn_last_active_at'] ?? null;
+        $GLOBALS['asn_test_user_meta'][7]['im_here_for'] = 'friendship,networking';
+        $GLOBALS['asn_test_user_meta'][7]['_asn_last_active_at'] = '2026-09-28 00:00:00';
+
+        try {
+            $this->assertTrue( Profile_Index::sync_user( 7 ) );
+            $row = Profile_Index::find( 7 );
+            $this->assertSame( 'friendship,networking', $row['here_for'] );
+            $this->assertSame( '2026-09-28 00:00:00', $row['last_active_at'] );
+        } finally {
+            if ( null === $previous_here_for ) {
+                unset( $GLOBALS['asn_test_user_meta'][7]['im_here_for'] );
+            } else {
+                $GLOBALS['asn_test_user_meta'][7]['im_here_for'] = $previous_here_for;
+            }
+            if ( null === $previous_activity ) {
+                unset( $GLOBALS['asn_test_user_meta'][7]['_asn_last_active_at'] );
+            } else {
+                $GLOBALS['asn_test_user_meta'][7]['_asn_last_active_at'] = $previous_activity;
+            }
         }
     }
 
