@@ -17,7 +17,7 @@ $saveable_filters = array(
 $has_filters = \ASN\Core\Directory\Directory_Query::has_active_filters( $filters );
 ?>
 <section class="asn-directory" aria-labelledby="asn-directory-title">
-    <h1 id="asn-directory-title" class="asn-directory__title">Explore members</h1>
+    <h1 id="asn-directory-title" class="asn-directory__title"><?php echo esc_html( $directory_heading ); ?></h1>
 
     <?php if ( '' !== $feature_notice && isset( $notice_messages[ $feature_notice ] ) ) : ?>
         <div class="asn-directory__notice"><?php echo esc_html( $notice_messages[ $feature_notice ] ); ?></div>
@@ -25,11 +25,11 @@ $has_filters = \ASN\Core\Directory\Directory_Query::has_active_filters( $filters
 
     <?php if ( get_current_user_id() > 0 ) : ?>
         <nav class="asn-directory__tools" aria-label="Explore member tools">
-            <a class="asn-directory__tool<?php echo ! $has_filters ? ' asn-directory__tool--active' : ''; ?>" href="<?php echo esc_url( $quick_links['all'] ); ?>">All members</a>
-            <a class="asn-directory__tool<?php echo ! empty( $filters['recent'] ) ? ' asn-directory__tool--active' : ''; ?>" href="<?php echo esc_url( $quick_links['recent'] ); ?>">Recently active</a>
-            <a class="asn-directory__tool<?php echo ! empty( $filters['favorites'] ) ? ' asn-directory__tool--active' : ''; ?>" href="<?php echo esc_url( $quick_links['favorites'] ); ?>">Saved profiles</a>
+            <a class="asn-directory__tool<?php echo ! $has_filters ? ' asn-directory__tool--active' : ''; ?>" href="<?php echo esc_url( $quick_links['all'] ); ?>" data-asn-directory-link>All members</a>
+            <a class="asn-directory__tool<?php echo ! empty( $filters['recent'] ) ? ' asn-directory__tool--active' : ''; ?>" href="<?php echo esc_url( $quick_links['recent'] ); ?>" data-asn-directory-link>Recently active</a>
+            <a class="asn-directory__tool<?php echo ! empty( $filters['favorites'] ) ? ' asn-directory__tool--active' : ''; ?>" href="<?php echo esc_url( $quick_links['favorites'] ); ?>" data-asn-directory-link>Saved profiles</a>
             <a class="asn-directory__tool" href="#asn-saved-searches-title">Saved searches</a>
-            <a class="asn-directory__tool" href="<?php echo esc_url( $quick_links['viewers'] ); ?>">Who viewed me</a>
+            <a class="asn-directory__tool<?php echo ! empty( $filters['viewers'] ) ? ' asn-directory__tool--active' : ''; ?>" href="<?php echo esc_url( $quick_links['viewers'] ); ?>" data-asn-directory-link>Who viewed me</a>
         </nav>
 
         <section class="asn-directory__saved-searches" aria-labelledby="asn-saved-searches-title">
@@ -46,7 +46,7 @@ $has_filters = \ASN\Core\Directory\Directory_Query::has_active_filters( $filters
                         $saved_url = $form_action . '?' . http_build_query( $saved_search['filters'], '', '&', PHP_QUERY_RFC3986 );
                         ?>
                         <div class="asn-directory__saved-search">
-                            <a href="<?php echo esc_url( $saved_url ); ?>"><?php echo esc_html( $saved_search['label'] ); ?></a>
+                            <a href="<?php echo esc_url( $saved_url ); ?>" data-asn-directory-link><?php echo esc_html( $saved_search['label'] ); ?></a>
                             <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
                                 <input type="hidden" name="action" value="asn_delete_saved_search">
                                 <input type="hidden" name="search_id" value="<?php echo esc_attr( $saved_search['id'] ); ?>">
@@ -146,6 +146,13 @@ $has_filters = \ASN\Core\Directory\Directory_Query::has_active_filters( $filters
             <?php wp_nonce_field( 'asn_save_search', 'asn_discovery_nonce' ); ?>
             <button class="asn-directory__secondary-action" type="submit">Save this search</button>
         </form>
+    <?php endif; ?>
+
+    <?php if ( ! empty( $filters['viewers'] ) ) : ?>
+        <div class="asn-directory__mode-note">
+            <strong>Who viewed my profile</strong>
+            <span>These members recently opened your profile. The same list is still available on your profile page.</span>
+        </div>
     <?php endif; ?>
 
     <?php if ( $show_suggested_section ) : ?>
