@@ -24,6 +24,10 @@ final class ASN_Directory_Test_WPDB extends ASN_Test_WPDB {
     }
 
     public function get_results( $sql, $output = null ) {
+        if ( false !== strpos( $sql, 'asn_profile_views' ) ) {
+            return parent::get_results( $sql, $output );
+        }
+
         $rows = $this->filtered_rows( $sql );
         usort( $rows, static function ( $a, $b ) use ( $sql ) {
             if ( false !== stripos( $sql, 'ORDER BY p.last_active_at DESC' ) ) {
@@ -210,6 +214,7 @@ final class DirectoryTest extends TestCase {
         $this->assertSame( 'Armenia', $filters['country'] );
         $this->assertSame( 1, $filters['page'] );
         $this->assertSame( 20, $filters['per_page'] );
+        $this->assertFalse( $filters['viewers'] );
         $this->assertSame( 10000, Directory_Query::from_request( array( 'page' => '99999999' ) )['page'] );
     }
 
@@ -298,6 +303,37 @@ final class DirectoryTest extends TestCase {
             $this->assertSame( 'Female', $item['gender'] );
             $this->assertStringContainsString( 'networking', $item['here_for'] );
             $this->assertSame( 'Developer', $item['job_title'] );
+        }
+    }
+
+    public function test_who_viewed_me_filter_returns_recent_viewers_inside_directory(): void {
+        $previous_views = $GLOBALS['asn_test_profile_views'];
+        $previous_user = $GLOBALS['asn_test_current_user_id'];
+
+        $GLOBALS['asn_test_current_user_id'] = 7;
+        $GLOBALS['asn_test_profile_views'] = array(
+            array( 'viewer_id' => 3, 'profile_user_id' => 7, 'viewed_at' => '2026-09-28 00:00:00' ),
+            array( 'viewer_id' => 5, 'profile_user_id' => 7, 'viewed_at' => '2026-09-27 00:00:00' ),
+        );
+
+        try {
+            $filters = Directory_Query::from_request( array( 'viewers' => '1' ) );
+            $this->assertTrue( $filters['viewers'] );
+
+            $result = Directory_Service::search( $filters );
+            $this->assertSame( 2, $result['total'] );
+            $this->assertSame(
+                array( 5, 3 ),
+                array_map(
+                    static function ( $item ) {
+                        return (int) $item['user_id'];
+                    },
+                    $result['items']
+                )
+            );
+        } finally {
+            $GLOBALS['asn_test_profile_views'] = $previous_views;
+            $GLOBALS['asn_test_current_user_id'] = $previous_user;
         }
     }
 
