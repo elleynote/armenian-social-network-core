@@ -296,6 +296,15 @@ final class Registration {
             update_user_meta( $user_id, $key . '_image', $url );
         }
 
+        if ( ! Memberships::can_text_chat( $user_id ) ) {
+            $assigned = PMPro_Integration::assign_level( Memberships::FREE_LEVEL_ID, $user_id );
+            if ( ! $assigned ) {
+                $this->redirect_with_error( add_query_arg( 'asn_step', 'photos', $return_url ), 'membership' );
+                return;
+            }
+            Profile_Index::sync_user( $user_id );
+        }
+
         update_user_meta( $user_id, '_asn_onboarding_step', 'plan' );
         $this->redirect( add_query_arg( 'asn_step', 'plan', $return_url ) );
     }
