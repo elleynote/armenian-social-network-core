@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.6.0 - Elly V2 member profile
+
+- Rebuilds the parallel ASN member profile to match Elly's supplied profile layout.
+- Adds the left identity card with member name and age, circular profile photo, username, job title, country, speaker level, and a full-width Message action.
+- Groups onboarding answers into the five client profile sections: "What makes me, me.", "What gets me out of bed in the morning?", "What I’m planning next?", "How I became me.", and "What I can share."
+- Adds the "A glimpse into my world." gallery using the four photo slots from the new onboarding flow.
+- Keeps the owner Edit Profile path available while normal profile viewing is read-only.
+- Removes the temporary "Test Better Messages" wording from the parallel profile and uses the client-facing "Message" label.
+- The profile UI no longer displays member email addresses.
+- No membership, billing, registration, Explore filtering, or Better Messages entitlement logic changed.
+
 ## 0.5.5 - Client Explore review adjustments
 
 - The Explore country filter now recognizes common United States aliases such as `usa`, `US`, `U.S.A.`, and `United States` and returns members whose saved country is United States / United States of America.
