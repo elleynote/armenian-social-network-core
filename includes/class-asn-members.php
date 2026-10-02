@@ -57,7 +57,7 @@ final class Members {
     }
 
     public static function profile_meta( int $user_id, string $key, $default = null ) {
-        if ( ! get_userdata( $user_id ) ) {
+        if ( $user_id <= 0 ) {
             return $default;
         }
 
