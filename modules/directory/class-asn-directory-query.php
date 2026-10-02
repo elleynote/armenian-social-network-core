@@ -28,6 +28,7 @@ final class Directory_Query {
 
         $recent = self::truthy( $request['recent'] ?? false );
         $favorites = self::truthy( $request['favorites'] ?? false );
+        $viewers = self::truthy( $request['viewers'] ?? false );
         $page = isset( $request['page'] ) && is_scalar( $request['page'] ) ? (int) $request['page'] : 1;
         $page = max( 1, min( self::MAX_PAGE, $page ) );
 
@@ -43,13 +44,14 @@ final class Directory_Query {
             'age_max'     => $age_max,
             'recent'      => $recent,
             'favorites'   => $favorites,
+            'viewers'     => $viewers,
             'page'        => $page,
             'per_page'    => self::PER_PAGE,
         );
     }
 
     public static function has_active_filters( array $filters ): bool {
-        foreach ( array( 'q', 'dialect', 'proficiency', 'country', 'gender', 'job_title', 'here_for', 'age_min', 'age_max', 'recent', 'favorites' ) as $key ) {
+        foreach ( array( 'q', 'dialect', 'proficiency', 'country', 'gender', 'job_title', 'here_for', 'age_min', 'age_max', 'recent', 'favorites', 'viewers' ) as $key ) {
             if ( ! empty( $filters[ $key ] ) ) {
                 return true;
             }
