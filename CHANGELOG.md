@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.7.0 - Elly Level 1 feature pack
+
+- Adds the new "I'm Here For" profile field with Friendship, Armenian practice, Networking, Business connections, and Community choices.
+- Shows a real profile-completion percentage on the member's own profile and a Resume Profile Setup action when profile cards are still incomplete.
+- Adds conversation-starter actions beside completed profile answers so another member can open the correct Better Messages conversation directly from the topic.
+- Adds Report Profile and Block Profile actions directly on member profiles.
+- ASN profile blocks now prevent direct Better Messages access, message sending, audio calls, and video calls between the blocked pair.
+- Adds an Unblock Profile action for the member who created the block.
+- Adds a short-lived New Member badge to Explore and the member profile.
+- Adds open profile-report visibility to ASN Core admin diagnostics so reports can be reviewed by administrators.
+- Keeps the selected green features available without any additional paid service.
+- Better Messages message reactions remain a Better Messages setting and are enabled separately in its Messaging settings; no paid add-on is required.
+- No billing, paid Level 2 entitlement, WooCommerce subscription, or AtomChat cutover logic changed.
+
 ## 0.6.0 - Elly V2 member profile
 
 - Rebuilds the parallel ASN member profile to match Elly's supplied profile layout.
