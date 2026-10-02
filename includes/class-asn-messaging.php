@@ -26,6 +26,7 @@ final class Messaging {
         $is_blocked = null === $blocked ? Member_Safety::is_blocked_between( $viewer_id, $target_user_id ) : $blocked;
         $entitled = $valid
             && $viewer_id > 0
+            && $viewer_id !== $target_user_id
             && Memberships::can_text_chat( $viewer_id )
             && $target_can_chat
             && ! $is_blocked;
