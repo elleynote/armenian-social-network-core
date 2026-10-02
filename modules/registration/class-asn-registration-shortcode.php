@@ -44,7 +44,7 @@ final class Registration_Shortcode {
             array(
                 'register_url' => site_url( '/asn-register-test/' ),
                 'explore_url'  => site_url( '/asn-explore-test/' ),
-                'paid_url'     => self::default_paid_checkout_url(),
+                'paid_url'     => '',
             ),
             $atts,
             'asn_register'
@@ -60,6 +60,10 @@ final class Registration_Shortcode {
         $user_id = (int) get_current_user_id();
         $step = isset( $_GET['asn_step'] ) ? sanitize_key( wp_unslash( $_GET['asn_step'] ) ) : '';
         $error = isset( $_GET['asn_register_error'] ) ? sanitize_key( wp_unslash( $_GET['asn_register_error'] ) ) : '';
+
+        if ( 'plan' === $step && '' === $paid_url ) {
+            $paid_url = self::default_paid_checkout_url();
+        }
 
         if ( $user_id > 0 && Memberships::can_text_chat( $user_id ) && ! in_array( $step, array( 'plan', 'complete' ), true ) ) {
             return '<div class="asn-registration"><div class="asn-registration__card"><h2>Membership active</h2><p>Your ASN membership is active.</p><a class="asn-button" href="' . esc_url( $explore_url ) . '">Continue to Explore</a></div></div>';
