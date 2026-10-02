@@ -168,7 +168,15 @@ $has_filters = \ASN\Core\Directory\Directory_Query::has_active_filters( $filters
         </section>
     <?php endif; ?>
 
-    <div class="asn-directory__results" data-asn-directory-results aria-live="polite">
+    <?php $next_page_url = $pagination_urls[ (int) $result['page'] + 1 ] ?? ''; ?>
+    <div
+        class="asn-directory__results"
+        data-asn-directory-results
+        data-asn-page="<?php echo esc_attr( (string) $result['page'] ); ?>"
+        data-asn-pages="<?php echo esc_attr( (string) $result['pages'] ); ?>"
+        data-asn-next-url="<?php echo esc_url( $next_page_url ); ?>"
+        aria-live="polite"
+    >
     <?php if ( empty( $members ) ) : ?>
         <div class="asn-directory__empty"><p><?php echo esc_html( 'No members found.' ); ?></p></div>
     <?php else : ?>
@@ -180,7 +188,10 @@ $has_filters = \ASN\Core\Directory\Directory_Query::has_active_filters( $filters
     <?php endif; ?>
 
     <?php if ( $result['pages'] > 1 ) : ?>
-        <nav class="asn-pagination" aria-label="Member directory pages">
+        <div class="asn-directory__load-sentinel" data-asn-load-sentinel aria-hidden="true">
+            <span>Loading more members…</span>
+        </div>
+        <nav class="asn-pagination" aria-label="Member directory pages" data-asn-pagination-fallback>
             <?php foreach ( $pagination_urls as $page_number => $url ) : ?>
                 <a class="asn-pagination__link<?php echo (int) $result['page'] === (int) $page_number ? ' asn-pagination__link--current' : ''; ?>" href="<?php echo esc_url( $url ); ?>"<?php echo (int) $result['page'] === (int) $page_number ? ' aria-current="page"' : ''; ?>><?php echo esc_html( (string) $page_number ); ?></a>
             <?php endforeach; ?>
