@@ -85,7 +85,11 @@ $resume_profile_url = (string) ( $profile['resume_profile_url'] ?? '' );
 $here_for_labels = (array) ( $profile['here_for_labels'] ?? array() );
 $viewer_blocked_target = ! empty( $profile['viewer_blocked_target'] );
 $blocked_between = ! empty( $profile['blocked_between'] );
+$is_favorite = ! empty( $profile['is_favorite'] );
+$is_recently_active = ! empty( $profile['is_recently_active'] );
+$profile_viewers = (array) ( $profile['profile_viewers'] ?? array() );
 $notice_key = isset( $_GET['asn_profile_notice'] ) ? sanitize_key( wp_unslash( $_GET['asn_profile_notice'] ) ) : '';
+$feature_notice = isset( $_GET['asn_feature_notice'] ) ? sanitize_key( wp_unslash( $_GET['asn_feature_notice'] ) ) : '';
 $notice_messages = array(
     'reported' => 'Thanks. This profile has been reported for review.',
     'blocked' => 'This member is now blocked.',
@@ -95,17 +99,32 @@ $notice_messages = array(
     'security' => 'Please refresh the page and try again.',
     'not_allowed' => 'That action is not available.',
 );
+$feature_notice_messages = array(
+    'favorite_saved' => 'Profile saved to your favorites.',
+    'favorite_removed' => 'Profile removed from your favorites.',
+    'favorite_failed' => 'We could not update that favorite.',
+    'security' => 'Please refresh the page and try again.',
+    'not_allowed' => 'That action is not available.',
+);
 ?>
 <?php if ( '' !== $notice_key && isset( $notice_messages[ $notice_key ] ) ) : ?>
     <div class="asn-profile-v2__notice"><?php echo esc_html( $notice_messages[ $notice_key ] ); ?></div>
+<?php endif; ?>
+<?php if ( '' !== $feature_notice && isset( $feature_notice_messages[ $feature_notice ] ) ) : ?>
+    <div class="asn-profile-v2__notice"><?php echo esc_html( $feature_notice_messages[ $feature_notice ] ); ?></div>
 <?php endif; ?>
 
 <section class="asn-profile asn-profile--v2" aria-labelledby="asn-profile-name">
     <aside class="asn-profile-v2__sidebar">
         <div class="asn-profile-v2__identity-card">
-            <?php if ( ! empty( $profile['is_new_member'] ) ) : ?>
-                <span class="asn-profile-v2__new-badge">New member</span>
-            <?php endif; ?>
+            <div class="asn-profile-v2__badges">
+                <?php if ( ! empty( $profile['is_new_member'] ) ) : ?>
+                    <span class="asn-profile-v2__new-badge">New member</span>
+                <?php endif; ?>
+                <?php if ( $is_recently_active ) : ?>
+                    <span class="asn-profile-v2__active-badge">Recently active</span>
+                <?php endif; ?>
+            </div>
 
             <h1 id="asn-profile-name" class="asn-profile-v2__name"><?php echo esc_html( $name_line ); ?></h1>
 
@@ -148,6 +167,15 @@ $notice_messages = array(
             <?php endif; ?>
 
             <?php if ( empty( $profile['is_owner'] ) && get_current_user_id() > 0 ) : ?>
+                <form class="asn-profile-v2__favorite-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                    <input type="hidden" name="action" value="asn_toggle_favorite">
+                    <input type="hidden" name="target_user_id" value="<?php echo esc_attr( (string) $profile['id'] ); ?>">
+                    <input type="hidden" name="favorite" value="<?php echo $is_favorite ? '0' : '1'; ?>">
+                    <input type="hidden" name="return_url" value="<?php echo esc_url( $profile_url ); ?>">
+                    <?php wp_nonce_field( 'asn_member_discovery_' . (int) $profile['id'], 'asn_discovery_nonce' ); ?>
+                    <button class="asn-profile-v2__favorite-button" type="submit"><?php echo $is_favorite ? 'Remove Saved Profile' : 'Save Profile'; ?></button>
+                </form>
+
                 <div class="asn-profile-v2__safety-actions">
                     <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
                         <input type="hidden" name="action" value="<?php echo $viewer_blocked_target ? 'asn_unblock_profile' : 'asn_block_profile'; ?>">
@@ -217,6 +245,32 @@ $notice_messages = array(
                 </article>
             <?php endforeach; ?>
         </div>
+
+        <?php if ( ! empty( $profile['is_owner'] ) ) : ?>
+            <section class="asn-profile-v2__viewers" aria-labelledby="asn-profile-viewers-title">
+                <div class="asn-profile-v2__section-heading">
+                    <h2 id="asn-profile-viewers-title">Who viewed my profile</h2>
+                    <p>Recent members who opened your profile.</p>
+                </div>
+
+                <?php if ( empty( $profile_viewers ) ) : ?>
+                    <p class="asn-profile-v2__empty">No profile views yet.</p>
+                <?php else : ?>
+                    <div class="asn-profile-v2__viewer-grid">
+                        <?php foreach ( $profile_viewers as $viewer_profile ) : ?>
+                            <?php $viewer_url = add_query_arg( 'member', (int) $viewer_profile['id'], site_url( '/asn-profile-test/' ) ); ?>
+                            <a class="asn-profile-v2__viewer" href="<?php echo esc_url( $viewer_url ); ?>">
+                                <img src="<?php echo esc_url( $viewer_profile['photo_url'] ); ?>" alt="<?php echo esc_attr( $viewer_profile['display_name'] ); ?>" loading="lazy" width="56" height="56">
+                                <span>
+                                    <strong><?php echo esc_html( $viewer_profile['display_name'] ); ?></strong>
+                                    <?php if ( ! empty( $viewer_profile['country'] ) ) : ?><small><?php echo esc_html( $viewer_profile['country'] ); ?></small><?php endif; ?>
+                                </span>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </section>
+        <?php endif; ?>
 
         <section class="asn-profile-v2__gallery" aria-labelledby="asn-profile-gallery-title">
             <h2 id="asn-profile-gallery-title">A glimpse into my world.</h2>
