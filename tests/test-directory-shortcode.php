@@ -17,6 +17,10 @@ final class ASN_Directory_Shortcode_Test_WPDB extends ASN_Test_WPDB {
     }
 
     public function get_results( $sql, $output = null ) {
+        if ( false !== strpos( $sql, 'asn_profile_views' ) ) {
+            return parent::get_results( $sql, $output );
+        }
+
         if ( 0 === $this->total ) {
             return array();
         }
@@ -155,6 +159,23 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'Networking', $html );
     }
 
+    public function test_who_viewed_me_stays_inside_explore_and_uses_ajax_navigation(): void {
+        $GLOBALS['asn_test_profile_views'][] = array(
+            'viewer_id' => 7,
+            'profile_user_id' => 8,
+            'viewed_at' => '2026-09-28 00:00:00',
+        );
+        $_GET = array( 'viewers' => '1' );
+
+        $html = ( new Directory_Shortcode() )->render();
+
+        $this->assertStringContainsString( 'Who viewed my profile', $html );
+        $this->assertStringContainsString( 'viewers=1', html_entity_decode( $html, ENT_QUOTES, 'UTF-8' ) );
+        $this->assertStringContainsString( 'data-asn-directory-link', $html );
+        $this->assertStringContainsString( 'These members recently opened your profile.', $html );
+        $this->assertStringNotContainsString( '#asn-profile-viewers-title', $html );
+    }
+
     public function test_parallel_better_messages_action_uses_client_chat_button_on_test_explore(): void {
         $GLOBALS['asn_test_better_messages_enabled'] = true;
 
@@ -205,6 +226,7 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'aria-live="polite"', $html );
         $this->assertStringContainsString( 'data-asn-directory-results', $html );
         $this->assertStringContainsString( 'data-asn-directory-submit', $html );
+        $this->assertStringContainsString( 'data-asn-directory-link', $html );
         $this->assertStringContainsString( 'data-asn-next-url', $html );
         $this->assertStringContainsString( 'data-asn-load-sentinel', $html );
         $this->assertStringContainsString( 'data-asn-pagination-fallback', $html );
@@ -223,6 +245,7 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'loadMore', $script );
         $this->assertStringContainsString( "rootMargin: '0px 0px 70% 0px'", $script );
         $this->assertStringContainsString( 'data-asn-next-url', $script );
+        $this->assertStringContainsString( '[data-asn-directory-link]', $script );
     }
 
     public function test_elly_explore_visual_system_styles_filters_cards_and_pagination(): void {
