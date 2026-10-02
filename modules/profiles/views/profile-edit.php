@@ -43,6 +43,21 @@ $basic_labels = array(
             </select>
         </label>
 
+        <fieldset class="asn-profile-edit__here-for">
+            <legend>I'm here for</legend>
+            <div class="asn-profile-edit__choice-grid">
+                <?php
+                $selected_here_for = explode( ',', \ASN\Core\Features\Member_Features::normalize_here_for( $profile['im_here_for'] ?? '' ) );
+                foreach ( \ASN\Core\Features\Member_Features::here_for_options() as $key => $label ) :
+                    ?>
+                    <label>
+                        <input type="checkbox" name="asn_profile[im_here_for][]" value="<?php echo esc_attr( $key ); ?>"<?php echo in_array( $key, $selected_here_for, true ) ? ' checked' : ''; ?>>
+                        <span><?php echo esc_html( $label ); ?></span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+        </fieldset>
+
         <?php foreach ( \ASN\Core\Profiles\Profile_Fields::prompt_keys() as $key ) : ?>
             <label class="asn-field">
                 <span class="asn-field__label"><?php echo esc_html( ucwords( str_replace( '_', ' ', $key ) ) ); ?></span>
