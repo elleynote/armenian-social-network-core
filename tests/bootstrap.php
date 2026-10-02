@@ -160,6 +160,21 @@ class ASN_Test_WPDB {
     }
 
     public function get_results( $sql, $output = null ) {
+        if ( false !== strpos( $sql, 'asn_blocks' ) && false !== stripos( $sql, 'SELECT blocker_id, blocked_id' ) ) {
+            preg_match_all( '/(?:blocker_id|blocked_id) = (\d+)/', $sql, $matches );
+            $user_id = (int) ( $matches[1][0] ?? 0 );
+
+            return array_values(
+                array_filter(
+                    $GLOBALS['asn_test_blocks'],
+                    static function ( $row ) use ( $user_id ) {
+                        return (int) ( $row['blocker_id'] ?? 0 ) === $user_id
+                            || (int) ( $row['blocked_id'] ?? 0 ) === $user_id;
+                    }
+                )
+            );
+        }
+
         if ( false !== strpos( $sql, 'asn_profile_views' ) ) {
             preg_match( '/profile_user_id = (\d+)/', $sql, $profile_match );
             $profile_user_id = (int) ( $profile_match[1] ?? 0 );
@@ -582,6 +597,7 @@ if ( ! function_exists( 'wp_verify_nonce' ) ) {
         $valid_action = in_array( $action, array( 'asn_update_profile', 'asn_sync_profiles' ), true )
             || 0 === strpos( (string) $action, 'asn_profile_safety_' )
             || 0 === strpos( (string) $action, 'asn_register_' )
+            || 0 === strpos( (string) $action, 'asn_open_better_messages_' )
             || 'asn_choose_free_plan' === $action;
         return $valid_action && $nonce === $GLOBALS['asn_test_valid_nonce'];
     }
@@ -615,6 +631,16 @@ if ( ! function_exists( 'add_query_arg' ) ) {
 if ( ! function_exists( 'wp_nonce_field' ) ) {
     function wp_nonce_field( $action, $name ) {
         echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $GLOBALS['asn_test_valid_nonce'] ) . '">';
+    }
+}
+if ( ! function_exists( 'wp_create_nonce' ) ) {
+    function wp_create_nonce( $action ) {
+        return $GLOBALS['asn_test_valid_nonce'];
+    }
+}
+if ( ! function_exists( 'wp_validate_redirect' ) ) {
+    function wp_validate_redirect( $location, $fallback = '' ) {
+        return '' !== (string) $location ? (string) $location : (string) $fallback;
     }
 }
 
