@@ -508,3 +508,213 @@
 @media(max-width:540px){
   .asn-directory__grid{grid-template-columns:1fr;}
 }
+
+
+/* Elly V2 member profile */
+.asn-profile--v2{
+  display:grid;
+  grid-template-columns:320px minmax(0,1fr);
+  gap:32px;
+  max-width:1180px;
+  margin:0 auto;
+  padding:44px 28px 76px;
+  color:#10294a;
+}
+.asn-profile-v2__sidebar{
+  min-width:0;
+}
+.asn-profile-v2__identity-card{
+  position:sticky;
+  top:28px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:24px 28px 30px;
+  border:1px solid #d9dde4;
+  border-radius:18px;
+  background:#fff;
+  text-align:center;
+}
+.asn-profile-v2__name{
+  margin:24px 0 18px;
+  color:#101b30;
+  font-size:clamp(2rem,3vw,2.55rem);
+  line-height:1.05;
+  font-weight:700;
+  letter-spacing:-.035em;
+}
+.asn-profile-v2__photo{
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#e2e2e2;
+}
+.asn-profile-v2__username{
+  margin:18px 0 8px;
+  color:#172237;
+  font-size:1.05rem;
+}
+.asn-profile-v2__meta{
+  display:grid;
+  gap:8px;
+  width:100%;
+  margin-top:4px;
+  color:#526078;
+}
+.asn-profile-v2__meta p{
+  margin:0;
+  font-size:1rem;
+  line-height:1.35;
+}
+.asn-profile-v2__primary-action{
+  display:flex;
+  width:100%;
+  min-height:48px;
+  align-items:center;
+  justify-content:center;
+  margin-top:24px;
+  padding:11px 18px;
+  border-radius:999px;
+  background:#f85d3f;
+  color:#fff!important;
+  text-decoration:none;
+  font-weight:600;
+}
+.asn-profile-v2__primary-action:hover,
+.asn-profile-v2__primary-action:focus{
+  background:#e95034;
+  color:#fff!important;
+}
+.asn-profile-v2__primary-action--disabled{
+  opacity:.55;
+  pointer-events:none;
+}
+.asn-profile-v2__content{
+  min-width:0;
+}
+.asn-profile-v2__summary-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px;
+}
+.asn-profile-v2__summary-card{
+  min-height:245px;
+  padding:26px 28px;
+  border-radius:18px;
+  background:#f3f3f3;
+}
+.asn-profile-v2__summary-card--planning{
+  grid-column:1/-1;
+  min-height:260px;
+}
+.asn-profile-v2__summary-card h2{
+  margin:0 0 16px;
+  color:#10294a;
+  font-size:1.45rem;
+  line-height:1.2;
+  font-weight:700;
+}
+.asn-profile-v2__answers{
+  display:grid;
+  gap:13px;
+}
+.asn-profile-v2__answer{
+  display:grid;
+  gap:4px;
+}
+.asn-profile-v2__answer-label{
+  color:#526078;
+  font-size:.72rem;
+  line-height:1.3;
+  font-weight:600;
+}
+.asn-profile-v2__answer p,
+.asn-profile-v2__empty{
+  margin:0;
+  color:#26354c;
+  font-size:.9rem;
+  line-height:1.48;
+}
+.asn-profile-v2__empty{
+  color:#7a8493;
+}
+.asn-profile-v2__gallery{
+  margin-top:20px;
+  padding:28px;
+  border-radius:18px;
+  background:#f3f3f3;
+}
+.asn-profile-v2__gallery h2{
+  margin:0 0 20px;
+  color:#101b30;
+  font-size:1.75rem;
+  line-height:1.15;
+}
+.asn-profile-v2__gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:20px;
+}
+.asn-profile-v2__gallery-item{
+  margin:0;
+  text-align:center;
+}
+.asn-profile-v2__gallery-item img,
+.asn-profile-v2__gallery-placeholder{
+  display:block;
+  width:100%;
+  aspect-ratio:1/1;
+  border-radius:14px;
+  background:#fff;
+  object-fit:cover;
+}
+.asn-profile-v2__gallery-item figcaption{
+  margin-top:10px;
+  color:#526078;
+  font-size:.72rem;
+  line-height:1.3;
+}
+@media(max-width:980px){
+  .asn-profile--v2{
+    grid-template-columns:260px minmax(0,1fr);
+    gap:24px;
+  }
+  .asn-profile-v2__identity-card{
+    padding:22px 20px 26px;
+  }
+  .asn-profile-v2__photo{
+    width:145px;
+    height:145px;
+  }
+  .asn-profile-v2__gallery-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+@media(max-width:760px){
+  .asn-profile--v2{
+    grid-template-columns:1fr;
+    padding:28px 18px 55px;
+  }
+  .asn-profile-v2__identity-card{
+    position:static;
+    max-width:520px;
+    width:100%;
+    margin:0 auto;
+  }
+}
+@media(max-width:560px){
+  .asn-profile-v2__summary-grid{
+    grid-template-columns:1fr;
+  }
+  .asn-profile-v2__summary-card--planning{
+    grid-column:auto;
+  }
+  .asn-profile-v2__summary-card{
+    min-height:0;
+  }
+  .asn-profile-v2__gallery-grid{
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+}
