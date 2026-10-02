@@ -35,12 +35,48 @@ final class Profile_Index {
             'job_title'     => (string) ( Profile_Fields::sanitize( 'job_title', $member['job_title'] ?? '' ) ?? '' ),
             'dialect'       => $spoken['dialect'],
             'proficiency'   => $spoken['proficiency'],
+            'here_for'      => (string) ( Profile_Fields::sanitize( 'im_here_for', $member['im_here_for'] ?? '' ) ?? '' ),
+            'last_active_at'=> self::activity_value( $user_id ),
             'registered_at' => isset( $user->user_registered ) ? (string) $user->user_registered : null,
             'created_at'    => $existing['created_at'] ?? $now,
             'updated_at'    => $now,
         );
 
         return false !== $wpdb->replace( Database::table( 'profiles' ), $data );
+    }
+
+    public static function touch_activity( int $user_id, string $when = '' ): bool {
+        global $wpdb;
+
+        if ( $user_id <= 0 || false === get_userdata( $user_id ) ) {
+            return false;
+        }
+
+        if ( '' === $when ) {
+            $when = current_time( 'mysql' );
+        }
+
+        update_user_meta( $user_id, '_asn_last_active_at', $when );
+
+        if ( null === self::find( $user_id ) ) {
+            return self::sync_user( $user_id );
+        }
+
+        return false !== $wpdb->update(
+            ASNCoreDatabase::table( 'profiles' ),
+            array(
+                'last_active_at' => $when,
+                'updated_at'     => current_time( 'mysql' ),
+            ),
+            array( 'user_id' => $user_id ),
+            array( '%s', '%s' ),
+            array( '%d' )
+        );
+    }
+
+    private static function activity_value( int $user_id ): ?string {
+        $value = trim( (string) get_user_meta( $user_id, '_asn_last_active_at', true ) );
+        return '' === $value ? null : $value;
     }
 
     public static function find( int $user_id ): ?array {
