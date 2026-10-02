@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.8.2 - Performance and infinite Explore loading
+
+- Removes Better Messages private-thread lookup/creation from Explore and profile page rendering; the exact conversation is now resolved only after the member clicks Message.
+- Replaces heavy full-profile hydration on Explore cards with the indexed directory row plus only the small amount of member data needed by the card.
+- Batches blocked-member and saved-profile state for Explore instead of repeating the same lookups per card.
+- Avoids repeated PMPro entitlement checks where one membership-level lookup is sufficient.
+- Skips Suggested Members work on page 2+ requests used by infinite scrolling.
+- Defers WooCommerce paid-plan variation resolution until the onboarding plan screen instead of running it on every registration step.
+- Removes redundant profile-index rebuilds from onboarding and skips index work entirely for prompt-only saves.
+- Replaces visible numbered Explore pagination with progressive infinite loading: 20 members initially, then another 20 automatically as the member approaches the lower part of the current results.
+- Keeps server-rendered numbered pagination as a no-JavaScript/error fallback.
+- Preserves PMPro/WooCommerce rules, Better Messages permission checks, AtomChat fallback, and the parallel test-page rollout.
+
 ## 0.8.1 - Explore discovery visibility and usability
 
 - Makes the selected discovery features obvious on Explore instead of leaving most of them hidden behind conditional states.
