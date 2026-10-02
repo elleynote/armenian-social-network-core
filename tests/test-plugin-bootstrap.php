@@ -30,6 +30,13 @@ final class PluginBootstrapTest extends TestCase {
         $this->assertSame( 4, $join[0]['accepted_args'] ?? 0 );
     }
 
+    public function test_member_discovery_hooks_are_registered(): void {
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_toggle_favorite'] ?? array() );
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_save_search'] ?? array() );
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['admin_post_asn_delete_saved_search'] ?? array() );
+        $this->assertNotEmpty( $GLOBALS['asn_test_hooks']['template_redirect'] ?? array() );
+    }
+
     public function test_paid_checkout_return_filter_is_registered(): void {
         $filters = $GLOBALS['asn_test_filters']['woocommerce_get_return_url'] ?? array();
 
