@@ -86,6 +86,11 @@ final class Profile_Service {
         }
 
         foreach ( $clean as $key => $value ) {
+            $existing = get_user_meta( $target_user_id, $key, true );
+            if ( (string) $existing === (string) $value ) {
+                continue;
+            }
+
             update_user_meta( $target_user_id, $key, $value );
             $result['updated'][] = $key;
         }

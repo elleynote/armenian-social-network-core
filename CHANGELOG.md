@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.8.3 - In-page Explore tools and registration hot-path cleanup
+
+- Makes All Members, Recently Active, Saved Profiles, saved-search links, and Who Viewed Me update the Explore interface through the existing AJAX directory controller instead of navigating to a new page.
+- Keeps Who Viewed Me inside Explore with the normal member-card layout while preserving the same viewer list on the member's own profile page.
+- Adds a dedicated Explore viewer filter backed by recent profile-view records.
+- Preserves infinite scrolling for filtered and viewer-mode results.
+- Removes repeated WordPress user-object lookups while reading profile metadata.
+- Skips unchanged user-meta writes during onboarding/profile saves so other plugins do not receive unnecessary metadata update hooks.
+- Keeps all membership, billing, Better Messages, AtomChat fallback, and test-page rollout behavior unchanged.
+- A remaining multi-second delay on the initial guest registration GET should be investigated at the WordPress/server level because that screen has no directory loop, Better Messages thread resolution, membership assignment, photo processing, or WooCommerce variation lookup.
+
 ## 0.8.2 - Performance and infinite Explore loading
 
 - Removes Better Messages private-thread lookup/creation from Explore and profile page rendering; the exact conversation is now resolved only after the member clicks Message.

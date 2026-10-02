@@ -211,6 +211,13 @@
             return;
         }
 
+        var directoryLink = event.target.closest('[data-asn-directory-link]');
+        if (directoryLink) {
+            event.preventDefault();
+            loadDirectory(directoryLink.href, true);
+            return;
+        }
+
         var pagination = event.target.closest('.asn-pagination__link');
         if (pagination) {
             event.preventDefault();

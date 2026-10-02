@@ -206,6 +206,38 @@ final class Member_Discovery {
         );
     }
 
+    public static function recent_profile_viewer_ids( int $profile_user_id, int $limit = 200 ): array {
+        if ( $profile_user_id <= 0 ) {
+            return array();
+        }
+
+        global $wpdb;
+        $table = Database::table( 'profile_views' );
+        $limit = max( 1, min( 500, $limit ) );
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT viewer_id, MAX(viewed_at) AS viewed_at FROM {$table} WHERE profile_user_id = %d GROUP BY viewer_id ORDER BY viewed_at DESC LIMIT %d",
+                $profile_user_id,
+                $limit
+            ),
+            defined( 'ARRAY_A' ) ? ARRAY_A : 'ARRAY_A'
+        );
+
+        if ( ! is_array( $rows ) ) {
+            return array();
+        }
+
+        $ids = array();
+        foreach ( $rows as $row ) {
+            $viewer_id = (int) ( $row['viewer_id'] ?? 0 );
+            if ( $viewer_id > 0 && $viewer_id !== $profile_user_id ) {
+                $ids[ $viewer_id ] = $viewer_id;
+            }
+        }
+
+        return array_values( $ids );
+    }
+
     public static function recent_profile_viewers( int $profile_user_id, int $limit = 8 ): array {
         if ( $profile_user_id <= 0 || ! Memberships::can_text_chat( $profile_user_id ) ) {
             return array();

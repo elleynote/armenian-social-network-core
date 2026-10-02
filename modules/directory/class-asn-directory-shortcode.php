@@ -70,8 +70,9 @@ final class Directory_Shortcode {
             'all'       => $form_action,
             'recent'    => add_query_arg( 'recent', '1', $form_action ),
             'favorites' => add_query_arg( 'favorites', '1', $form_action ),
-            'viewers'   => add_query_arg( 'member', $viewer_id, site_url( '/asn-profile-test/' ) ) . '#asn-profile-viewers-title',
+            'viewers'   => add_query_arg( 'viewers', '1', $form_action ),
         );
+        $directory_heading = ! empty( $filters['viewers'] ) ? 'Who viewed my profile' : 'Explore members';
         $feature_notice = isset( $_GET['asn_feature_notice'] ) ? sanitize_key( wp_unslash( $_GET['asn_feature_notice'] ) ) : '';
         $notice_messages = array(
             'favorite_saved' => 'Profile saved to your favorites.',
@@ -158,6 +159,7 @@ final class Directory_Shortcode {
             'age_max'     => $filters['age_max'],
             'recent'      => $filters['recent'] ? '1' : '',
             'favorites'   => $filters['favorites'] ? '1' : '',
+            'viewers'     => $filters['viewers'] ? '1' : '',
             'page'        => $page,
         );
 

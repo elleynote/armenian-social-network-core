@@ -75,6 +75,8 @@ final class Directory_Service {
             $values[] = Member_Discovery::recent_cutoff();
         }
 
+        $ordered_ids = array();
+
         if ( $filters['favorites'] ) {
             $favorite_ids = Member_Discovery::favorite_ids( (int) get_current_user_id() );
             if ( empty( $favorite_ids ) ) {
@@ -84,6 +86,19 @@ final class Directory_Service {
                 $where[] = "p.user_id IN ({$placeholders})";
                 foreach ( $favorite_ids as $favorite_id ) {
                     $values[] = $favorite_id;
+                }
+            }
+        }
+
+        if ( $filters['viewers'] ) {
+            $ordered_ids = Member_Discovery::recent_profile_viewer_ids( (int) get_current_user_id(), 500 );
+            if ( empty( $ordered_ids ) ) {
+                $where[] = '1 = 0';
+            } else {
+                $placeholders = implode( ',', array_fill( 0, count( $ordered_ids ), '%d' ) );
+                $where[] = "p.user_id IN ({$placeholders})";
+                foreach ( $ordered_ids as $viewer_id ) {
+                    $values[] = $viewer_id;
                 }
             }
         }
@@ -99,9 +114,13 @@ final class Directory_Service {
         $offset = ( $page - 1 ) * Directory_Query::PER_PAGE;
 
         $select = self::select_columns();
-        $order = $filters['recent']
-            ? 'p.last_active_at DESC, p.registered_at DESC, p.user_id DESC'
-            : 'p.registered_at DESC, p.user_id DESC';
+        if ( $filters['viewers'] && ! empty( $ordered_ids ) ) {
+            $order = 'FIELD(p.user_id,' . implode( ',', array_map( 'absint', $ordered_ids ) ) . ')';
+        } else {
+            $order = $filters['recent']
+                ? 'p.last_active_at DESC, p.registered_at DESC, p.user_id DESC'
+                : 'p.registered_at DESC, p.user_id DESC';
+        }
         $sql = "SELECT DISTINCT {$select} FROM {$table} AS p INNER JOIN {$membership_table} AS mu ON mu.user_id = p.user_id WHERE {$where_sql} ORDER BY {$order} LIMIT %d OFFSET %d";
         $query_values = array_merge( $values, array( Directory_Query::PER_PAGE, $offset ) );
         $sql = $wpdb->prepare( $sql, ...$query_values );
