@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.8.0 - Elly shared Level 1 + Level 2 feature pack
+
+- Adds Save / Favorite Profiles from Explore and member profiles, with a Saved Profiles Explore filter.
+- Adds Who Viewed My Profile using ASN Core's existing profile-view table, with recent unique member viewers shown to the profile owner.
+- Adds Advanced Search Filters for age range, gender, job title, "I'm Here For", recently active members, and saved profiles while keeping country, dialect, proficiency, and keyword search.
+- Adds Recently Active member badges and filtering backed by a lightweight member activity timestamp.
+- Adds Suggested Members using shared country, Armenian dialect/proficiency, "I'm Here For" interests, and recent activity signals.
+- Adds Saved Searches so members can save, reuse, and delete useful Explore filter combinations.
+- Implements Elly's default-free rule: after onboarding reaches the final profile stage, a member with no active ASN membership is automatically assigned PMPro Level 1. Existing Level 2 members are never downgraded.
+- Extends the rebuildable profile index to schema 1.2.0 for discovery interests and recent activity.
+- Keeps Pinned Conversations, Message Search, Favorite/Starred Messages, and Message Reactions inside Better Messages rather than duplicating chat data in ASN Core.
+- No new paid service is required, and WooCommerce remains the billing source for later Level 2 upgrades.
+- AtomChat remains installed during the parallel test phase.
+
 ## 0.7.0 - Elly Level 1 feature pack
 
 - Adds the new "I'm Here For" profile field with Friendship, Armenian practice, Networking, Business connections, and Community choices.
