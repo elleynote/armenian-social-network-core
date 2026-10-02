@@ -22,6 +22,8 @@ require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-fields.php';
 require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-index.php';
 require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-photo.php';
 require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-service.php';
+require_once ASN_CORE_PATH . 'modules/features/class-asn-member-features.php';
+require_once ASN_CORE_PATH . 'modules/features/class-asn-member-safety.php';
 require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-shortcode.php';
 require_once ASN_CORE_PATH . 'modules/profiles/class-asn-profile-form.php';
 require_once ASN_CORE_PATH . 'modules/directory/class-asn-directory-query.php';
