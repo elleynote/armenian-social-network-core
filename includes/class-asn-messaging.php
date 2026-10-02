@@ -19,16 +19,19 @@ final class Messaging {
         );
     }
 
-    public static function better_messages_action( int $target_user_id ): array {
+    public static function better_messages_action( int $target_user_id, string $return_url = '', ?bool $target_entitled = null, ?bool $blocked = null ): array {
         $viewer_id = (int) get_current_user_id();
         $valid = $target_user_id > 0 && false !== get_userdata( $target_user_id );
+        $target_can_chat = null === $target_entitled ? Memberships::can_text_chat( $target_user_id ) : $target_entitled;
+        $is_blocked = null === $blocked ? Member_Safety::is_blocked_between( $viewer_id, $target_user_id ) : $blocked;
         $entitled = $valid
             && $viewer_id > 0
+            && $viewer_id !== $target_user_id
             && Memberships::can_text_chat( $viewer_id )
-            && Memberships::can_text_chat( $target_user_id )
-            && ! Member_Safety::is_blocked_between( $viewer_id, $target_user_id );
-        $url = $entitled ? Better_Messages_Integration::conversation_url( $target_user_id ) : '';
-        $available = '' !== $url;
+            && $target_can_chat
+            && ! $is_blocked;
+        $available = $entitled && Better_Messages_Integration::is_available();
+        $url = $available ? self::better_messages_launch_url( $target_user_id, $return_url ) : '';
 
         return array(
             'available'      => $available,
@@ -37,6 +40,60 @@ final class Messaging {
             'url'            => $url,
             'entitled'       => $entitled,
         );
+    }
+
+    public static function handle_open_better_messages(): void {
+        $viewer_id = (int) get_current_user_id();
+        $target_user_id = isset( $_GET['target_user_id'] ) ? absint( wp_unslash( $_GET['target_user_id'] ) ) : 0;
+        $fallback = add_query_arg( 'member', $target_user_id, site_url( '/asn-profile-test/' ) );
+        $return_url = isset( $_GET['return_url'] ) ? esc_url_raw( wp_unslash( $_GET['return_url'] ) ) : $fallback;
+        $return_url = wp_validate_redirect( $return_url, $fallback );
+        $nonce = isset( $_GET['asn_messaging_nonce'] ) ? sanitize_text_field( wp_unslash( $_GET['asn_messaging_nonce'] ) ) : '';
+
+        $allowed = is_user_logged_in()
+            && $viewer_id > 0
+            && $target_user_id > 0
+            && $viewer_id !== $target_user_id
+            && wp_verify_nonce( $nonce, 'asn_open_better_messages_' . $target_user_id )
+            && false !== get_userdata( $target_user_id )
+            && Memberships::can_text_chat( $viewer_id )
+            && Memberships::can_text_chat( $target_user_id )
+            && ! Member_Safety::is_blocked_between( $viewer_id, $target_user_id )
+            && Better_Messages_Integration::is_available();
+
+        if ( ! $allowed ) {
+            self::redirect( add_query_arg( 'asn_message_notice', 'unavailable', $return_url ) );
+            return;
+        }
+
+        $conversation_url = Better_Messages_Integration::conversation_url( $target_user_id );
+        if ( '' === $conversation_url ) {
+            self::redirect( add_query_arg( 'asn_message_notice', 'unavailable', $return_url ) );
+            return;
+        }
+
+        self::redirect( $conversation_url );
+    }
+
+    private static function better_messages_launch_url( int $target_user_id, string $return_url = '' ): string {
+        if ( '' === $return_url ) {
+            $return_url = add_query_arg( 'member', $target_user_id, site_url( '/asn-profile-test/' ) );
+        }
+
+        $url = admin_url( 'admin-post.php' );
+        $url = add_query_arg( 'action', 'asn_open_better_messages', $url );
+        $url = add_query_arg( 'target_user_id', $target_user_id, $url );
+        $url = add_query_arg( 'return_url', $return_url, $url );
+        $url = add_query_arg( 'asn_messaging_nonce', wp_create_nonce( 'asn_open_better_messages_' . $target_user_id ), $url );
+
+        return esc_url_raw( $url );
+    }
+
+    private static function redirect( string $url ): void {
+        wp_safe_redirect( $url );
+        if ( ! defined( 'ASN_CORE_TESTING' ) || ! ASN_CORE_TESTING ) {
+            exit;
+        }
     }
 
     public static function filter_better_messages_can_send_message( $allowed, $user_id, $thread_id ): bool {

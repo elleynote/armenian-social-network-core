@@ -116,7 +116,7 @@ final class Directory_Service {
         );
     }
 
-    public static function suggested( int $viewer_id, int $limit = 4 ): array {
+    public static function suggested( int $viewer_id, int $limit = 4, array $blocked_ids = array() ): array {
         if ( $viewer_id <= 0 || ! Memberships::can_text_chat( $viewer_id ) ) {
             return array();
         }
@@ -126,12 +126,16 @@ final class Directory_Service {
             return array();
         }
 
+        if ( empty( $blocked_ids ) ) {
+            $blocked_ids = Member_Safety::blocked_user_ids( $viewer_id );
+        }
+
         $rows = self::active_candidate_rows( 80 );
         $scored = array();
 
         foreach ( $rows as $row ) {
             $target_id = (int) ( $row['user_id'] ?? 0 );
-            if ( $target_id <= 0 || $target_id === $viewer_id || Member_Safety::is_blocked_between( $viewer_id, $target_id ) ) {
+            if ( $target_id <= 0 || $target_id === $viewer_id || in_array( $target_id, $blocked_ids, true ) ) {
                 continue;
             }
 

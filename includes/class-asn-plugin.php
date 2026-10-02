@@ -35,6 +35,7 @@ final class Plugin {
 
         $this->booted = true;
         add_action( 'init', array( $this, 'init' ) );
+        add_action( 'admin_post_asn_open_better_messages', array( Messaging::class, 'handle_open_better_messages' ) );
         add_filter( 'better_messages_can_send_message', array( Messaging::class, 'filter_better_messages_can_send_message' ), 10, 3 );
         add_filter( 'bp_better_messages_can_audio_call', array( Messaging::class, 'filter_better_messages_can_audio_call' ), 10, 3 );
         add_filter( 'bp_better_messages_can_video_call', array( Messaging::class, 'filter_better_messages_can_video_call' ), 10, 3 );

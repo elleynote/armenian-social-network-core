@@ -46,15 +46,33 @@ final class MessagingTest extends TestCase {
         $this->assertSame( '', $invalid['transport'] );
     }
 
-    public function test_better_messages_parallel_action_uses_wordpress_user_id_and_public_api_link(): void {
+    public function test_better_messages_action_defers_thread_resolution_until_message_click(): void {
         $GLOBALS['asn_test_better_messages_enabled'] = true;
 
-        $action = Messaging::better_messages_action( 7 );
+        $action = Messaging::better_messages_action( 7, 'https://example.test/asn-explore-test/' );
 
         $this->assertTrue( $action['available'] );
         $this->assertSame( 7, $action['target_user_id'] );
         $this->assertSame( 'better-messages', $action['transport'] );
-        $this->assertSame( 'https://example.test/messages/#conversation/1007', $action['url'] );
+        $this->assertStringContainsString( 'admin-post.php', $action['url'] );
+        $this->assertStringContainsString( 'action=asn_open_better_messages', $action['url'] );
+        $this->assertStringContainsString( 'target_user_id=7', $action['url'] );
+        $this->assertStringNotContainsString( '/messages/#conversation/1007', $action['url'] );
+    }
+
+    public function test_deferred_better_messages_launcher_resolves_conversation_on_click(): void {
+        $GLOBALS['asn_test_better_messages_enabled'] = true;
+        $_GET = array(
+            'target_user_id' => '7',
+            'return_url' => 'https://example.test/asn-explore-test/',
+            'asn_messaging_nonce' => $GLOBALS['asn_test_valid_nonce'],
+        );
+        $GLOBALS['asn_test_redirect'] = '';
+
+        Messaging::handle_open_better_messages();
+
+        $this->assertSame( 'https://example.test/messages/#conversation/1007', $GLOBALS['asn_test_redirect'] );
+        $_GET = array();
     }
 
     public function test_better_messages_parallel_action_requires_active_chat_membership_for_both_members(): void {

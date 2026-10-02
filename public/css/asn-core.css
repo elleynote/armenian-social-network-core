@@ -1225,3 +1225,20 @@
   .asn-directory__save-search{justify-content:stretch;}
   .asn-directory__secondary-action{width:100%;}
 }
+
+.asn-directory__load-sentinel{
+  display:flex;
+  min-height:72px;
+  align-items:center;
+  justify-content:center;
+  margin-top:12px;
+  color:#68758a;
+  font-size:.82rem;
+}
+.asn-directory__load-sentinel span{
+  opacity:0;
+  transition:opacity .18s ease;
+}
+.asn-directory__load-sentinel.is-loading span{
+  opacity:1;
+}

@@ -199,7 +199,6 @@ final class Registration {
             return;
         }
 
-        Profile_Index::sync_user( $user_id );
         self::save_legacy_age_meta( $user_id, $age );
 
         $this->redirect( add_query_arg( 'asn_step', 'prompts', $return_url ) );
@@ -247,7 +246,7 @@ final class Registration {
             $clean_input[ $key ] = isset( $input[ $key ] ) ? $input[ $key ] : '';
         }
 
-        $result = Profile_Service::update_own_profile( $user_id, $user_id, $clean_input );
+        $result = Profile_Service::update_own_profile( $user_id, $user_id, $clean_input, false );
         if ( ! $result['success'] ) {
             $this->redirect_with_error( add_query_arg( 'asn_step', $step, $return_url ), 'profile' );
             return;

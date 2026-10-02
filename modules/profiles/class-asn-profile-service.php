@@ -40,7 +40,7 @@ final class Profile_Service {
         return $profile;
     }
 
-    public static function update_own_profile( int $actor_user_id, int $target_user_id, array $input ): array {
+    public static function update_own_profile( int $actor_user_id, int $target_user_id, array $input, bool $sync_index = true ): array {
         $result = array(
             'success'      => false,
             'updated'      => array(),
@@ -91,9 +91,13 @@ final class Profile_Service {
         }
 
         $result['success'] = true;
-        $result['index_synced'] = Profile_Index::sync_user( $target_user_id );
-        if ( ! $result['index_synced'] ) {
-            $result['errors'][] = 'index_sync_failed';
+        if ( $sync_index ) {
+            $result['index_synced'] = Profile_Index::sync_user( $target_user_id );
+            if ( ! $result['index_synced'] ) {
+                $result['errors'][] = 'index_sync_failed';
+            }
+        } else {
+            $result['index_synced'] = true;
         }
 
         return $result;
