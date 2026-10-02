@@ -18,12 +18,12 @@ final class Memberships {
     }
 
     public static function is_premium( int $user_id ): bool {
-        return PMPro_Integration::has_level( self::PREMIUM_LEVEL_ID, $user_id );
+        return self::PREMIUM_LEVEL_ID === self::level_id( $user_id );
     }
 
     public static function can_text_chat( int $user_id ): bool {
-        return PMPro_Integration::has_level( self::FREE_LEVEL_ID, $user_id )
-            || PMPro_Integration::has_level( self::PREMIUM_LEVEL_ID, $user_id );
+        $level_id = self::level_id( $user_id );
+        return in_array( $level_id, array( self::FREE_LEVEL_ID, self::PREMIUM_LEVEL_ID ), true );
     }
 
     public static function can_voice_chat( int $user_id ): bool {
