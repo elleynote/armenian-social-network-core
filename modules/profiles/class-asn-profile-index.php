@@ -35,7 +35,7 @@ final class Profile_Index {
             'job_title'     => (string) ( Profile_Fields::sanitize( 'job_title', $member['job_title'] ?? '' ) ?? '' ),
             'dialect'       => $spoken['dialect'],
             'proficiency'   => $spoken['proficiency'],
-            'here_for'      => (string) ( Profile_Fields::sanitize( 'im_here_for', $member['im_here_for'] ?? '' ) ?? '' ),
+            'here_for'      => (string) ( Profile_Fields::sanitize( 'im_here_for', get_user_meta( $user_id, 'im_here_for', true ) ) ?? '' ),
             'last_active_at'=> self::activity_value( $user_id ),
             'registered_at' => isset( $user->user_registered ) ? (string) $user->user_registered : null,
             'created_at'    => $existing['created_at'] ?? $now,
@@ -63,7 +63,7 @@ final class Profile_Index {
         }
 
         return false !== $wpdb->update(
-            ASNCoreDatabase::table( 'profiles' ),
+            Database::table( 'profiles' ),
             array(
                 'last_active_at' => $when,
                 'updated_at'     => current_time( 'mysql' ),
