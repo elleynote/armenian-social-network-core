@@ -4,10 +4,14 @@ use PHPUnit\Framework\TestCase;
 
 final class MessagingTest extends TestCase {
     private $active_plugins;
+    private $wpdb;
     private $current_user_id;
     private $better_messages_enabled;
 
     protected function setUp(): void {
+        global $wpdb;
+        $this->wpdb = $wpdb;
+        $wpdb = new ASN_Test_WPDB();
         $this->active_plugins = get_option( 'active_plugins', array() );
         $this->current_user_id = $GLOBALS['asn_test_current_user_id'];
         $this->better_messages_enabled = $GLOBALS['asn_test_better_messages_enabled'];
@@ -18,6 +22,8 @@ final class MessagingTest extends TestCase {
     }
 
     protected function tearDown(): void {
+        global $wpdb;
+        $wpdb = $this->wpdb;
         $GLOBALS['asn_test_options']['active_plugins'] = $this->active_plugins;
         $GLOBALS['asn_test_current_user_id'] = $this->current_user_id;
         $GLOBALS['asn_test_better_messages_enabled'] = $this->better_messages_enabled;
