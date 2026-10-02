@@ -33,6 +33,7 @@ $GLOBALS['asn_test_new_user_notifications'] = array();
 $GLOBALS['asn_test_wpfc_excluded'] = 0;
 $GLOBALS['asn_test_blocks'] = array();
 $GLOBALS['asn_test_reports'] = array();
+$GLOBALS['asn_test_profile_views'] = array();
 
 class ASN_Test_WPDB {
     public $prefix = 'wp_';
@@ -52,6 +53,24 @@ class ASN_Test_WPDB {
     }
 
     public function get_var( $sql ) {
+        if ( false !== strpos( $sql, 'asn_profile_views' ) && false !== stripos( $sql, 'SELECT viewed_at' ) ) {
+            preg_match( '/viewer_id = (\d+)/', $sql, $viewer_match );
+            preg_match( '/profile_user_id = (\d+)/', $sql, $profile_match );
+            $viewer_id = (int) ( $viewer_match[1] ?? 0 );
+            $profile_user_id = (int) ( $profile_match[1] ?? 0 );
+            $matches = array_values( array_filter(
+                $GLOBALS['asn_test_profile_views'],
+                static function ( $row ) use ( $viewer_id, $profile_user_id ) {
+                    return (int) ( $row['viewer_id'] ?? 0 ) === $viewer_id
+                        && (int) ( $row['profile_user_id'] ?? 0 ) === $profile_user_id;
+                }
+            ) );
+            usort( $matches, static function ( $a, $b ) {
+                return strcmp( (string) ( $b['viewed_at'] ?? '' ), (string) ( $a['viewed_at'] ?? '' ) );
+            } );
+            return $matches[0]['viewed_at'] ?? null;
+        }
+
         if ( false !== strpos( $sql, 'asn_blocks' ) ) {
             preg_match_all( '/(?:blocker_id|blocked_id) = (\\d+)/', $sql, $matches );
             $ids = array_map( 'intval', $matches[1] ?? array() );
@@ -79,11 +98,15 @@ class ASN_Test_WPDB {
     }
 
     public function insert( $table, $data, $formats = null ) {
-        if ( 'wp_asn_blocks' === $table ) {
+        if ( false !== strpos( $table, 'asn_profile_views' ) ) {
+            $GLOBALS['asn_test_profile_views'][] = $data;
+            return 1;
+        }
+        if ( 'wp_asn_blocks' === $table || false !== strpos( $table, 'asn_blocks' ) ) {
             $GLOBALS['asn_test_blocks'][] = $data;
             return 1;
         }
-        if ( 'wp_asn_reports' === $table ) {
+        if ( 'wp_asn_reports' === $table || false !== strpos( $table, 'asn_reports' ) ) {
             $GLOBALS['asn_test_reports'][] = $data;
             return 1;
         }
@@ -109,6 +132,18 @@ class ASN_Test_WPDB {
         return $before - count( $GLOBALS['asn_test_blocks'] );
     }
 
+    public function update( $table, $data, $where, $formats = null, $where_formats = null ) {
+        if ( false !== strpos( $table, 'asn_profiles' ) ) {
+            $user_id = (int) ( $where['user_id'] ?? 0 );
+            if ( $user_id <= 0 || ! isset( $GLOBALS['asn_test_profile_rows'][ $user_id ] ) ) {
+                return false;
+            }
+            $GLOBALS['asn_test_profile_rows'][ $user_id ] = array_merge( $GLOBALS['asn_test_profile_rows'][ $user_id ], $data );
+            return 1;
+        }
+        return 1;
+    }
+
     public function replace( $table, $data, $formats = null ) {
         if ( (int) ( $GLOBALS['asn_test_sync_fail_user'] ?? 0 ) === (int) $data['user_id'] ) {
             return false;
@@ -125,7 +160,33 @@ class ASN_Test_WPDB {
     }
 
     public function get_results( $sql, $output = null ) {
-        if ( false !== strpos( $sql, 'wp_asn_reports' ) ) {
+        if ( false !== strpos( $sql, 'asn_profile_views' ) ) {
+            preg_match( '/profile_user_id = (\d+)/', $sql, $profile_match );
+            $profile_user_id = (int) ( $profile_match[1] ?? 0 );
+            $latest = array();
+
+            foreach ( $GLOBALS['asn_test_profile_views'] as $row ) {
+                if ( (int) ( $row['profile_user_id'] ?? 0 ) !== $profile_user_id ) {
+                    continue;
+                }
+
+                $viewer_id = (int) ( $row['viewer_id'] ?? 0 );
+                if ( ! isset( $latest[ $viewer_id ] ) || strcmp( (string) $row['viewed_at'], (string) $latest[ $viewer_id ]['viewed_at'] ) > 0 ) {
+                    $latest[ $viewer_id ] = array(
+                        'viewer_id' => $viewer_id,
+                        'viewed_at' => (string) $row['viewed_at'],
+                    );
+                }
+            }
+
+            $rows = array_values( $latest );
+            usort( $rows, static function ( $a, $b ) {
+                return strcmp( (string) $b['viewed_at'], (string) $a['viewed_at'] );
+            } );
+            return $rows;
+        }
+
+        if ( false !== strpos( $sql, 'wp_asn_reports' ) || false !== strpos( $sql, 'asn_reports' ) ) {
             return array_values( array_filter(
                 $GLOBALS['asn_test_reports'],
                 static function ( $row ) {
