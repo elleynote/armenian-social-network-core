@@ -31,14 +31,14 @@ final class Member_Safety {
         global $wpdb;
         $table = Database::table( 'blocks' );
         $sql = $wpdb->prepare(
-            "SELECT COUNT(*) FROM {$table} WHERE (blocker_id = %d AND blocked_id = %d) OR (blocker_id = %d AND blocked_id = %d)",
+            "SELECT id FROM {$table} WHERE (blocker_id = %d AND blocked_id = %d) OR (blocker_id = %d AND blocked_id = %d) LIMIT 1",
             $first_user_id,
             $second_user_id,
             $second_user_id,
             $first_user_id
         );
 
-        return (int) $wpdb->get_var( $sql ) > 0;
+        return null !== $wpdb->get_var( $sql );
     }
 
     public static function is_blocked_by( int $blocker_id, int $blocked_id ): bool {
@@ -49,12 +49,12 @@ final class Member_Safety {
         global $wpdb;
         $table = Database::table( 'blocks' );
         $sql = $wpdb->prepare(
-            "SELECT COUNT(*) FROM {$table} WHERE blocker_id = %d AND blocked_id = %d",
+            "SELECT id FROM {$table} WHERE blocker_id = %d AND blocked_id = %d LIMIT 1",
             $blocker_id,
             $blocked_id
         );
 
-        return (int) $wpdb->get_var( $sql ) > 0;
+        return null !== $wpdb->get_var( $sql );
     }
 
     public static function block( int $blocker_id, int $blocked_id ): bool {
