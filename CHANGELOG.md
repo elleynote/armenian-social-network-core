@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.1 - Explore discovery visibility and usability
+
+- Makes the selected discovery features obvious on Explore instead of leaving most of them hidden behind conditional states.
+- Adds an Explore tools bar with one-click access to Recently Active, Saved Profiles, Saved Searches, and Who Viewed Me.
+- Keeps Advanced Filters expanded by default so age, gender, job title, I'm Here For, recently-active, and saved-profile filters are immediately visible.
+- Shows the Saved Searches area even before the member has saved one, with clear guidance on how to create the first saved search.
+- Shows the Suggested Members area on the unfiltered Explore view even when no suggestions are available yet, with a useful empty state.
+- Shows I'm Here For interests directly on member cards when members have supplied them.
+- Keeps all existing membership, billing, Better Messages, AtomChat fallback, and parallel test-page behavior unchanged.
+
 ## 0.8.0 - Elly shared Level 1 + Level 2 feature pack
 
 - Adds Save / Favorite Profiles from Explore and member profiles, with a Saved Profiles Explore filter.
