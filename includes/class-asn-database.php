@@ -4,7 +4,7 @@ namespace ASN\Core;
 defined( 'ABSPATH' ) || exit;
 
 final class Database {
-    public const VERSION = '1.1.0';
+    public const VERSION = '1.2.0';
     public const VERSION_OPTION = 'asn_core_db_version';
     public const ERROR_OPTION = 'asn_core_db_error';
 
@@ -84,6 +84,8 @@ final class Database {
                 job_title varchar(191) NOT NULL DEFAULT '',
                 dialect varchar(50) NOT NULL DEFAULT '',
                 proficiency varchar(100) NOT NULL DEFAULT '',
+                here_for varchar(191) NOT NULL DEFAULT '',
+                last_active_at datetime NULL DEFAULT NULL,
                 registered_at datetime NULL DEFAULT NULL,
                 created_at datetime NOT NULL,
                 updated_at datetime NOT NULL,
@@ -94,7 +96,11 @@ final class Database {
                 KEY job_title (job_title),
                 KEY registered_at (registered_at),
                 KEY dialect (dialect),
-                KEY proficiency (proficiency)
+                KEY proficiency (proficiency),
+                KEY age (age),
+                KEY gender (gender),
+                KEY here_for (here_for),
+                KEY last_active_at (last_active_at)
             ) {$collate};",
             "CREATE TABLE {$connections} (
                 id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
