@@ -115,7 +115,7 @@ $photos = array(
                     $value = trim( (string) ( $profile[ $key ] ?? '' ) );
                     if ( '' !== $value ) {
                         $answers[] = array(
-                            'label' => ASNCoreProfilesProfile_Fields::prompt_label( $key ),
+                            'label' => \ASN\Core\Profiles\Profile_Fields::prompt_label( $key ),
                             'value' => $value,
                         );
                     }
