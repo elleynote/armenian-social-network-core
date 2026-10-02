@@ -8,7 +8,7 @@ final class ReleaseManifestTest extends TestCase {
 
         $this->assertStringContainsString( 'Version: 0.8.0', $main );
         $this->assertSame( '0.8.0', ASN_CORE_VERSION );
-        $this->assertSame( '1.1.0', Database::VERSION );
+        $this->assertSame( '1.2.0', Database::VERSION );
     }
 
     public function test_release_builder_includes_only_runtime_roots(): void {
