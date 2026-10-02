@@ -14,6 +14,7 @@ final class MessagingTest extends TestCase {
         $GLOBALS['asn_test_options']['active_plugins'] = array( 'atomchat/atomchat.php' );
         $GLOBALS['asn_test_current_user_id'] = 8;
         $GLOBALS['asn_test_better_messages_enabled'] = false;
+        $GLOBALS['asn_test_blocks'] = array();
     }
 
     protected function tearDown(): void {
@@ -68,6 +69,25 @@ final class MessagingTest extends TestCase {
                 $GLOBALS['asn_test_pmpro_levels'][8] = $previous;
             }
         }
+    }
+
+    public function test_profile_block_disables_better_messages_action_and_send(): void {
+        global $bp_better_messages_restrict_send_message;
+
+        $GLOBALS['asn_test_better_messages_enabled'] = true;
+        $GLOBALS['asn_test_blocks'][] = array(
+            'blocker_id' => 8,
+            'blocked_id' => 7,
+            'created_at' => '2026-10-03 00:00:00',
+        );
+        $bp_better_messages_restrict_send_message = array();
+
+        $action = Messaging::better_messages_action( 7 );
+
+        $this->assertFalse( $action['available'] );
+        $this->assertFalse( $action['entitled'] );
+        $this->assertFalse( Messaging::filter_better_messages_can_send_message( true, 8, 1007 ) );
+        $this->assertArrayHasKey( 'asn_blocked', $bp_better_messages_restrict_send_message );
     }
 
     public function test_better_messages_send_filter_blocks_non_members_with_clear_error(): void {
