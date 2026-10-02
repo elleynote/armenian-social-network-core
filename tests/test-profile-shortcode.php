@@ -186,7 +186,10 @@ final class ProfileShortcodeTest extends TestCase {
         $html = ( new Profile_Shortcode() )->render();
 
         $this->assertStringContainsString( '>Message</a>', $html );
-        $this->assertStringContainsString( 'https://example.test/messages/#conversation/1008', $html );
+        $decoded = html_entity_decode( $html, ENT_QUOTES, 'UTF-8' );
+        $this->assertStringContainsString( 'action=asn_open_better_messages', $decoded );
+        $this->assertStringContainsString( 'target_user_id=8', $decoded );
+        $this->assertStringNotContainsString( '/messages/#conversation/1008', $html );
         $this->assertStringNotContainsString( 'Test Better Messages', $html );
     }
 
