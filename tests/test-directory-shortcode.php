@@ -163,7 +163,9 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'asn-member-card__view-profile', $html );
         $this->assertStringContainsString( 'asn-member-card__chat', $html );
         $this->assertStringContainsString( '>Message</a>', $html );
-        $this->assertStringContainsString( 'https://example.test/messages/#conversation/1007', $html );
+        $this->assertStringContainsString( 'action=asn_open_better_messages', html_entity_decode( $html, ENT_QUOTES, 'UTF-8' ) );
+        $this->assertStringContainsString( 'target_user_id=7', html_entity_decode( $html, ENT_QUOTES, 'UTF-8' ) );
+        $this->assertStringNotContainsString( '/messages/#conversation/1007', $html );
         $this->assertStringNotContainsString( 'Test Better Messages', $html );
     }
 
@@ -203,9 +205,12 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'aria-live="polite"', $html );
         $this->assertStringContainsString( 'data-asn-directory-results', $html );
         $this->assertStringContainsString( 'data-asn-directory-submit', $html );
+        $this->assertStringContainsString( 'data-asn-next-url', $html );
+        $this->assertStringContainsString( 'data-asn-load-sentinel', $html );
+        $this->assertStringContainsString( 'data-asn-pagination-fallback', $html );
     }
 
-    public function test_directory_script_supports_click_submit_ajax_and_pagination_without_reload(): void {
+    public function test_directory_script_supports_ajax_filters_and_infinite_scroll(): void {
         $script = file_get_contents( dirname( __DIR__ ) . '/public/js/asn-directory.js' );
 
         $this->assertStringContainsString( "document.addEventListener('submit'", $script );
@@ -214,7 +219,10 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringContainsString( 'event.preventDefault()', $script );
         $this->assertStringContainsString( 'history.pushState', $script );
         $this->assertStringContainsString( 'data-asn-directory-submit', $script );
-        $this->assertStringContainsString( 'asn-pagination__link', $script );
+        $this->assertStringContainsString( 'IntersectionObserver', $script );
+        $this->assertStringContainsString( 'loadMore', $script );
+        $this->assertStringContainsString( "rootMargin: '0px 0px 70% 0px'", $script );
+        $this->assertStringContainsString( 'data-asn-next-url', $script );
     }
 
     public function test_elly_explore_visual_system_styles_filters_cards_and_pagination(): void {
