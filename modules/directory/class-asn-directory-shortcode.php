@@ -3,8 +3,9 @@ namespace ASN\Core\Directory;
 
 use ASN\Core\Features\Member_Discovery;
 use ASN\Core\Features\Member_Features;
+use ASN\Core\Features\Member_Safety;
 use ASN\Core\Messaging;
-use ASN\Core\Profiles\Profile_Service;
+use ASN\Core\Profiles\Profile_Photo;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -42,10 +43,11 @@ final class Directory_Shortcode {
 
         $result = Directory_Service::search( $filters );
         $viewer_id = (int) get_current_user_id();
+        $blocked_ids = $viewer_id > 0 ? Member_Safety::blocked_user_ids( $viewer_id ) : array();
         $members = array();
 
         foreach ( $result['items'] as $item ) {
-            $profile = self::hydrate_member( $item, $viewer_id );
+            $profile = self::hydrate_member( $item, $viewer_id, $blocked_ids, $request_uri );
             if ( $profile ) {
                 $members[] = $profile;
             }
@@ -53,8 +55,8 @@ final class Directory_Shortcode {
 
         $suggested_members = array();
         if ( $viewer_id > 0 && ! Directory_Query::has_active_filters( $filters ) ) {
-            foreach ( Directory_Service::suggested( $viewer_id, 4 ) as $item ) {
-                $profile = self::hydrate_member( $item, $viewer_id );
+            foreach ( Directory_Service::suggested( $viewer_id, 4, $blocked_ids ) as $item ) {
+                $profile = self::hydrate_member( $item, $viewer_id, $blocked_ids, $request_uri );
                 if ( $profile ) {
                     $suggested_members[] = $profile;
                 }
@@ -93,19 +95,45 @@ final class Directory_Shortcode {
         return (string) ob_get_clean();
     }
 
-    private static function hydrate_member( array $item, int $viewer_id ): ?array {
+    private static function hydrate_member( array $item, int $viewer_id, array $blocked_ids = array(), string $return_url = '' ): ?array {
         $user_id = isset( $item['user_id'] ) ? (int) $item['user_id'] : 0;
-        $profile = Profile_Service::find( $user_id, $viewer_id );
-        if ( ! $profile ) {
+        $user = $user_id > 0 ? get_userdata( $user_id ) : false;
+        if ( ! $user ) {
             return null;
         }
 
-        $profile['message_action'] = Messaging::action( $user_id );
-        $profile['better_messages_action'] = Messaging::better_messages_action( $user_id );
-        $profile['is_new_member'] = Member_Features::is_new_member( $user_id );
-        $profile['is_recently_active'] = Member_Discovery::is_recently_active( $user_id );
-        $profile['is_favorite'] = $viewer_id > 0 ? Member_Discovery::is_favorite( $viewer_id, $user_id ) : false;
-        $profile['here_for_labels'] = Member_Features::here_for_labels( $profile['im_here_for'] ?? '' );
+        $dialect = trim( (string) ( $item['dialect'] ?? '' ) );
+        $proficiency = trim( (string) ( $item['proficiency'] ?? '' ) );
+        $spoken = '';
+        if ( '' !== $dialect || '' !== $proficiency ) {
+            $spoken = trim(
+                ( '' !== $dialect ? ucfirst( $dialect ) . ' Armenian' : '' )
+                . ( '' !== $dialect && '' !== $proficiency ? ' - ' : '' )
+                . ( '' !== $proficiency ? ucfirst( $proficiency ) : '' )
+            );
+        }
+
+        $is_blocked = in_array( $user_id, $blocked_ids, true );
+        $better_messages = Messaging::better_messages_action( $user_id, $return_url, true, $is_blocked );
+
+        $profile = array(
+            'id'                     => $user_id,
+            'display_name'           => sanitize_text_field( (string) ( $item['display_name'] ?? '' ) ),
+            'username'               => isset( $user->user_login ) ? sanitize_user( (string) $user->user_login, true ) : '',
+            'photo_url'              => Profile_Photo::url( $user_id ),
+            'age'                    => (string) ( $item['age'] ?? '' ),
+            'job_title'              => sanitize_text_field( (string) ( $item['job_title'] ?? '' ) ),
+            'country'                => sanitize_text_field( (string) ( $item['country'] ?? '' ) ),
+            'spoken_proficiency'     => $spoken,
+            'im_here_for'            => (string) ( $item['here_for'] ?? '' ),
+            'message_action'         => ! empty( $better_messages['available'] ) ? array( 'available' => false ) : Messaging::action( $user_id ),
+            'better_messages_action' => $better_messages,
+            'is_new_member'          => Member_Features::is_new_member( $user_id ),
+            'is_recently_active'     => Member_Discovery::is_recently_active( $user_id ),
+            'is_favorite'            => $viewer_id > 0 ? Member_Discovery::is_favorite( $viewer_id, $user_id ) : false,
+            'here_for_labels'        => Member_Features::here_for_labels( $item['here_for'] ?? '' ),
+        );
+
         return $profile;
     }
 
