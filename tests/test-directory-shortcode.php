@@ -97,6 +97,19 @@ final class DirectoryShortcodeTest extends TestCase {
         $this->assertStringNotContainsString( 'secret-hash', $html );
     }
 
+    public function test_recent_member_gets_new_badge(): void {
+        $previous = $GLOBALS['asn_test_users'][7]->user_registered;
+        $GLOBALS['asn_test_users'][7]->user_registered = gmdate( 'Y-m-d H:i:s', time() - DAY_IN_SECONDS );
+
+        try {
+            $html = ( new Directory_Shortcode() )->render();
+            $this->assertStringContainsString( 'asn-member-card__new-badge', $html );
+            $this->assertStringContainsString( '>New</span>', $html );
+        } finally {
+            $GLOBALS['asn_test_users'][7]->user_registered = $previous;
+        }
+    }
+
     public function test_parallel_better_messages_action_uses_client_chat_button_on_test_explore(): void {
         $GLOBALS['asn_test_better_messages_enabled'] = true;
 
