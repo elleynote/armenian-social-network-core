@@ -416,6 +416,38 @@ final class RegistrationTest extends TestCase {
         );
     }
 
+    public function test_completed_profile_defaults_to_level_one_when_no_membership_was_chosen(): void {
+        $previous = $GLOBALS['asn_test_pmpro_levels'][8] ?? null;
+        unset( $GLOBALS['asn_test_pmpro_levels'][8] );
+
+        try {
+            $this->assertTrue( Registration::ensure_default_free_membership( 8 ) );
+            $this->assertSame( 1, $GLOBALS['asn_test_pmpro_levels'][8] );
+        } finally {
+            if ( null === $previous ) {
+                unset( $GLOBALS['asn_test_pmpro_levels'][8] );
+            } else {
+                $GLOBALS['asn_test_pmpro_levels'][8] = $previous;
+            }
+        }
+    }
+
+    public function test_default_free_rule_never_downgrades_existing_level_two(): void {
+        $previous = $GLOBALS['asn_test_pmpro_levels'][7] ?? null;
+        $GLOBALS['asn_test_pmpro_levels'][7] = 2;
+
+        try {
+            $this->assertTrue( Registration::ensure_default_free_membership( 7 ) );
+            $this->assertSame( 2, $GLOBALS['asn_test_pmpro_levels'][7] );
+        } finally {
+            if ( null === $previous ) {
+                unset( $GLOBALS['asn_test_pmpro_levels'][7] );
+            } else {
+                $GLOBALS['asn_test_pmpro_levels'][7] = $previous;
+            }
+        }
+    }
+
     public function test_pmpro_helper_assigns_free_level(): void {
         $previous = $GLOBALS['asn_test_pmpro_levels'][8] ?? null;
         unset( $GLOBALS['asn_test_pmpro_levels'][8] );
